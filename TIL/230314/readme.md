@@ -7,10 +7,10 @@
 ### case1
 ![image3](./original/20181219163759506459.jpg)
 ![image4](./yolov5/20181219163759506459.jpg)
-### case2
+### case2 - 검출 실패
 ![image5](./original/pxl_20220510_071006447.jpg)
 ![image13](./yolov5/pxl_20220510_071006447.jpg)
-### case3
+### case3- 검출 실패
 ![image6](./original/pxl_20220510_071150290.jpg)
 ![image14](./yolov5/pxl_20220510_071150290.jpg)
 ### case4
