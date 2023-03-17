@@ -13,4 +13,4 @@
 ### 검출 실패
 ![image2.jpg](./test/image(1).jpg)
 ![image3.jpg](./test/image(1).jpg)
-![image5.jpg](./test/image(2).jpg)
+![image5.jpg](./test/image(2).png)
