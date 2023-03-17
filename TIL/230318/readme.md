@@ -6,11 +6,11 @@
 
 ## 학습 테스트
 
-### 검출 성공
+### 검출 실패
 ![image1.jpg](./test/image(1).jpeg)
 ![image4.jpg](./test/image(2).jpeg)
 
-### 검출 실패
+### 검출 성공
 ![image2.jpg](./test/image(1).jpg)
-![image3.jpg](./test/image(1).jpg)
-![image5.jpg](./test/image(2).png)
+![image3.jpg](./test/image(1).png)
+![image5.jpg](./test/image(2).jpg)
