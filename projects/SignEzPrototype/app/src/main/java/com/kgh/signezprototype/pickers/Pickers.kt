@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun ImagePicker(onImageSelected: (videoUri: String) -> Unit, last:MutableState<String>) {
+fun ImagePicker(onImageSelected: (videoUri: String) -> Unit) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var imageUri by remember { mutableStateOf("") }
@@ -41,29 +41,13 @@ fun ImagePicker(onImageSelected: (videoUri: String) -> Unit, last:MutableState<S
     var imageSize by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
 
-    val loadImageMetadata = {
-        if (imageUri != "") {
-            coroutineScope.launch {
-                val metadata = withContext(Dispatchers.IO) {
-                    loadImageMetadata(Uri.parse(imageUri), context)
-                }
-                imageTitle = metadata.first
-                imageSize = metadata.second // bytes
-            }
-        }
-    }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
                 imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-//                imageBitmap?.let {
-//                    onImageSelected(it)
-//                }
                 imageUri = uri.toString()
                 onImageSelected(imageUri)
-                loadImageMetadata()
-                last.value = "gal"
             }
         }
     }
@@ -101,90 +85,20 @@ fun ImagePicker(onImageSelected: (videoUri: String) -> Unit, last:MutableState<S
                 Text("Clear")
             }
         }
-        Log.d("ccc","${last.value}")
-        if (last.value == "gal") {
-            imageBitmap?.let {
-                Column {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(BorderStroke(width = 4.dp, color = Color.Black))
-                            .height(400.dp)
-                    ) {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "Selected Image",
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .align(Alignment.Center)
-                        )
-                    }
-                    Text(text = "이미지 제목 : $imageTitle")
-                    Text(text = "이미지 크기 : $imageSize byte")
-                }
-            } // image + 정보
-
-        }
 
     }
 }
 
 @Composable
-fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit, last:MutableState<String>) {
+fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit) {
     val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-    val context = LocalContext.current
     var videoUri by remember { mutableStateOf("") }
     var videoFrame by remember { mutableStateOf(defaultBitmap) }
-    var videoTitle by remember { mutableStateOf("") }
-    var videoLength by remember { mutableStateOf(0L) }
-    var videoSize by remember { mutableStateOf(0L) }
-
-    val coroutineScope = rememberCoroutineScope()
-
-    val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(context, uri)
-        retriever.getFrameAtTime()
-    }
-
-    val loadVideoThumbnail = {
-        if (videoUri.isNotEmpty()) {
-            val uri = Uri.parse(videoUri)
-            coroutineScope.launch {
-                val bitmap = withContext(Dispatchers.IO) { getVideoThumbnail(uri) }
-                if (bitmap != null) {
-                    videoFrame = bitmap
-                }
-            }
-        }
-    }
-
-    val loadVideoMetadata = {
-        if (videoUri.isNotEmpty()) {
-            val uri = Uri.parse(videoUri)
-            coroutineScope.launch {
-                val metadata = withContext(Dispatchers.IO) {
-                    loadVideoMetadata(uri, context)
-                }
-                videoTitle = getVideoTitle(uri, context)
-                videoLength = metadata.second.toLong() // ms
-                videoSize = metadata.third.toLong() //  byte, val megabytes = bytes.toDouble() / (1024 * 1024)
-            }
-        }
-    }
-
-    LaunchedEffect(videoUri) {
-        loadVideoThumbnail()
-        loadVideoMetadata()
-    }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         videoUri = uri.toString()
         onVideoSelected(videoUri)
         Log.d("VideoPicker", "Selected video: $uri")
-        loadVideoThumbnail()
-        last.value = "gal"
     }
 
     Column {
@@ -218,30 +132,6 @@ fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit, last:MutableState<S
                 modifier = Modifier.padding(8.dp)
             ){
                 Text("Clear")
-            }
-        }
-
-        if (!videoFrame.sameAs(defaultBitmap) && last.value == "gal") {
-            Log.d("compare","$videoFrame $defaultBitmap")
-            Column {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(BorderStroke(width = 4.dp, color = Color.Black))
-                        .height(400.dp)
-                ) {
-                    Image(
-                        bitmap = videoFrame.asImageBitmap(),
-                        contentDescription = "Video frame",
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .align(Alignment.Center)
-                    )
-                }
-                Text(text = "영상 제목 : $videoTitle")
-                Text(text = "영상 길이 : $videoLength ms")
-                Text(text = "영상 크기 : $videoSize byte")
             }
         }
     }
