@@ -69,6 +69,7 @@ import com.kgh.signezprototype.pickers.*
 import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.MainViewModelFactory
 import com.kgh.signezprototype.ui.inputs.*
+import com.kgh.signezprototype.ui.signage.SignageViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -85,6 +86,7 @@ enum class Screen {
 class MainActivity : ComponentActivity() {
     private lateinit var viewModel1:PictureViewModel
     private lateinit var viewModel2:VideoViewModel
+    private lateinit var viewModel3:SignageViewModel
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as SignEzApplication).container)
     }
@@ -149,7 +151,9 @@ class MainActivity : ComponentActivity() {
         val appContainer = (application as SignEzApplication).container
         viewModel1 = ViewModelProvider(this,factory = AppViewModelProvider.Factory).get(PictureViewModel::class.java)
         viewModel2 = ViewModelProvider(this,factory = AppViewModelProvider.Factory).get(VideoViewModel::class.java)
+        viewModel3 = ViewModelProvider(this,factory = AppViewModelProvider.Factory).get(SignageViewModel::class.java)
 
+        viewModel3.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
                 SignEzApp(

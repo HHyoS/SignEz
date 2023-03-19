@@ -26,6 +26,7 @@ import com.kgh.signezprototype.SignEzApplication
 import com.kgh.signezprototype.ui.inputs.MainViewModel
 import com.kgh.signezprototype.ui.inputs.PictureViewModel
 import com.kgh.signezprototype.ui.inputs.VideoViewModel
+import com.kgh.signezprototype.ui.signage.SignageViewModel
 
 /**
  * Provides Factory to create instance of ViewModel for the entire Inventory app
@@ -40,6 +41,10 @@ object AppViewModelProvider {
         // Initializer for HomeViewModel
         initializer {
             VideoViewModel()
+        }
+
+        initializer {
+            SignageViewModel(SignEzApplication().container.signagesRepository)
         }
     }
 }
