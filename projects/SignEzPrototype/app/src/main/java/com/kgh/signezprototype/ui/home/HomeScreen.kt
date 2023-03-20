@@ -50,7 +50,7 @@ fun HomeScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "SignEz",
-                canNavigateBack = false,
+                canNavigateBack = false
             )
         }
     ){ innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
