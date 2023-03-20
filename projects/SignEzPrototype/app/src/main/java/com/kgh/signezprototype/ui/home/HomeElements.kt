@@ -70,7 +70,6 @@ fun PastResult(
 @Composable // 사이니지 스펙 틀
 fun SignEzSpec(
     modifier: Modifier = Modifier,
-    navigateToSignageList: () -> Unit
 ) {
     Surface(
         shape = MaterialTheme.shapes.large,
@@ -81,12 +80,12 @@ fun SignEzSpec(
         ),
         modifier = modifier
             .clip(MaterialTheme.shapes.small)
-            .clickable(onClick = navigateToSignageList)
+            .clickable(onClick = {})
     ) {
         Column {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f),
+                    .fillMaxWidth(0.75f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("사이니지 스펙", Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
@@ -127,45 +126,12 @@ fun CabinetSpec(
         Column {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f),
+                    .fillMaxWidth(0.75f),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("캐비닛 스펙", Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
             }
             Text(text = "사이니지의 캐비닛 정보", modifier = Modifier.padding(10.dp))
         }
-    }
-}
-
-@Composable
-fun PictureAnalysisBtn(navigateToPicture: () -> Unit) {
-    OutlinedButton(
-        onClick = navigateToPicture,
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(2.dp, Color.Blue),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Blue
-        ),
-        modifier = Modifier
-            .padding(top = 5.dp, bottom = 5.dp)
-            .fillMaxWidth(0.9F)
-    ) {
-        Text("사진 분석")
-    }
-}
-@Composable
-fun VideoAnalysisBtn(navigateToVideo: () -> Unit) {
-    OutlinedButton(
-        onClick = navigateToVideo,
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(2.dp, Color.Blue),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.Blue
-        ),
-        modifier = Modifier
-            .padding(top = 5.dp, bottom = 5.dp)
-            .fillMaxWidth(0.9F)
-    ) {
-        Text("영상 분석")
     }
 }
