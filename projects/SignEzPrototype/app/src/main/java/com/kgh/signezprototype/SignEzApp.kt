@@ -76,9 +76,7 @@ fun SignEzTopAppBar(
             backgroundColor = MaterialTheme.colors.background,
             modifier = modifier,
         )
-
     }
-
 }
 
 @Preview

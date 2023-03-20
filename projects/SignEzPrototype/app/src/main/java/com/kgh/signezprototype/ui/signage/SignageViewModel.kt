@@ -10,10 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.kgh.signezprototype.data.Converters
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.data.repository.SignagesRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
@@ -26,6 +23,12 @@ class SignageViewModel(private val signageRepository: SignagesRepository) : View
                  started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                  initialValue = SignageListState()
              )
+    private val _selectedSignageId = MutableStateFlow<Long?>(null)
+    val selectedSignageId: StateFlow<Long?> get() = _selectedSignageId
+
+    fun setSelectedSignageId(id: Long) {
+        _selectedSignageId.value = id
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -46,9 +49,9 @@ class SignageViewModel(private val signageRepository: SignagesRepository) : View
         val byteArray = outputStream.toByteArray()
         Log.d("testing",byteArray.size.toString() )
 
-        val testAnalysisResult = Signage(id = 2L,
+        val testAnalysisResult = Signage(id = 3L,
             name="TEST",
-            height =3.4,
+            height =5.4,
             width=5.2,
             heightCabinetNumber = 5,
             widthCabinetNumber = 7,
