@@ -83,10 +83,11 @@ enum class Screen {
     SECOND,
     THIRD
 }
+
 class MainActivity : ComponentActivity() {
-    private lateinit var viewModel1:PictureViewModel
-    private lateinit var viewModel2:VideoViewModel
-    private lateinit var viewModel3:SignageViewModel
+    private lateinit var viewModel1: PictureViewModel
+    private lateinit var viewModel2: VideoViewModel
+    private lateinit var viewModel3: SignageViewModel
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as SignEzApplication).container)
     }
@@ -120,13 +121,16 @@ class MainActivity : ComponentActivity() {
     }
 
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQUEST_CODE_IMAGE_CAPTURE -> { galleryAddPic(this, viewModel1) }
-                REQUEST_CODE_VIDEO_CAPTURE -> { galleryAddVideo(this, viewModel2) }
+                REQUEST_CODE_IMAGE_CAPTURE -> {
+                    galleryAddPic(this, viewModel1)
+                }
+                REQUEST_CODE_VIDEO_CAPTURE -> {
+                    galleryAddVideo(this, viewModel2)
+                }
 
             }
         }
@@ -149,18 +153,29 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = (application as SignEzApplication).container
-        viewModel1 = ViewModelProvider(this,factory = AppViewModelProvider.Factory).get(PictureViewModel::class.java)
-        viewModel2 = ViewModelProvider(this,factory = AppViewModelProvider.Factory).get(VideoViewModel::class.java)
-        viewModel3 = ViewModelProvider(this,factory = AppViewModelProvider.Factory).get(SignageViewModel::class.java)
+        viewModel1 = ViewModelProvider(
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(PictureViewModel::class.java)
+        viewModel2 = ViewModelProvider(
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(VideoViewModel::class.java)
+        viewModel3 = ViewModelProvider(
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(SignageViewModel::class.java)
 
         viewModel3.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
+            SignEzPrototypeTheme {
                 SignEzApp(
                     activity = this,
                     viewModel1 = viewModel1,
                     viewModel2 = viewModel2
-                    )
+                )
+            }
         }
         requestCameraPermission() // 카메라 권한 받기 , 앱 열때
         requestWriteExternalStoragePermission() // 외부 저장소 읽기 권한
