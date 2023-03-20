@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
@@ -92,17 +93,20 @@ fun SignEzTopAppBar(
                     )
                 }
             },
+            elevation = 0.dp
         )
     } else {
-        TopAppBar(title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.h2,
-                color = MaterialTheme.colors.onSurface
-            )
-        },
+        TopAppBar(
+            title = {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h2,
+                    color = MaterialTheme.colors.onSurface
+                )
+            },
             backgroundColor = MaterialTheme.colors.background,
             modifier = modifier,
+            elevation = 0.dp
         )
 
     }

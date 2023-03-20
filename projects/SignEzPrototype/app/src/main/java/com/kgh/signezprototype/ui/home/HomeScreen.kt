@@ -57,18 +57,26 @@ fun HomeScreen(
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(innerPadding)
-            .verticalScroll(rememberScrollState())) {
+            .verticalScroll(rememberScrollState())
+//            .background(androidx.compose.material.MaterialTheme.colors.onSurface)
+        ) {
             Column(
-                modifier = Modifier.align(alignment = Alignment.TopCenter),
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxHeight(),
+//                    .background(androidx.compose.material.MaterialTheme.colors.primary),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             )
             {
+                Spacer(modifier = Modifier.padding(5.dp))
                 PastResult(modifier = Modifier)
-                Spacer(modifier = Modifier.padding(16.dp))
-                SignEzSpec(modifier = Modifier,navigateToSignageList)
                 Spacer(modifier = Modifier.padding(8.dp))
+                SignEzSpec(modifier = Modifier,navigateToSignageList)
+//                Spacer(modifier = Modifier.padding(8.dp))
                 CabinetSpec(modifier = Modifier)
+                Spacer(modifier = Modifier.padding(130.dp))
                 VideoAnalysisBtn(navigateToVideo)
                 PictureAnalysisBtn(navigateToPicture)
             }
