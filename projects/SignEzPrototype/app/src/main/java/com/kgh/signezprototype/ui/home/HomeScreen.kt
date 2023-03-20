@@ -16,11 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
@@ -35,6 +37,7 @@ object HomeDestination : NavigationDestination {
 fun HomeScreen(
     navigateToPicture: () -> Unit,
     navigateToVideo: () -> Unit,
+    navigateToSignageList: () -> Unit
     ) {
     val focusManager = LocalFocusManager.current
     val sWidth = remember { mutableStateOf("") } // 사이니지
@@ -43,9 +46,17 @@ fun HomeScreen(
     val dWidth = remember { mutableStateOf("") } // 디스플레이
     val dHeight = remember { mutableStateOf("") } // 디스플레이
 
-    SignEzPrototypeTheme {
+    androidx.compose.material.Scaffold(
+        topBar = {
+            SignEzTopAppBar(
+                title = "SignEz",
+                canNavigateBack = false
+            )
+        }
+    ){ innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
         Box(modifier = Modifier
             .fillMaxSize()
+            .padding(innerPadding)
             .verticalScroll(rememberScrollState())) {
             Column(
                 modifier = Modifier.align(alignment = Alignment.TopCenter),
@@ -54,35 +65,17 @@ fun HomeScreen(
             )
             {
                 PastResult(modifier = Modifier)
-                SignEzSpec(modifier = Modifier)
+                Spacer(modifier = Modifier.padding(16.dp))
+                SignEzSpec(modifier = Modifier,navigateToSignageList)
+                Spacer(modifier = Modifier.padding(8.dp))
                 CabinetSpec(modifier = Modifier)
-                Row {
-                    OutlinedButton(
-                        onClick = navigateToVideo,
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier
-                            .padding(top=5.dp, bottom=5.dp)
-                    ) {
-                        Text("영상 분석")
-                    }
+                VideoAnalysisBtn(navigateToVideo)
+                PictureAnalysisBtn(navigateToPicture)
+            }
+        }
+    }
+}
 
-                    OutlinedButton(
-                        onClick = navigateToPicture,
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier
-                            .padding(top=5.dp, bottom=5.dp)
-                    ) {
-                        Text("사진 분석")
-                    }
-                }
 
 //                    Text(
 //                        text = "분석 데이터 선택",
@@ -155,9 +148,4 @@ fun HomeScreen(
 //                        onValueChange = { dHeight.value = it },
 //                    )
 //                    Spacer(modifier = Modifier.padding(10.dp))
-
-            }
-        }
-    }
-}
 // 일단 찍기, 불러오기 uri 따로 분리했는데 합쳐도 될듯.
