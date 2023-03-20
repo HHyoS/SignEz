@@ -14,6 +14,7 @@ import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.home.HomeDestination
 import com.kgh.signezprototype.ui.home.HomeScreen
 import com.kgh.signezprototype.ui.inputs.*
+import com.kgh.signezprototype.ui.signage.SignageInformationScreen
 import com.kgh.signezprototype.ui.signage.SignageList
 import com.kgh.signezprototype.ui.signage.SignageListScreenDestination
 
@@ -59,7 +60,7 @@ fun SignEzNavHost(
         }
 
         composable(route = SignageListScreenDestination.route) {
-            SignageList(
+            SignageInformationScreen(
                 onItemClick = {},
                 modifier = Modifier,
             )
