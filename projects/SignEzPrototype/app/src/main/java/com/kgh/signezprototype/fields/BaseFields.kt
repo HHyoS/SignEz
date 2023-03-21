@@ -1,10 +1,7 @@
 package com.kgh.signezprototype.fields
 
 import android.util.Log
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -19,6 +16,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
@@ -56,9 +54,11 @@ fun EditNumberField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    unit: String
 ) {
     Row(
-        Modifier.fillMaxWidth(0.5f) // set width to 70% of screen width
+        Modifier.fillMaxWidth(0.9f),
+        horizontalArrangement = Arrangement.SpaceAround // set width to 70% of screen width
     ) {
         Text(
             text = head,
@@ -72,18 +72,52 @@ fun EditNumberField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .heightIn(min = 20.dp) // set min height to 48dp
-                .fillMaxWidth()
+                .fillMaxWidth(0.4f)
                 .padding(3.dp),
             singleLine = true,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             visualTransformation = NumberCommaVisualTransformation()
         )
+        Text(
+            text = unit,
+            modifier = Modifier
+                .heightIn(min = 20.dp) // set min height to 48dp
+                .padding(8.dp)
+                .align(Alignment.CenterVertically) // center vertically with TextField
+        )
         //디자인 참고
         //https://developer.android.com/jetpack/compose/text?hl=ko#styling-textfield
         //https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#textfield
     }
 
+}
+
+@Composable
+fun CustomTextInput(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    placeholder:String
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier.padding(8.dp),
+        placeholder = {
+            Text(
+                text = placeholder,
+                style = MaterialTheme.typography.body1
+            )
+        },
+        singleLine = true,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        visualTransformation = visualTransformation
+    )
 }
 
 class NumberCommaVisualTransformation : VisualTransformation {

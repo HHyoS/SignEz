@@ -50,7 +50,7 @@ object PictureScreenDestination : NavigationDestination {
 @Composable
 fun PictureAnalysis(
     activity:Activity,
-    dispatchTakePictureIntent: (Activity, PictureViewModel) -> Unit,
+    dispatchTakePictureIntent: (Activity, PictureViewModel,Int) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     viewModel: PictureViewModel
@@ -120,7 +120,7 @@ fun PictureAnalysis(
 
                     Row {
                         OutlinedButton(
-                            onClick = { dispatchTakePictureIntent(activity, viewModel) },
+                            onClick = { dispatchTakePictureIntent(activity, viewModel,2) },
                             shape = RoundedCornerShape(20.dp),
                             border = BorderStroke(2.dp, Color.Blue),
                             colors = ButtonDefaults.outlinedButtonColors(

@@ -1,9 +1,12 @@
 package com.kgh.signezprototype.data.entities
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "cabinets")
+@Entity(
+    tableName = "cabinets"
+)
 data class Cabinet(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

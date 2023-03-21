@@ -6,9 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
+import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.fields.EditNumberField
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 
@@ -39,13 +39,18 @@ fun HomeScreen(
     navigateToPicture: () -> Unit,
     navigateToVideo: () -> Unit,
     navigateToSignageList: () -> Unit,
+    viewModel: AnalysisViewModel
     ) {
     val focusManager = LocalFocusManager.current
-    val sWidth = remember { mutableStateOf("") } // 사이니지
-    val sHeight = remember { mutableStateOf("") } // 사이니지
 
-    val dWidth = remember { mutableStateOf("") } // 디스플레이
-    val dHeight = remember { mutableStateOf("") } // 디스플레이
+
+
+
+    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
+        value = viewModel.getCabinet(1)
+    })
+    val cabinet = cabinetState.value
+    val signageState by viewModel.getSignage().collectAsState()
 
     androidx.compose.material.Scaffold(
         topBar = {

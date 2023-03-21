@@ -19,9 +19,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.PictureViewModel
 import com.kgh.signezprototype.ui.inputs.VideoViewModel
 import com.kgh.signezprototype.ui.navigation.SignEzNavHost
+import com.kgh.signezprototype.ui.signage.CabinetViewModel
+import com.kgh.signezprototype.ui.signage.SignageViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 
 @Composable
@@ -29,13 +32,19 @@ fun SignEzApp(
     navController: NavHostController = rememberNavController(),
     activity: Activity,
     viewModel1: PictureViewModel,
-    viewModel2: VideoViewModel
+    viewModel2: VideoViewModel,
+    viewModel3: SignageViewModel,
+    viewModel4: CabinetViewModel,
+    viewModel5: AnalysisViewModel
     ) {
     SignEzNavHost(
         navController = navController,
         activity = activity,
         viewModel1 = viewModel1,
-        viewModel2 = viewModel2
+        viewModel2 = viewModel2,
+        viewModel3 = viewModel3,
+        viewModel4 = viewModel4,
+        viewModel5 = viewModel5
         )
 }
 /**

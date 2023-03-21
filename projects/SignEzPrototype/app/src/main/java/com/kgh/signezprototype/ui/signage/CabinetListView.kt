@@ -1,7 +1,6 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,13 +30,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
-import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.VideoScreenDestination
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGBlue
@@ -45,40 +44,40 @@ import com.kgh.signezprototype.ui.theme.OneBGGrey
 import java.text.NumberFormat
 import java.util.*
 
-object SignageListScreenDestination : NavigationDestination {
-    override val route = "SignageList"
-    override val titleRes = "Total Signage"
+object CabinetListScreenDestination : NavigationDestination {
+    override val route = "CabinetList"
+    override val titleRes = "Total Cabinet"
 }
+
 @Composable
-fun SignageInformationScreen(    
+fun CabinetInformationScreen(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController:NavHostController,
-    viewModel: AnalysisViewModel
+    signageViewModel:SignageViewModel
     ) {
 
     val focusManager = LocalFocusManager.current
     var selectedId:Long by remember { mutableStateOf(-1)}
-
     androidx.compose.material.Scaffold(
         modifier = Modifier
             .clickable(onClick = { focusManager.clearFocus() })
             .background(OneBGGrey),
         topBar = {
             SignEzTopAppBar(
-                title = "사이니지 정보 입력",
+                title = "캐비닛 정보 입력",
                 canNavigateBack = true
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(AddSignageDestination.route) }, //navigateToEditItem(uiState.value.id)
+                onClick = { navController.navigate(AddCabinetDestination.route) }, //navigateToEditItem(uiState.value.id)
                 modifier = Modifier.navigationBarsPadding(),
                 backgroundColor = OneBGBlue
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "사이니지 추가",
+                    contentDescription = "캐비닛 추가",
                     tint = Color.White
                 )
             }
@@ -95,7 +94,7 @@ fun SignageInformationScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    SearchBar()
+//                    SearchBar()
                     Spacer(modifier.padding(10.dp))
                     Text(text = "전체 사이니지",
                         modifier=modifier
@@ -109,54 +108,39 @@ fun SignageInformationScreen(
                             .background(Color.White, shape = RoundedCornerShape(10.dp)),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        SignageList(onItemClick = { signage ->
+                        CabinetList(onItemClick = { cabinet ->
                             run {
-                                if (selectedId == signage.id) {
+                                if (selectedId == cabinet.id) {
                                     selectedId = -1
                                 } else {
-                                    selectedId = signage.id
+                                    selectedId = cabinet.id
                                 }
                             }
                         }, selectedId = selectedId)
                     }
-
-                    if (selectedId > -1) {
+                    if (selectedId != -1L) {
                         Button(onClick = {
-                            viewModel.signageId.value = selectedId
+                            signageViewModel.selectedCabinetId.value = selectedId
+                            navController.popBackStack()
                         }) {
                             Text(text = "선택")
                         }
                     }
-
                 }
             }
         }
     }
-
 }
 
 @Composable
-fun SignageList(
-    onItemClick: (Signage) -> Unit,
+fun CabinetList(
+    onItemClick: (Cabinet) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: CabinetViewModel = viewModel(factory = AppViewModelProvider.Factory),
     selectedId: Long
 ) {
-    val signageListState by viewModel.signageListState.collectAsState()
-    val itemList = signageListState.itemList
-    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-        value = viewModel.getRelatedCabinet(1)
-    })
-    val cabinet = cabinetState.value
-
-    if (selectedId > -1) { // 외래기 연결 데이터 확인용
-        Button(onClick = { /*TODO*/ }) {
-            if (cabinet != null) {
-                Text(text=cabinet.cabinetHeight.toString())
-            }
-        }
-    }
-
+    val cabinetListState by viewModel.cabinetListState.collectAsState()
+    val itemList = cabinetListState.itemList
     if (itemList.isEmpty()) {
         Text(
             text = "텅 비었어요.",
@@ -165,9 +149,9 @@ fun SignageList(
     } else {
         LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(items = itemList, key = { it.id }) { item ->
-                InventoryItem(signage = item,
+                InventoryItem(cabinet = item,
                     onItemClick = onItemClick,
-                selectedId=selectedId)
+                    selectedId=selectedId)
                 Divider()
             }
         }
@@ -176,25 +160,25 @@ fun SignageList(
 
 @Composable
 private fun InventoryItem(
-    signage: Signage,
-    onItemClick: (Signage) -> Unit,
+    cabinet: Cabinet,
+    onItemClick: (Cabinet) -> Unit,
     modifier: Modifier = Modifier,
     selectedId:Long
 ) {
     Row(modifier = modifier
         .fillMaxWidth()
-        .clickable { onItemClick(signage) }
+        .clickable { onItemClick(cabinet) }
         .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         var bitmap:Bitmap
         RadioButton(
-            selectedId==signage.id,
-            onClick = { onItemClick(signage)},
+            selectedId==cabinet.id,
+            onClick = { onItemClick(cabinet)},
             enabled=true
         ) // 라디오 버튼
-        signage.repImg?.let { byteArray ->
+        cabinet.repImg?.let { byteArray ->
             byteArray.let {
                 bitmap = byteArrayToBitmap(it)
                 Image(
@@ -208,47 +192,22 @@ private fun InventoryItem(
         } // 대표 이미지
         Column (modifier=modifier.padding(start=16.dp)) {
             Text(
-                text = signage.name,
+                text = cabinet.name,
                 fontWeight = FontWeight.Bold,
                 color=Color.Black,
                 fontSize = 20.sp,
             )
             Row (modifier=modifier.padding()) {
                 Text (
-                    text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(signage.width)+"mm / ",
+                    text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(cabinet.cabinetWidth)+"mm / ",
                 )
                 Text(
-                    text = "H : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(signage.height)+"mm",
+                    text = "H : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(cabinet.cabinetHeight)+"mm / ",
+                )
+                Text(
+                    text = "${cabinet.moduleColCount}X${cabinet.moduleRowCount}"
                 )
             }
         } // 텍스트 공간
     }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun SearchBar(
-    modifier: Modifier = Modifier,
-    hint: String = "설치 장소 검색",
-    onSearch: (String) -> Unit = {}
-) {
-    val searchQuery = remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    OutlinedTextField(
-        value = searchQuery.value,
-        onValueChange = { newValue -> searchQuery.value = newValue },
-        modifier = Modifier.fillMaxWidth(0.9f),
-        label = { Text(hint) },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = {
-            onSearch(searchQuery.value)
-            keyboardController?.hide()
-        }),
-        colors = androidx.compose.material.TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Black,
-            unfocusedBorderColor = Color.Gray
-        )
-    )
 }
