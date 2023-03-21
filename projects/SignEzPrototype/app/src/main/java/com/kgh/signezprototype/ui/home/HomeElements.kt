@@ -18,6 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kgh.signezprototype.R
+import com.kgh.signezprototype.data.entities.Cabinet
+import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.components.AnalyzeButton
 import com.kgh.signezprototype.ui.components.FocusBlock
 
@@ -78,7 +80,8 @@ fun PastResult(
 @Composable // 사이니지 스펙 틀
 fun SignEzSpec(
     modifier: Modifier = Modifier,
-    navigateToSignageList: () -> Unit
+    navigateToSignageList: () -> Unit,
+    signage: Signage?
 ) {
 //    Surface(
 //        shape = MaterialTheme.shapes.large,
@@ -125,9 +128,14 @@ fun SignEzSpec(
         subtitle = stringResource(id = R.string.need_signage_info),
         buttonTitle = "입력",
         isbuttonVisible = true,
-        buttonOnclickEvent = {},
-        modifier = Modifier
+        buttonOnclickEvent = navigateToSignageList,
+        modifier = Modifier,
     )
+    if (signage != null) {
+        Text(text = "설치 장소 = ${signage.name}")
+        Text(text = "높이 : ${signage.width}")
+        Text(text = "너비 : ${signage.height}")
+    }
 
 //}
 }
@@ -135,6 +143,7 @@ fun SignEzSpec(
 @Composable // 캐비닛 스펙 틀
 fun CabinetSpec(
     modifier: Modifier = Modifier,
+    cabinet: Cabinet?
 ) {
 //    Surface(
 //        shape = MaterialTheme.shapes.large,
@@ -171,6 +180,12 @@ fun CabinetSpec(
         buttonOnclickEvent = {},
         modifier = Modifier
     )
+    if (cabinet != null) {
+        Text(text = "설치 장소 = ${cabinet.name}")
+        Text(text = "높이 : ${cabinet.cabinetHeight}")
+        Text(text = "너비 : ${cabinet.cabinetWidth}")
+        Text(text = "모듈 : ${cabinet.moduleColCount}X${cabinet.moduleRowCount}")
+    }
 }
 
 @Composable

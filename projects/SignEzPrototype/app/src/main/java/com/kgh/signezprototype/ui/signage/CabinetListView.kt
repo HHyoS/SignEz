@@ -96,7 +96,7 @@ fun CabinetInformationScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
 //                    SearchBar()
                     Spacer(modifier.padding(10.dp))
-                    Text(text = "전체 사이니지",
+                    Text(text = "전체 캐비닛",
                         modifier=modifier
                             .align(alignment=Alignment.Start),
                         fontWeight = FontWeight.Bold,

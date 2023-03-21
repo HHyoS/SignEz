@@ -3,14 +3,16 @@ package com.kgh.signezprototype.ui.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import com.kgh.signezprototype.SignEzTopAppBar
+import com.kgh.signezprototype.data.entities.Cabinet
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 
@@ -25,12 +27,9 @@ fun HomeScreen(
     navigateToPicture: () -> Unit,
     navigateToVideo: () -> Unit,
     navigateToSignageList: () -> Unit,
+    viewModel: AnalysisViewModel
 ) {
     val focusManager = LocalFocusManager.current
-
-
-
-
     val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
         value = viewModel.getCabinet(1)
     })
@@ -82,11 +81,17 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.padding(5.dp))
                 PastResult(modifier = Modifier)
                 Spacer(modifier = Modifier.padding(8.dp))
-                SignEzSpec(modifier = Modifier, navigateToSignageList)
-                CabinetSpec(modifier = Modifier)
+                if (viewModel.signageId.value > -1) {
+                    SignEzSpec(modifier = Modifier, navigateToSignageList, signageState.signage)
+                    CabinetSpec(modifier = Modifier, cabinet)
+                } else {
+                    SignEzSpec(modifier = Modifier, navigateToSignageList, null)
+                    CabinetSpec(modifier = Modifier, null)
+                }
                 Spacer(modifier = Modifier.padding(110.dp))
                 VideoAnalysisBtn(navigateToVideo)
                 PictureAnalysisBtn(navigateToPicture)
+                Text(text = "${viewModel.signageId.value}")
             }
         }
     }
