@@ -138,7 +138,7 @@ fun PictureAnalysis(
                             modifier = Modifier.weight(0.5f)
                         ){
                             IntentButton(title = "카메라") {
-                                dispatchTakePictureIntent(activity, viewModel)
+                                dispatchTakePictureIntent(activity, viewModel,2)
                             }
 
 //                        OutlinedButton(
