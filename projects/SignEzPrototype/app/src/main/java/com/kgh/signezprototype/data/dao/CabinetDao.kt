@@ -48,4 +48,11 @@ interface CabinetDao {
 
     @Delete
     suspend fun delete(cabinet: Cabinet)
+
+    @Query("""
+        SELECT cabinets.* FROM cabinets
+        INNER JOIN signages ON cabinets.id = signages.modelId
+        WHERE signages.id = :signageId
+    """)
+    suspend fun getCabinetBySignageId(signageId: Long): Cabinet
 }

@@ -11,10 +11,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kgh.signezprototype.SignEzApplication
 import com.kgh.signezprototype.ui.AppViewModelProvider
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.home.HomeDestination
 import com.kgh.signezprototype.ui.home.HomeScreen
 import com.kgh.signezprototype.ui.inputs.*
 import com.kgh.signezprototype.ui.signage.*
+import kotlin.math.sign
 
 @Composable
 fun SignEzNavHost(
@@ -22,7 +24,10 @@ fun SignEzNavHost(
     modifier: Modifier = Modifier,
     activity: Activity,
     viewModel1: PictureViewModel,
-    viewModel2: VideoViewModel
+    viewModel2: VideoViewModel,
+    viewModel3: SignageViewModel,
+    viewModel4: CabinetViewModel,
+    viewModel5: AnalysisViewModel
 ) {
     NavHost(
         navController = navController,
@@ -34,6 +39,7 @@ fun SignEzNavHost(
                 navigateToVideo = { navController.navigate(VideoScreenDestination.route) },
                 navigateToPicture = { navController.navigate(PictureScreenDestination.route) },
                 navigateToSignageList = { navController.navigate(SignageListScreenDestination.route) },
+                viewModel = viewModel5
             )
         }
 
@@ -61,13 +67,32 @@ fun SignEzNavHost(
             SignageInformationScreen(
                 onItemClick = {},
                 modifier = Modifier,
-                navController = navController
+                navController = navController,
+                viewModel =  viewModel5
             )
         }
 
         composable(route = AddSignageDestination.route) {
-            AddSignageScreen()
+            AddSignageScreen(
+                activity=activity,
+                viewModel = viewModel3,
+                navController = navController)
         }
 
+        composable(route = CabinetListScreenDestination.route) {
+            CabinetInformationScreen(
+                onItemClick = {},
+                modifier = Modifier,
+                navController = navController,
+                signageViewModel =  viewModel3
+            )
+        }
+
+        composable(route = AddCabinetDestination.route) {
+            AddCabinetScreen(
+                activity=activity,
+                viewModel = viewModel4,
+                navController = navController)
+        }
     }
 }
