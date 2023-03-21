@@ -1,6 +1,7 @@
 package com.kgh.signezprototype.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,7 +36,8 @@ fun FocusBlock(
     Card(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable(onClick = buttonOnclickEvent),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colors.surface
         )

@@ -123,6 +123,7 @@ fun SignageInformationScreen(
                     if (selectedId > -1) {
                         Button(onClick = {
                             viewModel.signageId.value = selectedId
+                            navController.popBackStack()
                         }) {
                             Text(text = "선택")
                         }
@@ -144,18 +145,18 @@ fun SignageList(
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
-    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-        value = viewModel.getRelatedCabinet(1)
-    })
-    val cabinet = cabinetState.value
+//    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
+//        value = viewModel.getRelatedCabinet(1)
+//    })
+//    val cabinet = cabinetState.value
 
-    if (selectedId > -1) { // 외래기 연결 데이터 확인용
-        Button(onClick = { /*TODO*/ }) {
-            if (cabinet != null) {
-                Text(text=cabinet.cabinetHeight.toString())
-            }
-        }
-    }
+//    if (selectedId > -1) { // 외래기 연결 데이터 확인용
+//        Button(onClick = { /*TODO*/ }) {
+//            if (cabinet != null) {
+//                Text(text=cabinet.cabinetHeight.toString())
+//            }
+//        }
+//    }
 
     if (itemList.isEmpty()) {
         Text(

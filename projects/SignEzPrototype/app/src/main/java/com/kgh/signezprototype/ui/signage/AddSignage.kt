@@ -258,7 +258,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                                     width = sWidth.value.toDouble(),
                                     height = sHeight.value.toDouble(),
                                     bitmap = imageBitmap,
-                                    modelId = 0
+                                    modelId = viewModel.selectedCabinetId.value
                                 )
                                 navController.popBackStack()
                             } catch (e: Exception) {
