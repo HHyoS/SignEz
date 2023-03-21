@@ -27,11 +27,15 @@ fun HomeScreen(
     navigateToSignageList: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    val sWidth = remember { mutableStateOf("") } // 사이니지
-    val sHeight = remember { mutableStateOf("") } // 사이니지
 
-    val dWidth = remember { mutableStateOf("") } // 디스플레이
-    val dHeight = remember { mutableStateOf("") } // 디스플레이
+
+
+
+    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
+        value = viewModel.getCabinet(1)
+    })
+    val cabinet = cabinetState.value
+    val signageState by viewModel.getSignage().collectAsState()
 
     androidx.compose.material.Scaffold(
         topBar = {

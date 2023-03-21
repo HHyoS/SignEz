@@ -48,8 +48,8 @@ object PictureScreenDestination : NavigationDestination {
 
 @Composable
 fun PictureAnalysis(
-    activity: Activity,
-    dispatchTakePictureIntent: (Activity, PictureViewModel) -> Unit,
+    activity:Activity,
+    dispatchTakePictureIntent: (Activity, PictureViewModel,Int) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     viewModel: PictureViewModel

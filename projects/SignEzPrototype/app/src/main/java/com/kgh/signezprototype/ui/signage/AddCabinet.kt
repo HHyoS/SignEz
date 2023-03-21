@@ -5,7 +5,10 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.compose.foundation.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -26,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.fields.CustomTextInput
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.pickers.ImagePicker
@@ -39,16 +41,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-object AddSignageDestination : NavigationDestination {
-    override val route = "AddSignage"
-    override val titleRes = "Add Signage"
+object AddCabinetDestination : NavigationDestination {
+    override val route = "AddCabinet"
+    override val titleRes = "Add Cabinet"
 }
 
 
 @Composable
-fun AddSignageScreen(modifier:Modifier = Modifier
+fun AddCabinetScreen(modifier:Modifier = Modifier
                      ,activity:Activity
-                     ,viewModel: SignageViewModel,
+                     ,viewModel: CabinetViewModel,
                      navController: NavHostController) {
     val coroutineScope = rememberCoroutineScope()
     var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
@@ -58,16 +60,18 @@ fun AddSignageScreen(modifier:Modifier = Modifier
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
 
-    val sWidth = remember { mutableStateOf("") } // 사이니지
-    val sHeight = remember { mutableStateOf("") } // 사이니지
-    val sName = remember { mutableStateOf("") }
+    val cabinetWidth = remember { mutableStateOf("") } // 사이니지
+    val cabinetHeight = remember { mutableStateOf("") } // 사이니지
+    val cabinetName = remember { mutableStateOf("") }
+    val colModuleCount = remember { mutableStateOf("") }
+    val rowModuleCount = remember { mutableStateOf("") }
     val allFieldsNotEmpty = (
-            sName.value.isNotEmpty() &&
-            sWidth.value.isNotEmpty() &&
-            sHeight.value.isNotEmpty()
+                cabinetWidth.value.isNotEmpty() &&
+                cabinetHeight.value.isNotEmpty() &&
+                cabinetName.value.isNotEmpty() &&
+                colModuleCount.value.isNotEmpty() &&
+                rowModuleCount.value.isNotEmpty()
             )
-    val cabinetState by viewModel.getCabinet().collectAsState()
-
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
@@ -88,14 +92,14 @@ fun AddSignageScreen(modifier:Modifier = Modifier
             .background(OneBGGrey),
         topBar = {
             SignEzTopAppBar(
-                title = "새 사이니지 추가",
+                title = "새 캐비닛 추가",
                 canNavigateBack = true
             )
         },
     ) { innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Box(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
@@ -115,7 +119,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                         }
 
                         Text(
-                            text = "사이니지 사진을 추가해 주세요.",
+                            text = "캐비닛 사진을 추가해 주세요.",
                             modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
                             style = TextStyle(color = Color.Black), // Customize the text style
                         )
@@ -142,7 +146,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                     })
 
                     OutlinedButton(
-                        onClick = { dispatchTakePictureIntent(activity, viewModel=viewModel,type=22) },
+                        onClick = { dispatchTakePictureIntent(activity, viewModel=viewModel,type=222) },
                         shape = RoundedCornerShape(20.dp),
                         border = BorderStroke(2.dp, Color.Blue),
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -171,9 +175,9 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                     }
                 }
                 CustomTextInput(
-                    value = sName.value,
-                    onValueChange = { it -> sName.value = it },
-                    placeholder = "사이니지 이름")
+                    value = cabinetName.value,
+                    onValueChange = { it -> cabinetName.value = it }
+                    , placeholder = "캐비닛 모델 명")
                 EditNumberField(
                     // 가로 길이
                     head = "너비",
@@ -184,8 +188,8 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                     keyboardActions = KeyboardActions(
                         onDone = { focusManager.clearFocus() }
                     ),
-                    value = sWidth.value,
-                    onValueChange = { sWidth.value = it },
+                    value = cabinetWidth.value,
+                    onValueChange = { cabinetWidth.value = it },
                     unit = "mm"
                 )
                 EditNumberField(
@@ -199,53 +203,40 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                     keyboardActions = KeyboardActions(
                         onDone = { focusManager.clearFocus() }
                     ),
-                    value = sHeight.value,
-                    onValueChange = { sHeight.value = it },
+                    value = cabinetHeight.value,
+                    onValueChange = { cabinetHeight.value = it },
                     unit = "mm"
                 )
-                
-                if (viewModel.selectedCabinetId.value == -1L) {
-                    OutlinedButton(
-                        onClick = {
-                            navController.navigate(CabinetListScreenDestination.route)
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text("캐비닛 스펙 추가")
-                    }
-                } // 캐비닛 정보 선택 구간
-                else {
-                    Box {
-                        Column {
-                            OutlinedButton(
-                                onClick = {
-                                    navController.navigate(CabinetListScreenDestination.route)
-                                },
-                                shape = RoundedCornerShape(20.dp),
-                                border = BorderStroke(2.dp, Color.Blue),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    backgroundColor = Color.White,
-                                    contentColor = Color.Blue
-                                ),
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text("변경")
-                            }
-                            Text(text="캐비닛 스펙")
-                            Text(text = cabinetState.cabinet.name)
-                            Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
-                            Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
-                            Text(text = "${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}")
-                        }
-                    }
-                } // 캐비닛 변경 버튼 else문
+                EditNumberField(
+                    // 세로 길이
+                    head = "가로 모듈 수",
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
 
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusManager.clearFocus() }
+                    ),
+                    value = colModuleCount.value,
+                    onValueChange = { colModuleCount.value = it },
+                    unit = "개"
+                )
+                EditNumberField(
+                    // 세로 길이
+                    head = "세로 모듈 수",
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = { focusManager.clearFocus() }
+                    ),
+                    value = rowModuleCount.value,
+                    onValueChange = { rowModuleCount.value = it },
+                    unit = "개"
+                )
                 Row {
                     Button(onClick = { navController.popBackStack() }) {
                         Text(text = "취소")
@@ -254,22 +245,21 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                         coroutineScope.launch {
                             try {
                                 viewModel.saveItem(
-                                    name = sName.value,
-                                    width = sWidth.value.toDouble(),
-                                    height = sHeight.value.toDouble(),
-                                    bitmap = imageBitmap,
-                                    modelId = 0
-                                )
+                                    name=cabinetName.value,
+                                    width=cabinetWidth.value.toDouble(),
+                                    height=cabinetHeight.value.toDouble(),
+                                    colCount=colModuleCount.value.toInt(),
+                                    rowCount=rowModuleCount.value.toInt(),
+                                    bitmap=imageBitmap)
                                 navController.popBackStack()
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
                                     Toast.makeText(context, "입력 정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
                                 }
                             }
-                        }
-                     },
-                        enabled=allFieldsNotEmpty) {
-                        Text(text = "저장 ${viewModel.selectedCabinetId.value}")
+                    } },
+                        enabled= allFieldsNotEmpty) {
+                        Text(text = "저장")
                     }
                 }
             }// 화면 전체 컬럼 끝

@@ -38,9 +38,6 @@ fun ImagePicker(onImageSelected: (videoUri: String) -> Unit) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var imageUri by remember { mutableStateOf("") }
-    var imageTitle by remember { mutableStateOf("") }
-    var imageSize by remember { mutableStateOf(0L) }
-    val coroutineScope = rememberCoroutineScope()
 
 
     val launcher =
@@ -101,12 +98,10 @@ fun ImagePicker(onImageSelected: (videoUri: String) -> Unit) {
 fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit) {
     val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     var videoUri by remember { mutableStateOf("") }
-    var videoFrame by remember { mutableStateOf(defaultBitmap) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         videoUri = uri.toString()
         onVideoSelected(videoUri)
-        Log.d("VideoPicker", "Selected video: $uri")
     }
 
 //    Column {

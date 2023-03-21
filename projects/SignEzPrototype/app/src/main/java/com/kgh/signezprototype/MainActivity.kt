@@ -68,7 +68,9 @@ import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.pickers.*
 import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.MainViewModelFactory
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.*
+import com.kgh.signezprototype.ui.signage.CabinetViewModel
 import com.kgh.signezprototype.ui.signage.SignageViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import kotlinx.coroutines.Dispatchers
@@ -88,6 +90,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var viewModel1: PictureViewModel
     private lateinit var viewModel2: VideoViewModel
     private lateinit var viewModel3: SignageViewModel
+    private lateinit var viewModel4: CabinetViewModel
+    private lateinit var viewModel5: AnalysisViewModel
+
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as SignEzApplication).container)
     }
@@ -103,6 +108,8 @@ class MainActivity : ComponentActivity() {
 
     private val REQUEST_CODE_VIDEO_CAPTURE = 1
     private val REQUEST_CODE_IMAGE_CAPTURE = 2
+    private val REQUEST_CODE_IMAGE_CAPTURE_2 = 22
+    private val REQUEST_CODE_IMAGE_CAPTURE_3 = 222
     private val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3
     private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
 
@@ -127,6 +134,12 @@ class MainActivity : ComponentActivity() {
             when (requestCode) {
                 REQUEST_CODE_IMAGE_CAPTURE -> {
                     galleryAddPic(this, viewModel1)
+                }
+                REQUEST_CODE_IMAGE_CAPTURE_2 -> {
+                    galleryAddPic(this, viewModel3)
+                }
+                REQUEST_CODE_IMAGE_CAPTURE_3 -> {
+                    galleryAddPic(this, viewModel4)
                 }
                 REQUEST_CODE_VIDEO_CAPTURE -> {
                     galleryAddVideo(this, viewModel2)
@@ -153,19 +166,28 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appContainer = (application as SignEzApplication).container
-        viewModel1 = ViewModelProvider(
+        viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
         ).get(PictureViewModel::class.java)
-        viewModel2 = ViewModelProvider(
+        viewModel2 = ViewModelProvider( // 분석 영상
             this,
             factory = AppViewModelProvider.Factory
         ).get(VideoViewModel::class.java)
-        viewModel3 = ViewModelProvider(
+        viewModel3 = ViewModelProvider( // 사이니지
             this,
             factory = AppViewModelProvider.Factory
         ).get(SignageViewModel::class.java)
+        viewModel4 = ViewModelProvider( // 캐비닛
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(CabinetViewModel::class.java)
+        viewModel5 = ViewModelProvider( // 캐비닛
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(AnalysisViewModel::class.java)
 
+        viewModel4.insertTestRecord()
         viewModel3.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
@@ -173,7 +195,10 @@ class MainActivity : ComponentActivity() {
                 SignEzApp(
                     activity = this,
                     viewModel1 = viewModel1,
-                    viewModel2 = viewModel2
+                    viewModel2 = viewModel2,
+                    viewModel3 = viewModel3,
+                    viewModel4 = viewModel4,
+                    viewModel5 = viewModel5
                 )
             }
         }

@@ -47,4 +47,6 @@ interface CabinetsRepository {
      * Update item in the data source
      */
     suspend fun updateCabinet(cabinet: Cabinet)
+
+    suspend fun getCabinetBySignageId(signageId: Long): Cabinet
 }
