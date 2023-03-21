@@ -1,30 +1,23 @@
 package com.kgh.signezprototype.ui.components
 
-import android.widget.Button
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.ui.theme.Shapes
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 
 /**
@@ -283,25 +276,132 @@ fun TutorialStartButton(
     }
 }
 
+
+@Composable
+fun BottomSingleFlatButton(
+    title: String,
+    isUsable: Boolean,
+    onClickEvent: () -> Unit
+) {
+
+    androidx.compose.material3.Button(
+        onClick = onClickEvent,
+        shape = RectangleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colors.background,
+        ),
+        enabled = isUsable,
+        modifier = Modifier
+//            .padding(top = 10.dp, end = 15.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.button,
+            color = MaterialTheme.colors.onSurface,
+            modifier = Modifier.padding(bottom = 2.dp)
+        )
+    }
+}
+
+@Composable
+fun BottomDoubleFlatButton(
+    leftTitle: String,
+    rightTitle: String,
+    isLeftUsable: Boolean,
+    isRightUsable: Boolean,
+    leftOnClickEvent: () -> Unit,
+    rightOnClickEvent: () -> Unit,
+) {
+    Row() {
+        androidx.compose.material3.Button(
+            onClick = leftOnClickEvent,
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colors.background,
+            ),
+            enabled = isLeftUsable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .weight(1f)
+        ) {
+            if (isLeftUsable) {
+                Text(
+                    text = leftTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            } else {
+                Text(
+                    text = leftTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+        androidx.compose.material3.Button(
+            onClick = rightOnClickEvent,
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colors.background,
+                disabledContainerColor = MaterialTheme.colors.background,
+            ),
+            enabled = isRightUsable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .weight(1f),
+        ) {
+            if (isRightUsable) {
+                Text(
+                    text = rightTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            } else {
+                Text(
+                    text = rightTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+    }
+
+}
+
 @Preview
 @Composable
 fun ComponentPreview() {
     SignEzPrototypeTheme(darkTheme = false) {
         Column() {
-            FocusBlock(
-                title = "사이니지 스펙",
-                subtitle = "정보 입력이 필요합니다",
-                buttonTitle = "입력",
-                isbuttonVisible = true,
-                buttonOnclickEvent = {},
-                modifier = Modifier
-            )
-            AnalyzeButton("영상 분석", false, onClickEvent = {})
-            AnalyzeButton("사진 분석", true, onClickEvent = {})
-            InFocusBlockButton(title = "입력", isVisible = true, onClickEvent = {})
-            IntentButton(title = "갤러리", onClickEvent = {})
-            SignEzFloatingButton(onClickEvent = {})
-            TutorialStartButton(title = "시작하기", onClickEvent = {})
+//            FocusBlock(
+//                title = "사이니지 스펙",
+//                subtitle = "정보 입력이 필요합니다",
+//                buttonTitle = "입력",
+//                isbuttonVisible = true,
+//                buttonOnclickEvent = {},
+//                modifier = Modifier
+//            )
+//            AnalyzeButton("영상 분석", false, onClickEvent = {})
+//            AnalyzeButton("사진 분석", true, onClickEvent = {})
+//            InFocusBlockButton(title = "입력", isVisible = true, onClickEvent = {})
+//            IntentButton(title = "갤러리", onClickEvent = {})
+//            SignEzFloatingButton(onClickEvent = {})
+//            TutorialStartButton(title = "시작하기", onClickEvent = {})
+//            BottomSingleFlatButton(title = "확인", true, onClickEvent = {})
+            BottomDoubleFlatButton(leftTitle = "취소",
+                rightTitle = "확인",
+                isLeftUsable = true,
+                isRightUsable = false,
+                leftOnClickEvent = {},
+                rightOnClickEvent = {})
         }
     }
 }
