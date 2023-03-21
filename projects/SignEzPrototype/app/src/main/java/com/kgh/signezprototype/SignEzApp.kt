@@ -53,8 +53,8 @@ fun SignEzTopAppBar(
         TopAppBar(
             title = { Text(
                 text = title,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
+                style = MaterialTheme.typography.h2,
+                color = MaterialTheme.colors.onSurface
             ) },
             modifier = modifier,
             navigationIcon = {
@@ -65,6 +65,7 @@ fun SignEzTopAppBar(
                     )
                 }
             },
+            backgroundColor = MaterialTheme.colors.background,
             elevation = 0.dp
         )
     } else {

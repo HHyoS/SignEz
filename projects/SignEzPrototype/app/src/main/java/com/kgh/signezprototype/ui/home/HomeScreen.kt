@@ -77,7 +77,7 @@ fun HomeScreen(
                 SignEzSpec(modifier = Modifier,navigateToSignageList)
 //                Spacer(modifier = Modifier.padding(8.dp))
                 CabinetSpec(modifier = Modifier)
-                Spacer(modifier = Modifier.padding(130.dp))
+                Spacer(modifier = Modifier.padding(110.dp))
                 VideoAnalysisBtn(navigateToVideo)
                 PictureAnalysisBtn(navigateToPicture)
             }

@@ -187,7 +187,7 @@ fun PictureAnalysisBtn(navigateToPicture: () -> Unit) {
 fun VideoAnalysisBtn(navigateToVideo: () -> Unit) {
     AnalyzeButton(
         title = stringResource(id = R.string.analyze_video),
-        isUsable = false,
+        isUsable = true,
         onClickEvent = navigateToVideo
     )
 

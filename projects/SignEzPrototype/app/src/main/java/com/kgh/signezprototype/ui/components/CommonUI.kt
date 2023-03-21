@@ -82,12 +82,12 @@ fun FocusBlock(
 
             }
 
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.padding(start = 18.dp, top=8.dp, bottom = 8.dp)
-                )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
+            )
 
 //                Text(
 //                    text = subtitle,
@@ -209,6 +209,31 @@ fun InFocusBlockButton(
     }
 }
 
+@Composable
+fun IntentButton(
+    title: String,
+    onClickEvent: () -> Unit
+) {
+    androidx.compose.material3.Button(
+        onClick = onClickEvent,
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colors.primaryVariant,
+        ),
+        modifier = Modifier
+            .padding(top = 10.dp, end = 15.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface,
+            modifier = Modifier.padding(bottom = 2.dp)
+        )
+    }
+}
+
 
 @Preview
 @Composable
@@ -226,6 +251,7 @@ fun ComponentPreview() {
             AnalyzeButton("영상 분석", false, onClickEvent = {})
             AnalyzeButton("사진 분석", true, onClickEvent = {})
             InFocusBlockButton(title = "입력", isVisible = true, onClickEvent = {})
+            IntentButton(title = "갤러리", onClickEvent = {})
         }
     }
 }
