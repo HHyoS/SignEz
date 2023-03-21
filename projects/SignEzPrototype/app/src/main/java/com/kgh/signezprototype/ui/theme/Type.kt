@@ -2,6 +2,7 @@ package com.kgh.signezprototype.ui.theme
 
 import androidx.compose.material.Text
 import androidx.compose.material.Typography
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -24,39 +25,60 @@ val Typography = Typography(
     h1 = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Normal,
-        fontSize = 32.sp
+        fontSize = 32.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
     // App Bar 제목
     h2 = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Medium,
-        fontSize = 18.sp
+        fontSize = 18.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
     // 컴포넌트 제목
     h3 = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
     // 회색 소 제목
     h4 = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Medium,
-        fontSize = 14.sp
+        fontSize = 14.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
     body1 = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        fontSize = 14.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
     body2 = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp
+        fontSize = 12.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
     button = TextStyle(
         fontFamily = NotoSansKR,
         fontWeight = FontWeight.Medium,
-        fontSize = 16.sp
+        fontSize = 16.sp,
+        platformStyle = PlatformTextStyle(
+            includeFontPadding = false
+        )
     ),
 )

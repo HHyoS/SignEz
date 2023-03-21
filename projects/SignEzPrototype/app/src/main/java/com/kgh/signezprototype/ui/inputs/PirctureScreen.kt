@@ -8,9 +8,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
@@ -35,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.pickers.loadImageMetadata
+import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +48,7 @@ object PictureScreenDestination : NavigationDestination {
 
 @Composable
 fun PictureAnalysis(
-    activity:Activity,
+    activity: Activity,
     dispatchTakePictureIntent: (Activity, PictureViewModel) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
@@ -66,9 +65,9 @@ fun PictureAnalysis(
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
-            contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-        }
-        else {
+            contentUri =
+                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } else {
             contentUri = viewModel.imageUri.value
         }
     }
@@ -100,76 +99,87 @@ fun PictureAnalysis(
                 navigateUp = onNavigateUp
             )
         }
-    ){ innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "사진 분석",
-                    modifier = Modifier.align(Alignment.Start),
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Column {
-                    Row {
-                        ImagePicker(onImageSelected = { address ->
-                            viewModel.imageUri.value = Uri.parse(address)
-                            imageBitmap = null
-                        })
-                    }
-
-                    Row {
-                        OutlinedButton(
-                            onClick = { dispatchTakePictureIntent(activity, viewModel) },
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(2.dp, Color.Blue),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Blue
-                            ),
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text("사진 촬영")
-                        }
-
-                        OutlinedButton(
-                            onClick = {
+                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+                ) {
+                    Text(
+                        text = "사진 분석",
+                        modifier = Modifier.align(Alignment.Start),
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row (
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        Column (
+                            modifier = Modifier.weight(0.5f)
+                        ){
+                            ImagePicker(onImageSelected = { address ->
+                                viewModel.imageUri.value = Uri.parse(address)
                                 imageBitmap = null
-                                viewModel.imageUri.value = Uri.EMPTY
-                            },
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(2.dp, Color.Blue),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Blue
-                            ),
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text("Clear")
+                            })
                         }
-                    }
 
-                    Log.d("compare", viewModel.imageUri.value.toString())
-                    //imageBitmap != null && last.value == "take"
-                    if (viewModel.imageUri.value != Uri.EMPTY ) {
-                        Column {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
-                                    .height(400.dp)
-                            ) {
-                                imageBitmap?.let {
-                                    Image(
-                                        bitmap = it.asImageBitmap(),
-                                        contentDescription = "Picture frame",
-                                        contentScale = ContentScale.FillBounds,
-                                        modifier = Modifier
-                                    )
-                                }
+                        Column (
+                            modifier = Modifier.weight(0.5f)
+                        ){
+                            IntentButton(title = "카메라") {
+                                dispatchTakePictureIntent(activity, viewModel)
                             }
-                            Text(text = "이미지 제목 : $imageTitle")
-                            Text(text = "이미지 크기 : $imageSize byte")
+
+//                        OutlinedButton(
+//                            onClick = {
+//                                imageBitmap = null
+//                                viewModel.imageUri.value = Uri.EMPTY
+//                            },
+//                            shape = RoundedCornerShape(20.dp),
+//                            border = BorderStroke(2.dp, Color.Blue),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                backgroundColor = Color.White,
+//                                contentColor = Color.Blue
+//                            ),
+//                            modifier = Modifier.padding(16.dp)
+//                        ) {
+//                            Text("Clear")
+//                        }
+                        }
+
+                        Log.d("compare", viewModel.imageUri.value.toString())
+                        //imageBitmap != null && last.value == "take"
+                        if (viewModel.imageUri.value != Uri.EMPTY) {
+                            Column {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(BorderStroke(width = 4.dp, color = Color.Black))
+                                        .height(400.dp)
+                                ) {
+                                    imageBitmap?.let {
+                                        Image(
+                                            bitmap = it.asImageBitmap(),
+                                            contentDescription = "Picture frame",
+                                            contentScale = ContentScale.FillBounds,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                }
+                                Text(text = "이미지 제목 : $imageTitle")
+                                Text(text = "이미지 크기 : $imageSize byte")
+                            }
                         }
                     }
                 }

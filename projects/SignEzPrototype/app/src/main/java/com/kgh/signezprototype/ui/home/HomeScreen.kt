@@ -1,31 +1,17 @@
 package com.kgh.signezprototype.ui.home
 
-import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.fields.EditNumberField
-import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
+import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 
 
@@ -39,7 +25,7 @@ fun HomeScreen(
     navigateToPicture: () -> Unit,
     navigateToVideo: () -> Unit,
     navigateToSignageList: () -> Unit,
-    ) {
+) {
     val focusManager = LocalFocusManager.current
     val sWidth = remember { mutableStateOf("") } // 사이니지
     val sHeight = remember { mutableStateOf("") } // 사이니지
@@ -53,23 +39,48 @@ fun HomeScreen(
                 title = "SignEz",
                 canNavigateBack = false
             )
-        }
-    ){ innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .verticalScroll(rememberScrollState())) {
+        },
+        // 하단 양쪽 버튼 예시
+//        bottomBar = {
+//            BottomDoubleFlatButton(
+//                leftTitle = "취소",
+//                rightTitle = "확인",
+//                isLeftUsable = true,
+//                isRightUsable = false,
+//                leftOnClickEvent = { /*TODO*/ },
+//                rightOnClickEvent = { /*TODO*/ }
+//            )
+//        }
+        // 플로팅 버튼 예시
+//        floatingActionButton = {
+//            SignEzFloatingButton(
+//                onClickEvent = {}
+//            )
+//        }
+    ) { innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+//            .background(androidx.compose.material.MaterialTheme.colors.onSurface)
+        ) {
             Column(
-                modifier = Modifier.align(alignment = Alignment.TopCenter),
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxHeight(),
+//                    .background(androidx.compose.material.MaterialTheme.colors.primary),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             )
             {
+                Spacer(modifier = Modifier.padding(5.dp))
                 PastResult(modifier = Modifier)
-                Spacer(modifier = Modifier.padding(16.dp))
-                SignEzSpec(modifier = Modifier,navigateToSignageList)
                 Spacer(modifier = Modifier.padding(8.dp))
+                SignEzSpec(modifier = Modifier, navigateToSignageList)
                 CabinetSpec(modifier = Modifier)
+                Spacer(modifier = Modifier.padding(110.dp))
                 VideoAnalysisBtn(navigateToVideo)
                 PictureAnalysisBtn(navigateToPicture)
             }
