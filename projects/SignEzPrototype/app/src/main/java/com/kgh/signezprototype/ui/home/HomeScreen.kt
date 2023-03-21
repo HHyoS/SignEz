@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
@@ -37,7 +38,7 @@ object HomeDestination : NavigationDestination {
 fun HomeScreen(
     navigateToPicture: () -> Unit,
     navigateToVideo: () -> Unit,
-    navigateToSignageList: () -> Unit
+    navigateToSignageList: () -> Unit,
     ) {
     val focusManager = LocalFocusManager.current
     val sWidth = remember { mutableStateOf("") } // 사이니지
@@ -50,7 +51,7 @@ fun HomeScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "SignEz",
-                canNavigateBack = false,
+                canNavigateBack = false
             )
         }
     ){ innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
