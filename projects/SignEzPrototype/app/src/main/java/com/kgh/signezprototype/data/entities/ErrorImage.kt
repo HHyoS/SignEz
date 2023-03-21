@@ -12,7 +12,7 @@ data class ErrorImage(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
     var error_module_id: Long,
-    var evidence_image: ByteArray
+    var evidence_image: ByteArray? = null
 )
 
 class BitmapTypeConverter {

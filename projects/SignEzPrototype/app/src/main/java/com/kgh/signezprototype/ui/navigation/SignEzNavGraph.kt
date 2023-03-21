@@ -14,8 +14,7 @@ import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.home.HomeDestination
 import com.kgh.signezprototype.ui.home.HomeScreen
 import com.kgh.signezprototype.ui.inputs.*
-import com.kgh.signezprototype.ui.signage.SignageList
-import com.kgh.signezprototype.ui.signage.SignageListScreenDestination
+import com.kgh.signezprototype.ui.signage.*
 
 @Composable
 fun SignEzNavHost(
@@ -34,7 +33,7 @@ fun SignEzNavHost(
             HomeScreen(
                 navigateToVideo = { navController.navigate(VideoScreenDestination.route) },
                 navigateToPicture = { navController.navigate(PictureScreenDestination.route) },
-                navigateToSignageList = { navController.navigate(SignageListScreenDestination.route) }
+                navigateToSignageList = { navController.navigate(SignageListScreenDestination.route) },
             )
         }
 
@@ -59,10 +58,15 @@ fun SignEzNavHost(
         }
 
         composable(route = SignageListScreenDestination.route) {
-            SignageList(
+            SignageInformationScreen(
                 onItemClick = {},
                 modifier = Modifier,
+                navController = navController
             )
+        }
+
+        composable(route = AddSignageDestination.route) {
+            AddSignageScreen()
         }
 
     }

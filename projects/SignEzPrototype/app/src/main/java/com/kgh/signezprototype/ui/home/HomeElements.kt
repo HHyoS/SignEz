@@ -114,10 +114,19 @@ fun SignEzSpec(
 //            Text(text = "정보 입력이 필요 합니다.", modifier = Modifier.padding(10.dp))
 //        }
 
+    //ㅇㅇㅇㅇㅇㅇ
+//    FocusBlock(
+//        title = stringResource(id = R.string.signage_spec_title), subtitle = stringResource(id = R.string.need_signage_info), modifier = modifier
+//            .clip(MaterialTheme.shapes.small)
+//            .clickable(onClick = navigateToSignageList)
+//    )
     FocusBlock(
-        title = stringResource(id = R.string.signage_spec_title), subtitle = stringResource(id = R.string.need_signage_info), modifier = modifier
-            .clip(MaterialTheme.shapes.small)
-            .clickable(onClick = navigateToSignageList)
+        title = stringResource(id = R.string.signage_spec_title),
+        subtitle = stringResource(id = R.string.need_signage_info),
+        buttonTitle = "입력",
+        isbuttonVisible = true,
+        buttonOnclickEvent = {},
+        modifier = Modifier
     )
 
 //}
@@ -150,51 +159,36 @@ fun CabinetSpec(
 //        }
 //    }
 
+    ///ㅇㅇㅇㅇㅇㅇㅇㅇ
+//    FocusBlock(
+//        title = stringResource(id = R.string.cabinet_spec_title), subtitle = stringResource(id = R.string.need_cabinet_info), modifier = modifier
+//    )
     FocusBlock(
-        title = stringResource(id = R.string.cabinet_spec_title), subtitle = stringResource(id = R.string.need_cabinet_info), modifier = modifier
+        title = stringResource(id = R.string.cabinet_spec_title),
+        subtitle = stringResource(id = R.string.need_cabinet_info),
+        buttonTitle = null,
+        isbuttonVisible = false,
+        buttonOnclickEvent = {},
+        modifier = Modifier
     )
 }
 
 @Composable
 fun PictureAnalysisBtn(navigateToPicture: () -> Unit) {
     AnalyzeButton(
-        "사진 분석",
-        true,
-        navigateToPicture
+        title = stringResource(id = R.string.analyze_photo),
+        isUsable = true,
+        onClickEvent = navigateToPicture
     )
-//    OutlinedButton(
-//        onClick = navigateToPicture,
-//        shape = RoundedCornerShape(20.dp),
-//        border = BorderStroke(2.dp, Color.Blue),
-//        colors = ButtonDefaults.outlinedButtonColors(
-//            contentColor = Color.Blue
-//        ),
-//        modifier = Modifier
-//            .padding(top = 5.dp, bottom = 5.dp)
-//            .fillMaxWidth(0.9F)
-//    ) {
-//        Text("사진 분석")
-//    }
+
 }
 
 @Composable
 fun VideoAnalysisBtn(navigateToVideo: () -> Unit) {
     AnalyzeButton(
-        "영상 분석",
-        true,
-        navigateToVideo
+        title = stringResource(id = R.string.analyze_video),
+        isUsable = true,
+        onClickEvent = navigateToVideo
     )
-//    OutlinedButton(
-//        onClick = navigateToVideo,
-//        shape = RoundedCornerShape(20.dp),
-//        border = BorderStroke(2.dp, Color.Blue),
-//        colors = ButtonDefaults.outlinedButtonColors(
-//            contentColor = Color.Blue
-//        ),
-//        modifier = Modifier
-//            .padding(top = 5.dp, bottom = 5.dp)
-//            .fillMaxWidth(0.9F)
-//    ) {
-//        Text("영상 분석")
-//    }
+
 }
