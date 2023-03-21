@@ -5,14 +5,20 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -234,6 +240,23 @@ fun IntentButton(
     }
 }
 
+@Composable
+fun SignEzFloatingButton(
+    onClickEvent: () -> Unit
+) {
+    FloatingActionButton(
+        onClick = onClickEvent,
+        shape = CircleShape,
+        containerColor = androidx.compose.material.MaterialTheme.colors.primary,
+    ) {
+        androidx.compose.material.Icon(
+            imageVector = Icons.Rounded.Add,
+            contentDescription = "추가",
+            tint = androidx.compose.material.MaterialTheme.colors.surface
+        )
+    }
+}
+
 
 @Preview
 @Composable
@@ -252,6 +275,7 @@ fun ComponentPreview() {
             AnalyzeButton("사진 분석", true, onClickEvent = {})
             InFocusBlockButton(title = "입력", isVisible = true, onClickEvent = {})
             IntentButton(title = "갤러리", onClickEvent = {})
+            SignEzFloatingButton(onClickEvent = {})
         }
     }
 }

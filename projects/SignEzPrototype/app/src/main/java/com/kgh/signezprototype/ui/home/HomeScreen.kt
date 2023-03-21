@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.fields.EditNumberField
+import com.kgh.signezprototype.ui.components.SignEzFloatingButton
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 
@@ -53,7 +54,13 @@ fun HomeScreen(
                 title = "SignEz",
                 canNavigateBack = false
             )
-        }
+        },
+        // 플로팅 버튼 예시
+//        floatingActionButton = {
+//            SignEzFloatingButton(
+//                onClickEvent = {}
+//            )
+//        }
     ){ innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
         Box(modifier = Modifier
             .fillMaxSize()
