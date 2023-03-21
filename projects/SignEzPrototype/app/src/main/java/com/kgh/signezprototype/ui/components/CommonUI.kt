@@ -252,7 +252,32 @@ fun SignEzFloatingButton(
         androidx.compose.material.Icon(
             imageVector = Icons.Rounded.Add,
             contentDescription = "추가",
-            tint = androidx.compose.material.MaterialTheme.colors.surface
+            tint = androidx.compose.material.MaterialTheme.colors.onPrimary
+        )
+    }
+}
+
+@Composable
+fun TutorialStartButton(
+    title: String,
+    onClickEvent: () -> Unit
+) {
+    androidx.compose.material3.Button(
+        onClick = onClickEvent,
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colors.primary,
+        ),
+        modifier = Modifier
+            .padding(top = 10.dp, end = 15.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onPrimary,
+            modifier = Modifier.padding(bottom = 2.dp)
         )
     }
 }
@@ -276,6 +301,7 @@ fun ComponentPreview() {
             InFocusBlockButton(title = "입력", isVisible = true, onClickEvent = {})
             IntentButton(title = "갤러리", onClickEvent = {})
             SignEzFloatingButton(onClickEvent = {})
+            TutorialStartButton(title = "시작하기", onClickEvent = {})
         }
     }
 }
