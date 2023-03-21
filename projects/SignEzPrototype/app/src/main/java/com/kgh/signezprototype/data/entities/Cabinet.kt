@@ -12,6 +12,6 @@ data class Cabinet(
     var cabinetHeight: Double,
     var moduleRowCount: Int,
     var moduleColCount: Int,
-    var repImage: ByteArray
+    var repImg: ByteArray? = null
 )
 

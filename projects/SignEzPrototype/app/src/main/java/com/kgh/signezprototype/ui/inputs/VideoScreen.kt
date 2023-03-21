@@ -6,14 +6,8 @@ import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -28,16 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.analysis.getFrames
 import com.kgh.signezprototype.pickers.VideoPicker
 import com.kgh.signezprototype.pickers.getVideoTitle
 import com.kgh.signezprototype.pickers.loadVideoMetadata
+import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.reflect.KFunction1
 
 object VideoScreenDestination : NavigationDestination {
     override val route = "VideoScreen"
@@ -46,7 +39,7 @@ object VideoScreenDestination : NavigationDestination {
 
 @Composable
 fun VideoAnalysis(
-    activity:Activity,
+    activity: Activity,
     dispatchTakeVideoIntent: (Activity, VideoViewModel) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
@@ -69,8 +62,9 @@ fun VideoAnalysis(
     val loadVideoThumbnail = {
         if (viewModel.videoUri.value != Uri.EMPTY) {
             coroutineScope.launch {
-                val bitmap = withContext(Dispatchers.IO) { getVideoThumbnail(viewModel.videoUri.value) }
-                if (bitmap != null ) {
+                val bitmap =
+                    withContext(Dispatchers.IO) { getVideoThumbnail(viewModel.videoUri.value) }
+                if (bitmap != null) {
                     videoFrame = bitmap
                 }
             }
@@ -78,13 +72,13 @@ fun VideoAnalysis(
     }
 
     val loadVideoMetadata = {
-        if (viewModel.videoUri.value != Uri.EMPTY ) {
-            var contentUri:Uri
-            if ( !viewModel.videoUri.value.toString().contains("content") ) {
+        if (viewModel.videoUri.value != Uri.EMPTY) {
+            var contentUri: Uri
+            if (!viewModel.videoUri.value.toString().contains("content")) {
                 val file = File(viewModel.videoUri.value.toString())
-                contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-            }
-            else {
+                contentUri =
+                    FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+            } else {
                 contentUri = viewModel.videoUri.value
             }
 
@@ -94,7 +88,8 @@ fun VideoAnalysis(
                 }
                 videoTitle = getVideoTitle(contentUri, context)
                 videoLength = metadata.second.toLong() // ms
-                videoSize = metadata.third.toLong() //  byte, val megabytes = bytes.toDouble() / (1024 * 1024)
+                videoSize =
+                    metadata.third.toLong() //  byte, val megabytes = bytes.toDouble() / (1024 * 1024)
             }
         }
         loadVideoThumbnail()
@@ -112,90 +107,117 @@ fun VideoAnalysis(
                 navigateUp = onNavigateUp
             )
         }
-    ){ innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+
+            Column(
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "영상 분석",
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Column {
-                    Row {
-                        VideoPicker(onVideoSelected = { address ->
-                            viewModel.videoUri.value = Uri.parse(address)
-                            videoFrame = defaultBitmap
-                        })
-                    }
-
-                    Row {
-                        OutlinedButton(
-                            onClick = { dispatchTakeVideoIntent(activity,viewModel) },
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(2.dp, Color.Blue),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Blue
-                            ),
-                            modifier = Modifier.padding(16.dp)
+                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+                ) {
+                    Text(
+                        text = "영상 분석",
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(0.5f)
                         ) {
-                            Text("동영상 촬영")
-                        }
-
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.videoUri.value = Uri.EMPTY
+                            VideoPicker(onVideoSelected = { address ->
+                                viewModel.videoUri.value = Uri.parse(address)
                                 videoFrame = defaultBitmap
-                            },
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(2.dp, Color.Blue),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Blue
-                            ),
-                            modifier = Modifier.padding(16.dp)
-                        ){
-                            Text("Clear")
+                            })
                         }
-                    }
 
-                    Log.d("compare","$videoFrame $viewModel.videoUri")
-                    if ( !videoFrame.sameAs(defaultBitmap) ) {
-                        Column {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
-                                    .height(400.dp)
-                            ) {
-                                Image(
-                                    bitmap = videoFrame.asImageBitmap(),
-                                    contentDescription = "Video frame",
-                                    contentScale = ContentScale.FillBounds,
+                        Column(
+                            modifier = Modifier.weight(0.5f)
+                        ) {
+                            IntentButton(title = "카메라") {
+                                dispatchTakeVideoIntent(activity, viewModel)
+                            }
+//                        OutlinedButton(
+//                            onClick = { dispatchTakeVideoIntent(activity,viewModel) },
+//                            shape = RoundedCornerShape(20.dp),
+//                            border = BorderStroke(2.dp, Color.Blue),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                backgroundColor = Color.White,
+//                                contentColor = Color.Blue
+//                            ),
+//                            modifier = Modifier.padding(16.dp)
+//                        ) {
+//                            Text("동영상 촬영")
+//                        }
+//
+//                        OutlinedButton(
+//                            onClick = {
+//                                viewModel.videoUri.value = Uri.EMPTY
+//                                videoFrame = defaultBitmap
+//                            },
+//                            shape = RoundedCornerShape(20.dp),
+//                            border = BorderStroke(2.dp, Color.Blue),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                backgroundColor = Color.White,
+//                                contentColor = Color.Blue
+//                            ),
+//                            modifier = Modifier.padding(16.dp)
+//                        ){
+//                            Text("Clear")
+//                        }
+                        }
+
+                        Log.d("compare", "$videoFrame $viewModel.videoUri")
+                        if (!videoFrame.sameAs(defaultBitmap)) {
+                            Column {
+                                Box(
                                     modifier = Modifier
-                                        .fillMaxHeight()
-                                        .align(Alignment.Center)
-                                        .clickable(onClick = {
-                                            val intent = Intent(Intent.ACTION_VIEW)
-                                            intent.setDataAndType(viewModel.videoUri.value, "video/*")
+                                        .fillMaxWidth()
+                                        .border(BorderStroke(width = 4.dp, color = Color.Black))
+                                        .height(400.dp)
+                                ) {
+                                    Image(
+                                        bitmap = videoFrame.asImageBitmap(),
+                                        contentDescription = "Video frame",
+                                        contentScale = ContentScale.FillBounds,
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .align(Alignment.Center)
+                                            .clickable(onClick = {
+                                                val intent = Intent(Intent.ACTION_VIEW)
+                                                intent.setDataAndType(
+                                                    viewModel.videoUri.value,
+                                                    "video/*"
+                                                )
 //                                        intent.putExtra("loop", true) // 비디오 반복재생 설정
 //                                        intent.putExtra("position", 5000) ms 단위로 비디오 시작점 지정
 //                                        intent.putExtra("control", false) // 재생여부등 기본긴으 컨트롤러 키기
 //                                        intent.putExtra("quality", "1080p") 화질 조정정                                        startActivity(context,intent,null)
-                                        })
-                                )
+                                            })
+                                    )
+                                }
+                                Text(text = "영상 제목 : $videoTitle")
+                                Text(text = "영상 길이 : $videoLength ms")
+                                Text(text = "영상 크기 : $videoSize byte")
                             }
-                            Text(text = "영상 제목 : $videoTitle")
-                            Text(text = "영상 길이 : $videoLength ms")
-                            Text(text = "영상 크기 : $videoSize byte")
                         }
                     }
                 }
             }
         }//최외곽 컬럼 끝
-        
+
     }
 
 }
