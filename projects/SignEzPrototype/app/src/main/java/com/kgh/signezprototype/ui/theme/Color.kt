@@ -13,6 +13,7 @@ val OneBGWhite = Color(0xFFFFFFFF)
 val OneBGGrey = Color(0xFFF6F6F6)
 val OneBGDarkGrey = Color(0xFFE3E3E3)
 val OneBGBlue = Color(0xFF0381FE)
+val OneOutLineGrey = Color(0xFFDCDCDC)
 
 val OneTextBlack = Color(0xFF000000)
 val OneTextGrey = Color(0xFF969696)

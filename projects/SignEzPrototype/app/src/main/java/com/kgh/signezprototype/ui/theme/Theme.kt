@@ -9,10 +9,12 @@ import androidx.compose.runtime.Composable
 
 private val OneLightColorPalette = lightColors(
 
-    // 버튼
+    // 튜토리얼 버튼
     primary = OneBGBlue,
     // 입력창, 선택된 리스트
     secondary = OneBGDarkGrey,
+    // 버튼 아웃라인
+    secondaryVariant = OneOutLineGrey,
     // 기본 백그라운드 색상
     background = OneBGGrey,
     // 컴포넌트들 기본 색상
