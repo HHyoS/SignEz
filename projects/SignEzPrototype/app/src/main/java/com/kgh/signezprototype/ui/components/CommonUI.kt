@@ -296,7 +296,8 @@ fun BottomSingleFlatButton(
         modifier = Modifier
 //            .padding(top = 10.dp, end = 15.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
+//            .wrapContentHeight()
+            .height(65.dp),
     ) {
         Text(
             text = title,
@@ -326,7 +327,7 @@ fun BottomDoubleFlatButton(
             enabled = isLeftUsable,
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
+                .height(65.dp)
                 .weight(1f)
         ) {
             if (isLeftUsable) {
@@ -355,7 +356,7 @@ fun BottomDoubleFlatButton(
             enabled = isRightUsable,
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
+                .height(65.dp)
                 .weight(1f),
         ) {
             if (isRightUsable) {

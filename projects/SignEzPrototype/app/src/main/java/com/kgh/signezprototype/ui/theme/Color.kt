@@ -17,5 +17,6 @@ val OneOutLineGrey = Color(0xFFDCDCDC)
 val OneBtnGrey = Color(0xFFE6E6E6)
 
 val OneTextBlack = Color(0xFF000000)
+val OneTextLightBlack = Color(0xFF575757)
 val OneTextGrey = Color(0xFF969696)
 val OneTextWhite = Color(0xFFFAFAFA)

@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.pickers.loadImageMetadata
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,8 @@ fun PictureAnalysis(
     dispatchTakePictureIntent: (Activity, PictureViewModel,Int) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: PictureViewModel
+    viewModel: PictureViewModel,
+    analysisViewModel: AnalysisViewModel
 ) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -70,6 +72,8 @@ fun PictureAnalysis(
         } else {
             contentUri = viewModel.imageUri.value
         }
+        analysisViewModel.videoContentUri.value = Uri.EMPTY
+        analysisViewModel.imageContentUri.value = contentUri
     }
 
 //    var tempUri by remember { mutableStateOf(Uri.EMPTY) }

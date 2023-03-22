@@ -207,7 +207,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                 if (viewModel.selectedCabinetId.value == -1L) {
                     OutlinedButton(
                         onClick = {
-                            navController.navigate(CabinetListScreenDestination.route)
+                            navController.navigate(CabinetListScreenDestination.route+"/edit")
                         },
                         shape = RoundedCornerShape(20.dp),
                         border = BorderStroke(2.dp, Color.Blue),

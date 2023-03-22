@@ -25,6 +25,7 @@ import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.pickers.VideoPicker
 import com.kgh.signezprototype.pickers.getVideoTitle
 import com.kgh.signezprototype.pickers.loadVideoMetadata
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,8 @@ fun VideoAnalysis(
     dispatchTakeVideoIntent: (Activity, VideoViewModel) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: VideoViewModel
+    viewModel: VideoViewModel,
+    analysisViewModel: AnalysisViewModel
 ) {
     val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     val coroutineScope = rememberCoroutineScope()
@@ -91,6 +93,8 @@ fun VideoAnalysis(
                 videoSize =
                     metadata.third.toLong() //  byte, val megabytes = bytes.toDouble() / (1024 * 1024)
             }
+            analysisViewModel.imageContentUri.value = Uri.EMPTY
+            analysisViewModel.videoContentUri.value = contentUri
         }
         loadVideoThumbnail()
     }

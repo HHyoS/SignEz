@@ -49,4 +49,5 @@ interface CabinetsRepository {
     suspend fun updateCabinet(cabinet: Cabinet)
 
     suspend fun getCabinetBySignageId(signageId: Long): Cabinet
+    suspend fun getNewCabinet(cabinetId: Long): Cabinet
 }

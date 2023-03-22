@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Item
 import com.kgh.signezprototype.data.entities.Signage
 import kotlinx.coroutines.flow.Flow
@@ -48,4 +49,10 @@ interface SignageDao {
 
     @Delete
     suspend fun delete(signage: Signage)
+
+    @Query("""
+        SELECT * FROM signages
+        WHERE signages.id = :signageId
+    """)
+    suspend fun getSignageById(signageId: Long): Signage
 }

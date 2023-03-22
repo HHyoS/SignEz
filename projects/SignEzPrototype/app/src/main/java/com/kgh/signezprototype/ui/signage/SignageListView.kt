@@ -1,21 +1,17 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
-import androidx.compose.runtime.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -24,31 +20,45 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
-import com.kgh.signezprototype.ui.inputs.VideoScreenDestination
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGBlue
 import com.kgh.signezprototype.ui.theme.OneBGGrey
 import java.text.NumberFormat
 import java.util.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.composed
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
+import com.kgh.signezprototype.R
+import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
+import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
+import com.kgh.signezprototype.ui.components.SignEzFloatingButton
+import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 
 object SignageListScreenDestination : NavigationDestination {
     override val route = "SignageList"
     override val titleRes = "Total Signage"
 }
+// clickable의 ripple효과 없애는 메서드
+inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier = composed {
+    clickable(indication = null,
+        interactionSource = remember { MutableInteractionSource() }) {
+        onClick()
+    }
+}
+
 @Composable
 fun SignageInformationScreen(    
     onItemClick: (Signage) -> Unit,
@@ -62,7 +72,8 @@ fun SignageInformationScreen(
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
-            .clickable(onClick = { focusManager.clearFocus() })
+//            .noRippleClickable { focusManager.clearFocus() }
+            .clickable{ focusManager.clearFocus() }
             .background(OneBGGrey),
         topBar = {
             SignEzTopAppBar(
@@ -71,23 +82,24 @@ fun SignageInformationScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(AddSignageDestination.route) }, //navigateToEditItem(uiState.value.id)
-                modifier = Modifier.navigationBarsPadding(),
-                backgroundColor = OneBGBlue
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "사이니지 추가",
-                    tint = Color.White
-                )
-            }
+            SignEzFloatingButton(
+                onClickEvent = { navController.navigate(AddSignageDestination.route) }
+            )
         },
+        bottomBar = {
+            if (selectedId > -1) {
+                BottomSingleFlatButton(title = "선택", isUsable = true) {
+                    viewModel.signageId.value = selectedId
+                    navController.popBackStack()
+                }
+            }
+        }
     ){ innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
-                .fillMaxWidth(),
+                .padding(start = 16.dp, end = 16.dp)
+                .fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
             Box(
@@ -97,16 +109,21 @@ fun SignageInformationScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     SearchBar()
                     Spacer(modifier.padding(10.dp))
-                    Text(text = "전체 사이니지",
-                        modifier=modifier
-                            .align(alignment=Alignment.Start),
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                    Text(
+                        text = "전체 사이니지",
+                        modifier = modifier
+                            .align(alignment = Alignment.Start)
+                            .padding(start = 10.dp),
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.colors.onSurface,
                     )
+                    Spacer(modifier.padding(5.dp))
                     Box(
                         modifier = Modifier
-                            .fillMaxSize(0.9F)
-                            .background(Color.White, shape = RoundedCornerShape(10.dp)),
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.99F)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         SignageList(onItemClick = { signage ->
@@ -117,9 +134,11 @@ fun SignageInformationScreen(
                                     selectedId = signage.id
                                 }
                             }
-                        }, selectedId = selectedId)
+                        }, selectedId = selectedId,
+                            navController=navController)
                     }
 
+                    // 삭제하시나여?
                     if (selectedId > -1) {
                         Button(onClick = {
                             viewModel.signageId.value = selectedId
@@ -141,7 +160,8 @@ fun SignageList(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    selectedId: Long
+    selectedId: Long,
+    navController:NavHostController
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
@@ -164,64 +184,131 @@ fun SignageList(
             style = MaterialTheme.typography.subtitle2
         )
     } else {
-        LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(
+            modifier = modifier.background(MaterialTheme.colors.surface),
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(items = itemList, key = { it.id }) { item ->
-                InventoryItem(signage = item,
+                InventoryItem(
+                    signage = item,
                     onItemClick = onItemClick,
-                selectedId=selectedId)
-                Divider()
+                    selectedId=selectedId,
+                    navController=navController)
+                Divider(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth(0.95f),
+                    startIndent = 70.dp
+                )
             }
         }
     }
 }
+
+// 조건 맞춰서 Modifier 바꾸는 것
+fun Modifier.conditional(condition: Boolean, modifier: Modifier.() -> Modifier): Modifier {
+    return if (condition) {
+        then(modifier(Modifier))
+    } else {
+        this
+    }
+}
+
 
 @Composable
 private fun InventoryItem(
     signage: Signage,
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
-    selectedId:Long
+    selectedId: Long,
+    navController: NavHostController
 ) {
-    Row(modifier = modifier
+    Row(
+        modifier = Modifier
         .fillMaxWidth()
-        .clickable { onItemClick(signage) }
-        .padding(vertical = 4.dp),
+        .conditional(selectedId == signage.id) {
+            background(
+                color = Color(0xFFE6E6E6)
+            )
+        }
+        .clickable {
+            navController.navigate(DetailSignageScreenDestination.route+"/${signage.id}")
+        },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var bitmap:Bitmap
-        RadioButton(
-            selectedId==signage.id,
-            onClick = { onItemClick(signage)},
-            enabled=true
-        ) // 라디오 버튼
-        signage.repImg?.let { byteArray ->
-            byteArray.let {
-                bitmap = byteArrayToBitmap(it)
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Signage Image",
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(15.dp))
+        var bitmap: Bitmap
+        Row(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(start = 5.dp, end = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selectedId == signage.id,
+                onClick = {
+                    onItemClick(signage)
+                },
+                enabled = true,
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colors.onSurface,
+                    unselectedColor = MaterialTheme.colors.secondary
                 )
-            }
-        } // 대표 이미지
-        Column (modifier=modifier.padding(start=16.dp)) {
-            Text(
-                text = signage.name,
-                fontWeight = FontWeight.Bold,
-                color=Color.Black,
-                fontSize = 20.sp,
-            )
-            Row (modifier=modifier.padding()) {
-                Text (
-                    text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(signage.width)+"mm / ",
-                )
+            ) // 라디오 버튼
+        }
+        Divider(
+//            color = MaterialTheme.colors.onSurface,
+            modifier = Modifier
+                .height(20.dp)
+                .width(1.dp)
+        )
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clickable { /*여기에 해당 사이니지 정보로가는 이벤트 넣으면 됩니다*/ }
+                .padding(vertical = 5.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.padding(start = 10.dp)) {
+                signage.repImg?.let { byteArray ->
+                    byteArray.let {
+                        bitmap = byteArrayToBitmap(it)
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Signage Image",
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                        )
+                    }
+                }
+            } // 대표 이미지
+
+            Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp))
+            {
                 Text(
-                    text = "H : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(signage.height)+"mm",
+                    text = signage.name,
+                    style = MaterialTheme.typography.h4,
+                    color = MaterialTheme.colors.onSecondary,
+                    modifier = Modifier.padding(bottom = 5.dp)
                 )
-            }
+
+                Row(modifier = modifier.padding(top = 3.dp)) {
+                    Text(
+                        text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault())
+                            .format(signage.width) + "mm / ",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                    Text(
+                        text = "H : " + NumberFormat.getNumberInstance(Locale.getDefault())
+                            .format(signage.height) + "mm",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                }
+            } // 텍스트 공간
         } // 텍스트 공간
     }
 }
@@ -230,7 +317,7 @@ private fun InventoryItem(
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    hint: String = "설치 장소 검색",
+    placeholder: String = "설치 장소 검색",
     onSearch: (String) -> Unit = {}
 ) {
     val searchQuery = remember { mutableStateOf("") }
@@ -239,8 +326,16 @@ fun SearchBar(
     OutlinedTextField(
         value = searchQuery.value,
         onValueChange = { newValue -> searchQuery.value = newValue },
-        modifier = Modifier.fillMaxWidth(0.9f),
-        label = { Text(hint) },
+        modifier = Modifier
+            .fillMaxWidth(),
+        textStyle = MaterialTheme.typography.h3,
+        placeholder = {
+            Text(
+                text = placeholder,
+                style = MaterialTheme.typography.h3,
+                color = MaterialTheme.colors.onBackground,
+            )
+        },
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = {
@@ -248,8 +343,20 @@ fun SearchBar(
             keyboardController?.hide()
         }),
         colors = androidx.compose.material.TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = Color.Black,
-            unfocusedBorderColor = Color.Gray
+            textColor = MaterialTheme.colors.onSurface,
+            backgroundColor = MaterialTheme.colors.secondary,
+            focusedBorderColor = MaterialTheme.colors.secondary,
+            unfocusedBorderColor = MaterialTheme.colors.secondary
         )
     )
 }
+
+//@Preview
+//@Composable
+//fun ComponentPreview() {
+//    SignEzPrototypeTheme(darkTheme = false) {
+//        Column {
+//            SearchBar()
+//        }
+//   }
+//}

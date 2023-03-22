@@ -27,7 +27,9 @@ import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.MainViewModel
 import com.kgh.signezprototype.ui.inputs.PictureViewModel
 import com.kgh.signezprototype.ui.inputs.VideoViewModel
+import com.kgh.signezprototype.ui.signage.CabinetDetailViewModel
 import com.kgh.signezprototype.ui.signage.CabinetViewModel
+import com.kgh.signezprototype.ui.signage.SignageDetailViewModel
 import com.kgh.signezprototype.ui.signage.SignageViewModel
 
 /**
@@ -55,6 +57,13 @@ object AppViewModelProvider {
 
         initializer {
             AnalysisViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+        }
+
+        initializer {
+            SignageDetailViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+        }
+        initializer {
+            CabinetDetailViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
         }
     }
 }

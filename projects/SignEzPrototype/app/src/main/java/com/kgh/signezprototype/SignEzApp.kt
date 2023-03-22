@@ -32,7 +32,9 @@ import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.PictureViewModel
 import com.kgh.signezprototype.ui.inputs.VideoViewModel
 import com.kgh.signezprototype.ui.navigation.SignEzNavHost
+import com.kgh.signezprototype.ui.signage.CabinetDetailViewModel
 import com.kgh.signezprototype.ui.signage.CabinetViewModel
+import com.kgh.signezprototype.ui.signage.SignageDetailViewModel
 import com.kgh.signezprototype.ui.signage.SignageViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 
@@ -44,7 +46,9 @@ fun SignEzApp(
     viewModel2: VideoViewModel,
     viewModel3: SignageViewModel,
     viewModel4: CabinetViewModel,
-    viewModel5: AnalysisViewModel
+    viewModel5: AnalysisViewModel,
+    viewModel6: SignageDetailViewModel,
+    viewModel7: CabinetDetailViewModel
     ) {
     SignEzNavHost(
         navController = navController,
@@ -53,7 +57,9 @@ fun SignEzApp(
         viewModel2 = viewModel2,
         viewModel3 = viewModel3,
         viewModel4 = viewModel4,
-        viewModel5 = viewModel5
+        viewModel5 = viewModel5,
+        viewModel6 = viewModel6,
+        viewModel7 = viewModel7
         )
 }
 

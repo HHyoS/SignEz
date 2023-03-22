@@ -5,44 +5,34 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
-import androidx.compose.runtime.R
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
-import com.kgh.signezprototype.ui.inputs.VideoScreenDestination
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGBlue
 import com.kgh.signezprototype.ui.theme.OneBGGrey
 import java.text.NumberFormat
 import java.util.*
+import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
+import com.kgh.signezprototype.ui.components.SignEzFloatingButton
 
 object CabinetListScreenDestination : NavigationDestination {
     override val route = "CabinetList"
@@ -53,15 +43,17 @@ object CabinetListScreenDestination : NavigationDestination {
 fun CabinetInformationScreen(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
-    navController:NavHostController,
-    signageViewModel:SignageViewModel
+    navController: NavHostController,
+    signageViewModel: SignageViewModel,
+    detailViewModel: SignageDetailViewModel,
+    mode: String
     ) {
 
     val focusManager = LocalFocusManager.current
-    var selectedId:Long by remember { mutableStateOf(-1)}
+    var selectedId: Long by remember { mutableStateOf(-1) }
     androidx.compose.material.Scaffold(
         modifier = Modifier
-            .clickable(onClick = { focusManager.clearFocus() })
+            .noRippleClickable { focusManager.clearFocus() }
             .background(OneBGGrey),
         topBar = {
             SignEzTopAppBar(
@@ -70,23 +62,24 @@ fun CabinetInformationScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(AddCabinetDestination.route) }, //navigateToEditItem(uiState.value.id)
-                modifier = Modifier.navigationBarsPadding(),
-                backgroundColor = OneBGBlue
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "캐비닛 추가",
-                    tint = Color.White
-                )
+            SignEzFloatingButton(
+                onClickEvent = { navController.navigate(AddCabinetDestination.route) }
+            )
+        },
+        bottomBar = {
+            if (selectedId != -1L) {
+                BottomSingleFlatButton(title = "선택", isUsable = true) {
+                    signageViewModel.selectedCabinetId.value = selectedId
+                    navController.popBackStack()
+                }
             }
         },
-    ){ innerPadding ->
+    ) { innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
-                .fillMaxWidth(),
+                .padding(start = 16.dp, end = 16.dp)
+                .fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
             Box(
@@ -94,18 +87,24 @@ fun CabinetInformationScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-//                    SearchBar()
+                    SearchBar(placeholder = "모델 명 검색")
                     Spacer(modifier.padding(10.dp))
-                    Text(text = "전체 캐비닛",
-                        modifier=modifier
-                            .align(alignment=Alignment.Start),
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                    Text(
+                        text = "전체 캐비닛",
+                        modifier = modifier
+                            .align(alignment = Alignment.Start)
+                            .padding(start = 10.dp),
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.colors.onSurface,
                     )
+                    Spacer(modifier.padding(5.dp))
+
                     Box(
                         modifier = Modifier
-                            .fillMaxSize(0.9F)
-                            .background(Color.White, shape = RoundedCornerShape(10.dp)),
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.99F)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         CabinetList(onItemClick = { cabinet ->
@@ -116,15 +115,27 @@ fun CabinetInformationScreen(
                                     selectedId = cabinet.id
                                 }
                             }
-                        }, selectedId = selectedId)
+                        }, selectedId = selectedId,
+                            navController = navController)
                     }
+                    // 이거 지우나요?
                     if (selectedId != -1L) {
-                        Button(onClick = {
-                            signageViewModel.selectedCabinetId.value = selectedId
-                            navController.popBackStack()
-                        }) {
-                            Text(text = "선택")
+                        if (mode == "edit") {
+                            Button(onClick = {
+                                detailViewModel.newCabinetId.value = selectedId
+                                navController.popBackStack()
+                            }) {
+                                Text(text = "선택")
+                            }
+                        } else {
+                            Button(onClick = {
+                                signageViewModel.selectedCabinetId.value = selectedId
+                                navController.popBackStack()
+                            }) {
+                                Text(text = "선택")
+                            }
                         }
+
                     }
                 }
             }
@@ -137,7 +148,8 @@ fun CabinetList(
     onItemClick: (Cabinet) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CabinetViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    selectedId: Long
+    selectedId: Long,
+    navController:NavController
 ) {
     val cabinetListState by viewModel.cabinetListState.collectAsState()
     val itemList = cabinetListState.itemList
@@ -147,12 +159,22 @@ fun CabinetList(
             style = MaterialTheme.typography.subtitle2
         )
     } else {
-        LazyColumn(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyColumn(
+            modifier = modifier.background(MaterialTheme.colors.surface),
+//            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             items(items = itemList, key = { it.id }) { item ->
-                InventoryItem(cabinet = item,
+                InventoryItem(
+                    cabinet = item,
                     onItemClick = onItemClick,
-                    selectedId=selectedId)
-                Divider()
+                    selectedId = selectedId,
+                    navController = navController)
+                Divider(
+                    modifier = Modifier
+                        .height(1.dp)
+                        .fillMaxWidth(0.95f),
+                    startIndent = 70.dp
+                )
             }
         }
     }
@@ -163,51 +185,95 @@ private fun InventoryItem(
     cabinet: Cabinet,
     onItemClick: (Cabinet) -> Unit,
     modifier: Modifier = Modifier,
-    selectedId:Long
+    selectedId: Long,
+    navController: NavController
 ) {
     Row(modifier = modifier
+        .clickable { navController.navigate(DetailCabinetScreenDestination.route + "/${cabinet.id}") }
         .fillMaxWidth()
-        .clickable { onItemClick(cabinet) }
-        .padding(vertical = 4.dp),
+        .conditional(selectedId == cabinet.id) {
+            background(
+                color = Color(0xFFE6E6E6)
+            )
+        },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        var bitmap:Bitmap
-        RadioButton(
-            selectedId==cabinet.id,
-            onClick = { onItemClick(cabinet)},
-            enabled=true
-        ) // 라디오 버튼
-        cabinet.repImg?.let { byteArray ->
-            byteArray.let {
-                bitmap = byteArrayToBitmap(it)
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Signage Image",
-                    modifier = Modifier
-                        .size(60.dp)
-                        .clip(RoundedCornerShape(15.dp))
+
+        var bitmap: Bitmap
+        Row(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(start = 5.dp, end = 5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selectedId == cabinet.id,
+                onClick = { onItemClick(cabinet) },
+                enabled = true,
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = MaterialTheme.colors.onSurface,
+                    unselectedColor = MaterialTheme.colors.secondary
                 )
-            }
-        } // 대표 이미지
-        Column (modifier=modifier.padding(start=16.dp)) {
-            Text(
-                text = cabinet.name,
-                fontWeight = FontWeight.Bold,
-                color=Color.Black,
-                fontSize = 20.sp,
-            )
-            Row (modifier=modifier.padding()) {
-                Text (
-                    text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(cabinet.cabinetWidth)+"mm / ",
-                )
+            ) // 라디오 버튼
+        }
+        Divider(
+//            color = MaterialTheme.colors.onSurface,
+            modifier = Modifier
+                .height(20.dp)
+                .width(1.dp)
+        )
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .clickable { /*여기에 해당 캐비닛 정보로가는 이벤트 넣으면 됩니다*/ }
+                .padding(vertical = 5.dp),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.padding(start = 10.dp)) {
+                cabinet.repImg?.let { byteArray ->
+                    byteArray.let {
+                        bitmap = byteArrayToBitmap(it)
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Cabinet Image",
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                        )
+                    }
+                }
+            }// 대표 이미지
+            Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp))
+            {
                 Text(
-                    text = "H : " + NumberFormat.getNumberInstance(Locale.getDefault()).format(cabinet.cabinetHeight)+"mm / ",
+                    text = cabinet.name,
+                    style = MaterialTheme.typography.h4,
+                    color = MaterialTheme.colors.onSecondary,
+                    modifier = Modifier.padding(bottom = 5.dp)
                 )
-                Text(
-                    text = "${cabinet.moduleColCount}X${cabinet.moduleRowCount}"
-                )
-            }
-        } // 텍스트 공간
+
+                Row(modifier = modifier.padding(top = 3.dp)) {
+                    Text(
+                        text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault())
+                            .format(cabinet.cabinetWidth) + "mm / ",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                    Text(
+                        text = "H : " + NumberFormat.getNumberInstance(Locale.getDefault())
+                            .format(cabinet.cabinetHeight) + "mm / ",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                    Text(
+                        text = "${cabinet.moduleColCount}X${cabinet.moduleRowCount}",
+                        style = MaterialTheme.typography.body2,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                }
+            } // 텍스트 공간
+        }
     }
 }
