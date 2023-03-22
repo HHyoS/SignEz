@@ -28,6 +28,8 @@ private val OneLightColorPalette = lightColors(
     onSurface = OneTextBlack,
     // 회색 글씨
     onBackground = OneTextGrey,
+    // 얕은 검정
+    onSecondary =  OneTextLightBlack
 
     )
 
