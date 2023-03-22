@@ -2,7 +2,6 @@ package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -45,7 +44,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import com.kgh.signezprototype.R
 import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
 import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
 import com.kgh.signezprototype.ui.components.SignEzFloatingButton
@@ -76,8 +74,8 @@ fun SignageInformationScreen(
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
-//            .noRippleClickable { focusManager.clearFocus() }
-            .clickable{ focusManager.clearFocus() }
+            .noRippleClickable { focusManager.clearFocus() }
+//            .clickable{ focusManager.clearFocus() }
             .background(OneBGGrey),
         topBar = {
             SignEzTopAppBar(
@@ -234,9 +232,6 @@ private fun InventoryItem(
             background(
                 color = Color(0xFFE6E6E6)
             )
-        }
-        .clickable {
-            navController.navigate(DetailSignageScreenDestination.route+"/${signage.id}")
         },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
@@ -269,7 +264,7 @@ private fun InventoryItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clickable { /*여기에 해당 사이니지 정보로가는 이벤트 넣으면 됩니다*/ }
+                .clickable { navController.navigate(DetailSignageScreenDestination.route+"/${signage.id}") }
                 .padding(vertical = 5.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
