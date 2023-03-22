@@ -50,4 +50,6 @@ interface SignagesRepository {
      * Update item in the data source
      */
     suspend fun updateSignage(signage: Signage)
+
+    suspend fun getSignageById(signageId: Long) : Signage
 }

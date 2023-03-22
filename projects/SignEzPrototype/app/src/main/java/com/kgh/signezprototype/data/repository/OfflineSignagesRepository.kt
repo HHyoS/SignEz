@@ -30,4 +30,5 @@ class OfflineSignagesRepository(private val signageDao: SignageDao) : SignagesRe
     override suspend fun deleteSignage(signage: Signage) = signageDao.delete(signage)
 
     override suspend fun updateSignage(signage: Signage) = signageDao.update(signage)
+    override suspend fun getSignageById(signageId: Long) = signageDao.getSignageById(signageId)
 }
