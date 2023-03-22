@@ -121,7 +121,8 @@ fun SignageInformationScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(0.99F)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
                     ) {
                         SignageList(onItemClick = { signage ->
@@ -230,7 +231,6 @@ private fun InventoryItem(
                 selectedId == signage.id,
                 onClick = {
                     onItemClick(signage)
-//                    isclicked = !isclicked
                 },
                 enabled = true,
                 colors = RadioButtonDefaults.colors(
@@ -291,7 +291,6 @@ private fun InventoryItem(
                 }
             } // 텍스트 공간
         }
-
     }
 }
 
