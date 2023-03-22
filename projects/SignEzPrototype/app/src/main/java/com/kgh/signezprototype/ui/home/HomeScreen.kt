@@ -54,6 +54,15 @@ fun HomeScreen(
 //                rightOnClickEvent = { /*TODO*/ }
 //            )
 //        }
+        bottomBar = {
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp),
+            ) {
+                VideoAnalysisBtn(navigateToVideo)
+                PictureAnalysisBtn(navigateToPicture)
+            }
+        }
         // 플로팅 버튼 예시
 //        floatingActionButton = {
 //            SignEzFloatingButton(
@@ -88,10 +97,10 @@ fun HomeScreen(
                     SignEzSpec(modifier = Modifier, navigateToSignageList, null)
                     CabinetSpec(modifier = Modifier, null)
                 }
-                Spacer(modifier = Modifier.padding(110.dp))
-                VideoAnalysisBtn(navigateToVideo)
-                PictureAnalysisBtn(navigateToPicture)
-                Text(text = "${viewModel.signageId.value}")
+//                Spacer(modifier = Modifier.padding(110.dp))
+//                VideoAnalysisBtn(navigateToVideo)
+//                PictureAnalysisBtn(navigateToPicture)
+//                Text(text = "${viewModel.signageId.value}")
             }
         }
     }

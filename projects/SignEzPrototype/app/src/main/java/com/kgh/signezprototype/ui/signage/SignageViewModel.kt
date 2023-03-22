@@ -54,22 +54,112 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
 
     fun insertTestRecord() = viewModelScope.launch {
         // Save image as a Blob
-        val bitmap = createSimpleBitmap(100, 100, Color.RED)
+        val bitmap = createSimpleBitmap(100, 100, Color.BLUE)
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
         val byteArray = outputStream.toByteArray()
         Log.d("testing",byteArray.size.toString() )
 
         val testAnalysisResult = Signage(id = 1L,
-            name="TEST",
-            height =5.4,
-            width=5.2,
+            name="신세계 백화점 강남점",
+            height = 19000.0,
+            width = 11000.0,
             heightCabinetNumber = 5,
             widthCabinetNumber = 7,
             modelId = 1,
             repImg = byteArray
         )
         signageRepository.insertSignage(testAnalysisResult)
+        val testAnalysisResult2 = Signage(id = 2L,
+            name="신세계 백화점 본점",
+            height = 19000.0,
+            width = 11000.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult2)
+        val testAnalysisResult3 = Signage(id = 3L,
+            name="현대 백화점 천호점",
+            height = 19000.0,
+            width = 11000.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult3)
+        val testAnalysisResult4 = Signage(id = 4L,
+            name="현대 백화점 목동점",
+            height = 19000.0,
+            width = 11000.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult4)
+        val testAnalysisResult5 = Signage(id = 5L,
+            name="현대 백화점 대구점",
+            height = 19000.0,
+            width = 11000.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult5)
+        val testAnalysisResult6 = Signage(id = 6L,
+            name="현대 백화점 대구점",
+            height = 19000.0,
+            width = 11000.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult6)
+        val testAnalysisResult7 = Signage(id = 7L,
+            name="현대 백화점 대구점",
+            height = 1900.0,
+            width = 1100.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult7)
+        val testAnalysisResult8 = Signage(id = 8L,
+            name="현대 백화점 대구점",
+            height = 1900.0,
+            width = 1100.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult8)
+        val testAnalysisResult9 = Signage(id = 9L,
+            name="현대 백화점 대구점",
+            height = 1900.0,
+            width = 1100.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult9)
+        val testAnalysisResult10 = Signage(id = 10L,
+            name="현대 백화점 대구점",
+            height = 1900.0,
+            width = 1100.0,
+            heightCabinetNumber = 5,
+            widthCabinetNumber = 7,
+            modelId = 1,
+            repImg = byteArray
+        )
+        signageRepository.insertSignage(testAnalysisResult10)
     }
 
     fun saveItem(name:String,width:Double,height:Double,bitmap:Bitmap,modelId:Long=0) = viewModelScope.launch {
