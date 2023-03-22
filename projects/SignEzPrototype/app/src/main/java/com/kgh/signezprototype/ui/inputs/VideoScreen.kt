@@ -182,42 +182,42 @@ fun VideoAnalysis(
 //                            Text("Clear")
 //                        }
                         }
-
-                        Log.d("compare", "$videoFrame $viewModel.videoUri")
-                        if (!videoFrame.sameAs(defaultBitmap)) {
-                            Column {
-                                Box(
+                    }
+                    Log.d("compare", "$videoFrame $viewModel.videoUri")
+                    if (!videoFrame.sameAs(defaultBitmap)) {
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
+                                    .height(400.dp)
+                            ) {
+                                Image(
+                                    bitmap = videoFrame.asImageBitmap(),
+                                    contentDescription = "Video frame",
+                                    contentScale = ContentScale.FillBounds,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .border(BorderStroke(width = 4.dp, color = Color.Black))
-                                        .height(400.dp)
-                                ) {
-                                    Image(
-                                        bitmap = videoFrame.asImageBitmap(),
-                                        contentDescription = "Video frame",
-                                        contentScale = ContentScale.FillBounds,
-                                        modifier = Modifier
-                                            .fillMaxHeight()
-                                            .align(Alignment.Center)
-                                            .clickable(onClick = {
-                                                val intent = Intent(Intent.ACTION_VIEW)
-                                                intent.setDataAndType(
-                                                    viewModel.videoUri.value,
-                                                    "video/*"
-                                                )
+                                        .fillMaxHeight()
+                                        .align(Alignment.Center)
+                                        .clickable(onClick = {
+                                            val intent = Intent(Intent.ACTION_VIEW)
+                                            intent.setDataAndType(
+                                                viewModel.videoUri.value,
+                                                "video/*"
+                                            )
 //                                        intent.putExtra("loop", true) // 비디오 반복재생 설정
 //                                        intent.putExtra("position", 5000) ms 단위로 비디오 시작점 지정
 //                                        intent.putExtra("control", false) // 재생여부등 기본긴으 컨트롤러 키기
 //                                        intent.putExtra("quality", "1080p") 화질 조정정                                        startActivity(context,intent,null)
-                                            })
-                                    )
-                                }
-                                Text(text = "영상 제목 : $videoTitle")
-                                Text(text = "영상 길이 : $videoLength ms")
-                                Text(text = "영상 크기 : $videoSize byte")
+                                        })
+                                )
                             }
+                            Text(text = "영상 제목 : $videoTitle")
+                            Text(text = "영상 길이 : $videoLength ms")
+                            Text(text = "영상 크기 : $videoSize byte")
                         }
                     }
+
                 }
             }
         }//최외곽 컬럼 끝

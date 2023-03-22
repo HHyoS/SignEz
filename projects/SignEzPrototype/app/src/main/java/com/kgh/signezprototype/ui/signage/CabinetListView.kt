@@ -190,7 +190,7 @@ private fun InventoryItem(
     navController: NavController
 ) {
     Row(modifier = modifier
-        .clickable { navController.navigate(DetailCabinetScreenDestination.route + "/${cabinet.id}") }
+//        .clickable {  }
         .fillMaxWidth()
         .conditional(selectedId == cabinet.id) {
             background(
@@ -227,7 +227,7 @@ private fun InventoryItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clickable { /*여기에 해당 캐비닛 정보로가는 이벤트 넣으면 됩니다*/ }
+                .clickable { navController.navigate(DetailCabinetScreenDestination.route + "/${cabinet.id}") }
                 .padding(vertical = 5.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
