@@ -2,10 +2,12 @@ package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -15,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -26,13 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.kgh.signezprototype.R
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
-import com.kgh.signezprototype.ui.theme.OneBGBlue
 import com.kgh.signezprototype.ui.theme.OneBGGrey
+import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import java.text.NumberFormat
 import java.util.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -60,15 +64,15 @@ inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier
 }
 
 @Composable
-fun SignageInformationScreen(    
+fun SignageInformationScreen(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
-    navController:NavHostController,
+    navController: NavHostController,
     viewModel: AnalysisViewModel
-    ) {
+) {
 
     val focusManager = LocalFocusManager.current
-    var selectedId:Long by remember { mutableStateOf(-1)}
+    var selectedId: Long by remember { mutableStateOf(-1) }
 
     androidx.compose.material.Scaffold(
         modifier = Modifier

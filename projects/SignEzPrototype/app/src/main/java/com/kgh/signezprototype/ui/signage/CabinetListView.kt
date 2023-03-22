@@ -39,6 +39,7 @@ object CabinetListScreenDestination : NavigationDestination {
     override val titleRes = "Total Cabinet"
 }
 
+
 @Composable
 fun CabinetInformationScreen(
     onItemClick: (Signage) -> Unit,
