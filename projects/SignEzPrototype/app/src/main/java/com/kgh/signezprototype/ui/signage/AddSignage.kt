@@ -135,7 +135,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                 }
 
 
-                Row {
+                Column {
                     ImagePicker(onImageSelected = { address ->
                         imageBitmap = bitmap
                         viewModel.imageUri.value = Uri.parse(address)

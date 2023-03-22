@@ -59,8 +59,8 @@ fun CDetail(
     ) {
 
     val coroutineScope = rememberCoroutineScope()
-    var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-    var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
+    var bitmap:Bitmap? = null
+    var imageBitmap:Bitmap? = null
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val file = File(viewModel.imageUri.value.toString())
@@ -115,7 +115,7 @@ fun CDetail(
                     byteArray.let {
                         bitmap = byteArrayToBitmap(it)
                         Image(
-                            bitmap = bitmap.asImageBitmap(),
+                            bitmap = bitmap!!.asImageBitmap(),
                             contentDescription = "Signage Image",
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
@@ -127,18 +127,20 @@ fun CDetail(
                 }
             } else {
                 imageBitmap.let {
-                    Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = "rep Image",
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .fillMaxHeight(0.3f)
-                            .clip(RoundedCornerShape(15.dp))
-                            .background(color = OneBGDarkGrey)
-                    )
+                    it?.let { it1 ->
+                        Image(
+                            bitmap = it1.asImageBitmap(),
+                            contentDescription = "rep Image",
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .fillMaxHeight(0.3f)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = OneBGDarkGrey)
+                        )
+                    }
                 }
             }
-            Row {
+            Column {
                 ImagePicker(onImageSelected = { address ->
                     imageBitmap = bitmap
                     viewModel.imageUri.value = Uri.parse(address)
@@ -225,17 +227,30 @@ fun CDetail(
                 Button(onClick = {
                     coroutineScope.launch {
                         try {
+                            Log.d("gogo","${imageBitmap == null}")
                             if (cabinet != null) {
-                                viewModel.updateRecord(
-                                    name = cabinetName.value,
-                                    width = cabinetWidth.value.toDouble(),
-                                    height = cabinetHeight.value.toDouble(),
-                                    bitmap = imageBitmap,
-                                    cabinet = cabinet,
-                                    colNum = colModuleCount.value.toInt(),
-                                    rowNum = rowModuleCount.value.toInt(),
-                                )
-                                navController.popBackStack()
+                                if (imageBitmap == null ){
+                                    viewModel.updateRecord(
+                                        name = cabinetName.value,
+                                        width = cabinetWidth.value.toDouble(),
+                                        height = cabinetHeight.value.toDouble(),
+                                        bitmap = null,
+                                        cabinet = cabinet,
+                                        colNum = colModuleCount.value.toInt(),
+                                        rowNum = rowModuleCount.value.toInt(),
+                                    )
+                                }
+                                else {
+                                    viewModel.updateRecord(
+                                        name = cabinetName.value,
+                                        width = cabinetWidth.value.toDouble(),
+                                        height = cabinetHeight.value.toDouble(),
+                                        bitmap = imageBitmap,
+                                        cabinet = cabinet,
+                                        colNum = colModuleCount.value.toInt(),
+                                        rowNum = rowModuleCount.value.toInt(),
+                                    )
+                                }
                             }
                         } catch (e: Exception) {
                             withContext(Dispatchers.Main) {
