@@ -16,12 +16,7 @@
 
 package com.kgh.signezprototype.data.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Item
 import kotlinx.coroutines.flow.Flow
@@ -46,6 +41,7 @@ interface CabinetDao {
     @Update
     suspend fun update(cabinet: Cabinet)
 
+    @Transaction
     @Delete
     suspend fun delete(cabinet: Cabinet)
 
@@ -55,4 +51,11 @@ interface CabinetDao {
         WHERE signages.id = :signageId
     """)
     suspend fun getCabinetBySignageId(signageId: Long): Cabinet
+
+    @Query("""
+        SELECT * FROM cabinets
+        WHERE cabinets.id = :cabinetId
+    """)
+    suspend fun getNewCabinet(cabinetId: Long): Cabinet
+
 }

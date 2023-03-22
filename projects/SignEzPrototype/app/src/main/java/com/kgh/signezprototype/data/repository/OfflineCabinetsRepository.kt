@@ -33,4 +33,5 @@ class OfflineCabinetsRepository(private val cabinetDao: CabinetDao) : CabinetsRe
 
     override suspend fun updateCabinet(cabinet: Cabinet) = cabinetDao.update(cabinet)
     override suspend fun getCabinetBySignageId(signageId: Long) = cabinetDao.getCabinetBySignageId(signageId)
+    override suspend fun getNewCabinet(cabinetId: Long) = cabinetDao.getNewCabinet(cabinetId)
 }
