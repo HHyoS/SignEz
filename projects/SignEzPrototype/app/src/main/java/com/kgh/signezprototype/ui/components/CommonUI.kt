@@ -105,7 +105,7 @@ fun FocusBlock(
 }
 
 @Composable
-fun AnalyzeButton(
+fun WhiteButton(
     title: String,
     isUsable: Boolean,
     onClickEvent: () -> Unit
@@ -223,7 +223,7 @@ fun IntentButton(
             containerColor = MaterialTheme.colors.primaryVariant,
         ),
         modifier = Modifier
-            .padding(top = 10.dp, end = 15.dp)
+            .padding(start = 15.dp, end = 15.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
     ) {

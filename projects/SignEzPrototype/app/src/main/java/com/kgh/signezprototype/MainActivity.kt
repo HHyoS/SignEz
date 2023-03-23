@@ -70,7 +70,9 @@ import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.MainViewModelFactory
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.*
+import com.kgh.signezprototype.ui.signage.CabinetDetailViewModel
 import com.kgh.signezprototype.ui.signage.CabinetViewModel
+import com.kgh.signezprototype.ui.signage.SignageDetailViewModel
 import com.kgh.signezprototype.ui.signage.SignageViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +94,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var viewModel3: SignageViewModel
     private lateinit var viewModel4: CabinetViewModel
     private lateinit var viewModel5: AnalysisViewModel
+    private lateinit var viewModel6: SignageDetailViewModel
+    private lateinit var viewModel7: CabinetDetailViewModel
 
     private val mainViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as SignEzApplication).container)
@@ -110,6 +114,8 @@ class MainActivity : ComponentActivity() {
     private val REQUEST_CODE_IMAGE_CAPTURE = 2
     private val REQUEST_CODE_IMAGE_CAPTURE_2 = 22
     private val REQUEST_CODE_IMAGE_CAPTURE_3 = 222
+    private val REQUEST_CODE_IMAGE_CAPTURE_4 = 2222
+    private val REQUEST_CODE_IMAGE_CAPTURE_5 = 22222
     private val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3
     private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
 
@@ -133,16 +139,22 @@ class MainActivity : ComponentActivity() {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_CODE_IMAGE_CAPTURE -> {
-                    galleryAddPic(this, viewModel1)
+                    galleryAddPic(this, viewModel1) // 사진 분석용
                 }
                 REQUEST_CODE_IMAGE_CAPTURE_2 -> {
-                    galleryAddPic(this, viewModel3)
+                    galleryAddPic(this, viewModel3) // 사이니지 생성 사진
                 }
                 REQUEST_CODE_IMAGE_CAPTURE_3 -> {
-                    galleryAddPic(this, viewModel4)
+                    galleryAddPic(this, viewModel4) // 캐비닛 생성 사진
+                }
+                REQUEST_CODE_IMAGE_CAPTURE_4 -> {
+                    galleryAddPic(this, viewModel6) // 사이니지 수정 사진
+                }
+                REQUEST_CODE_IMAGE_CAPTURE_5 -> {
+                    galleryAddPic(this, viewModel7) // 캐비닛 수정 사진
                 }
                 REQUEST_CODE_VIDEO_CAPTURE -> {
-                    galleryAddVideo(this, viewModel2)
+                    galleryAddVideo(this, viewModel2) // 영상 분석용
                 }
 
             }
@@ -182,10 +194,18 @@ class MainActivity : ComponentActivity() {
             this,
             factory = AppViewModelProvider.Factory
         ).get(CabinetViewModel::class.java)
-        viewModel5 = ViewModelProvider( // 캐비닛
+        viewModel5 = ViewModelProvider( // 분석 종합
             this,
             factory = AppViewModelProvider.Factory
         ).get(AnalysisViewModel::class.java)
+        viewModel6 = ViewModelProvider( // 사이니지 수정
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(SignageDetailViewModel::class.java)
+        viewModel7 = ViewModelProvider( // 캐비닛 수정
+            this,
+            factory = AppViewModelProvider.Factory
+        ).get(CabinetDetailViewModel::class.java)
 
         viewModel4.insertTestRecord()
         viewModel3.insertTestRecord()
@@ -198,7 +218,9 @@ class MainActivity : ComponentActivity() {
                     viewModel2 = viewModel2,
                     viewModel3 = viewModel3,
                     viewModel4 = viewModel4,
-                    viewModel5 = viewModel5
+                    viewModel5 = viewModel5,
+                    viewModel6 = viewModel6,
+                    viewModel7 = viewModel7
                 )
             }
         }
