@@ -73,8 +73,8 @@ fun SDetail(
 //    }
 
     val coroutineScope = rememberCoroutineScope()
-    var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-    var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
+    var bitmap:Bitmap? = null
+    var imageBitmap:Bitmap? = null
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val file = File(viewModel.imageUri.value.toString())
@@ -130,7 +130,7 @@ fun SDetail(
                         byteArray.let {
                             bitmap = byteArrayToBitmap(it)
                             Image(
-                                bitmap = bitmap.asImageBitmap(),
+                                bitmap = bitmap!!.asImageBitmap(),
                                 contentDescription = "Signage Image",
                                 modifier = Modifier
                                     .fillMaxWidth(0.9f)
@@ -142,15 +142,17 @@ fun SDetail(
                     }
                 } else {
                     imageBitmap.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "rep Image",
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                                .fillMaxHeight(0.3f)
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(color = OneBGDarkGrey)
-                        )
+                        if (it != null) {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "rep Image",
+                                modifier = Modifier
+                                    .fillMaxWidth(0.9f)
+                                    .fillMaxHeight(0.3f)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = OneBGDarkGrey)
+                            )
+                        }
                     }
                 }
                 Row {
@@ -237,13 +239,25 @@ fun SDetail(
                         coroutineScope.launch {
                             try {
                                 if (signage != null) {
-                                    viewModel.updateRecord(
-                                        name = sName.value,
-                                        width = sWidth.value.toDouble(),
-                                        height = sHeight.value.toDouble(),
-                                        bitmap = imageBitmap,
-                                        signage = signage
-                                    )
+                                    if (imageBitmap == null ){
+                                        viewModel.updateRecord(
+                                            name = sName.value,
+                                            width = sWidth.value.toDouble(),
+                                            height = sHeight.value.toDouble(),
+                                            bitmap = null,
+                                            signage = signage
+                                        )
+                                    }
+                                    else {
+                                        viewModel.updateRecord(
+                                            name = sName.value,
+                                            width = sWidth.value.toDouble(),
+                                            height = sHeight.value.toDouble(),
+                                            bitmap = imageBitmap,
+                                            signage = signage
+                                        )
+                                    }
+
                                     navController.navigate(SignageListScreenDestination.route)
                                 }
                             } catch (e: Exception) {
