@@ -30,7 +30,6 @@ private val OneLightColorPalette = lightColors(
     onBackground = OneTextGrey,
     // 얕은 검정
     onSecondary =  OneTextLightBlack
-
     )
 
 private val DarkColorPalette = darkColors(

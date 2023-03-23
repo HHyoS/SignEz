@@ -30,6 +30,10 @@ import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.fields.CustomTextInput
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.pickers.ImagePicker
+import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
+import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
+import com.kgh.signezprototype.ui.components.IntentButton
+import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
@@ -46,10 +50,10 @@ object AddSignageDestination : NavigationDestination {
 
 
 @Composable
-fun AddSignageScreen(modifier:Modifier = Modifier
-                     ,activity:Activity
-                     ,viewModel: SignageViewModel,
-                     navController: NavHostController) {
+fun AddSignageScreen(
+    modifier: Modifier = Modifier, activity: Activity, viewModel: SignageViewModel,
+    navController: NavHostController
+) {
     val coroutineScope = rememberCoroutineScope()
     var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
     var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
@@ -63,17 +67,17 @@ fun AddSignageScreen(modifier:Modifier = Modifier
     val sName = remember { mutableStateOf("") }
     val allFieldsNotEmpty = (
             sName.value.isNotEmpty() &&
-            sWidth.value.isNotEmpty() &&
-            sHeight.value.isNotEmpty()
+                    sWidth.value.isNotEmpty() &&
+                    sHeight.value.isNotEmpty()
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
-            contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-        }
-        else {
+            contentUri =
+                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } else {
             contentUri = viewModel.imageUri.value
         }
     }
@@ -84,31 +88,64 @@ fun AddSignageScreen(modifier:Modifier = Modifier
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
-            .clickable(onClick = { focusManager.clearFocus() })
-            .background(OneBGGrey),
+            .noRippleClickable { focusManager.clearFocus() }
+            .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
                 title = "새 사이니지 추가",
                 canNavigateBack = true
             )
         },
+        bottomBar = {
+            BottomDoubleFlatButton(
+                leftTitle = "취소",
+                rightTitle = "저장",
+                isLeftUsable = true,
+                isRightUsable = allFieldsNotEmpty,
+                leftOnClickEvent = { navController.popBackStack() },
+                rightOnClickEvent = {
+                    coroutineScope.launch {
+                        try {
+                            viewModel.saveItem(
+                                name = sName.value,
+                                width = sWidth.value.toDouble(),
+                                height = sHeight.value.toDouble(),
+                                bitmap = imageBitmap,
+                                modelId = viewModel.selectedCabinetId.value
+                            )
+                            navController.popBackStack()
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "입력 정보를 다시 확인해주세요.", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    }
+                }
+            )
+        }
     ) { innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Box(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp)
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
                 Spacer(modifier = modifier.padding(15.dp))
                 if (viewModel.imageUri.value == Uri.EMPTY) {
-                    Box {
+                    Box(
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
                         imageBitmap.let {
                             Image(
                                 bitmap = it.asImageBitmap(),
                                 contentDescription = "rep Image",
                                 modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .fillMaxHeight(0.3f)
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+//                                    .fillMaxHeight(0.4f)
                                     .clip(RoundedCornerShape(15.dp))
                                     .background(color = OneBGDarkGrey)
                             )
@@ -121,59 +158,79 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                         )
                     }
                 } else {
-                    imageBitmap.let {
-                        Image(
-                            bitmap = it.asImageBitmap(),
-                            contentDescription = "rep Image",
-                            modifier = Modifier
-                                .fillMaxWidth(0.9f)
-                                .fillMaxHeight(0.3f)
-                                .clip(RoundedCornerShape(15.dp))
-                                .background(color = OneBGDarkGrey)
-                        )
+                    Box(
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+
+                        imageBitmap.let {
+//                        Image(
+//                            bitmap = it.asImageBitmap(),
+//                            contentDescription = "rep Image",
+//                            modifier = Modifier
+//                                .fillMaxWidth(0.9f)
+//                                .fillMaxHeight(0.3f)
+//                                .clip(RoundedCornerShape(15.dp))
+//                                .background(color = OneBGDarkGrey)
+//                        )
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "rep Image",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+//                                    .fillMaxHeight(0.4f)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = MaterialTheme.colors.onSurface)
+                            )
+                        }
                     }
                 }
 
 
-                Row {
-                    ImagePicker(onImageSelected = { address ->
-                        imageBitmap = bitmap
-                        viewModel.imageUri.value = Uri.parse(address)
-                    })
-
-                    OutlinedButton(
-                        onClick = { dispatchTakePictureIntent(activity, viewModel=viewModel,type=22) },
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier.padding(16.dp)
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
+                ) {
+                    Column(
+                        modifier = Modifier.weight(0.5f)
                     ) {
-                        Text("카메라")
-                    }
-
-                    OutlinedButton(
-                        onClick = {
+                        ImagePicker(onImageSelected = { address ->
                             imageBitmap = bitmap
-                            viewModel.imageUri.value = Uri.EMPTY
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text("Clear")
+                            viewModel.imageUri.value = Uri.parse(address)
+                        })
                     }
+                    Column(
+                        modifier = Modifier.weight(0.5f)
+                    ) {
+                        IntentButton(title = "카메라") {
+                            dispatchTakePictureIntent(
+                                activity,
+                                viewModel = viewModel,
+                                type = 22
+                            )
+                        }
+                    }
+
+//                    OutlinedButton(
+//                        onClick = {
+//                            imageBitmap = bitmap
+//                            viewModel.imageUri.value = Uri.EMPTY
+//                        },
+//                        shape = RoundedCornerShape(20.dp),
+//                        border = BorderStroke(2.dp, Color.Blue),
+//                        colors = ButtonDefaults.outlinedButtonColors(
+//                            backgroundColor = Color.White,
+//                            contentColor = Color.Blue
+//                        ),
+//                        modifier = Modifier.padding(16.dp)
+//                    ) {
+//                        Text("Clear")
+//                    }
                 }
                 CustomTextInput(
                     value = sName.value,
                     onValueChange = { it -> sName.value = it },
-                    placeholder = "사이니지 이름")
+                    placeholder = "사이니지 이름"
+                )
                 EditNumberField(
                     // 가로 길이
                     head = "너비",
@@ -203,22 +260,25 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                     onValueChange = { sHeight.value = it },
                     unit = "mm"
                 )
-                
+
                 if (viewModel.selectedCabinetId.value == -1L) {
-                    OutlinedButton(
-                        onClick = {
-                            navController.navigate(CabinetListScreenDestination.route)
-                        },
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text("캐비닛 스펙 추가")
+                    WhiteButton(title = "캐비닛 스펙 추가하기", isUsable = true) {
+                        navController.navigate(CabinetListScreenDestination.route + "/edit")
                     }
+//                    OutlinedButton(
+//                        onClick = {
+//                            navController.navigate(CabinetListScreenDestination.route + "/edit")
+//                        },
+//                        shape = RoundedCornerShape(20.dp),
+//                        border = BorderStroke(2.dp, Color.Blue),
+//                        colors = ButtonDefaults.outlinedButtonColors(
+//                            backgroundColor = Color.White,
+//                            contentColor = Color.Blue
+//                        ),
+//                        modifier = Modifier.padding(16.dp)
+//                    ) {
+//                        Text("캐비닛 스펙 추가")
+//                    }
                 } // 캐비닛 정보 선택 구간
                 else {
                     Box {
@@ -237,7 +297,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                             ) {
                                 Text("변경")
                             }
-                            Text(text="캐비닛 스펙")
+                            Text(text = "캐비닛 스펙")
                             Text(text = cabinetState.cabinet.name)
                             Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
                             Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
@@ -246,32 +306,7 @@ fun AddSignageScreen(modifier:Modifier = Modifier
                     }
                 } // 캐비닛 변경 버튼 else문
 
-                Row {
-                    Button(onClick = { navController.popBackStack() }) {
-                        Text(text = "취소")
-                    }
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                viewModel.saveItem(
-                                    name = sName.value,
-                                    width = sWidth.value.toDouble(),
-                                    height = sHeight.value.toDouble(),
-                                    bitmap = imageBitmap,
-                                    modelId = viewModel.selectedCabinetId.value
-                                )
-                                navController.popBackStack()
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(context, "입력 정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                     },
-                        enabled=allFieldsNotEmpty) {
-                        Text(text = "저장 ${viewModel.selectedCabinetId.value}")
-                    }
-                }
+
             }// 화면 전체 컬럼 끝
         }// 화면 전체 박스 끝
     }

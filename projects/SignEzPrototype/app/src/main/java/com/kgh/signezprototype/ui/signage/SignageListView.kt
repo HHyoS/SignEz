@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -21,26 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.kgh.signezprototype.R
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
-import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
 import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
 import com.kgh.signezprototype.ui.components.SignEzFloatingButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGGrey
-import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import java.text.NumberFormat
 import java.util.*
 
@@ -48,7 +39,6 @@ object SignageListScreenDestination : NavigationDestination {
     override val route = "SignageList"
     override val titleRes = "Total Signage"
 }
-
 // clickable의 ripple효과 없애는 메서드
 inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier = composed {
     clickable(indication = null,
@@ -70,8 +60,9 @@ fun SignageInformationScreen(
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
-            .noRippleClickable { focusManager.clearFocus() }
-            .background(OneBGGrey),
+//            .noRippleClickable { focusManager.clearFocus() }
+            .clickable{ focusManager.clearFocus() }
+            .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
                 title = "사이니지 정보 입력",
@@ -91,8 +82,7 @@ fun SignageInformationScreen(
                 }
             }
         }
-
-    ) { innerPadding ->
+    ){ innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
@@ -116,7 +106,6 @@ fun SignageInformationScreen(
                         color = MaterialTheme.colors.onSurface,
                     )
                     Spacer(modifier.padding(5.dp))
-
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -133,8 +122,20 @@ fun SignageInformationScreen(
                                     selectedId = signage.id
                                 }
                             }
-                        }, selectedId = selectedId)
+                        }, selectedId = selectedId,
+                            navController=navController)
                     }
+
+                    // 삭제하시나여?
+                    if (selectedId > -1) {
+                        Button(onClick = {
+                            viewModel.signageId.value = selectedId
+                            navController.popBackStack()
+                        }) {
+                            Text(text = "선택")
+                        }
+                    }
+
                 }
             }
         }
@@ -147,7 +148,8 @@ fun SignageList(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    selectedId: Long
+    selectedId: Long,
+    navController:NavHostController
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
@@ -178,8 +180,8 @@ fun SignageList(
                 InventoryItem(
                     signage = item,
                     onItemClick = onItemClick,
-                    selectedId = selectedId
-                )
+                    selectedId=selectedId,
+                    navController=navController)
                 Divider(
                     modifier = Modifier
                         .height(1.dp)
@@ -206,17 +208,20 @@ private fun InventoryItem(
     signage: Signage,
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
-    selectedId: Long
+    selectedId: Long,
+    navController: NavHostController
 ) {
-//    var isclicked: Boolean by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .conditional(selectedId == signage.id) {
-                background(
-                    color = Color(0xFFE6E6E6)
-                )
-            },
+        .fillMaxWidth()
+        .conditional(selectedId == signage.id) {
+            background(
+                color = Color(0xFFE6E6E6)
+            )
+        }
+        .clickable {
+            navController.navigate(DetailSignageScreenDestination.route+"/${signage.id}")
+        },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -268,13 +273,15 @@ private fun InventoryItem(
                 }
             } // 대표 이미지
 
-            Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp)) {
+            Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp))
+            {
                 Text(
                     text = signage.name,
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier.padding(bottom = 5.dp)
                 )
+
                 Row(modifier = modifier.padding(top = 3.dp)) {
                     Text(
                         text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault())
@@ -290,7 +297,7 @@ private fun InventoryItem(
                     )
                 }
             } // 텍스트 공간
-        }
+        } // 텍스트 공간
     }
 }
 

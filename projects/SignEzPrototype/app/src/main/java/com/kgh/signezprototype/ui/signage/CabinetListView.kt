@@ -5,46 +5,34 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
-import androidx.compose.runtime.R
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
-import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
-import com.kgh.signezprototype.ui.components.SignEzFloatingButton
-import com.kgh.signezprototype.ui.inputs.VideoScreenDestination
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGBlue
 import com.kgh.signezprototype.ui.theme.OneBGGrey
 import java.text.NumberFormat
 import java.util.*
+import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
+import com.kgh.signezprototype.ui.components.SignEzFloatingButton
 
 object CabinetListScreenDestination : NavigationDestination {
     override val route = "CabinetList"
@@ -57,8 +45,10 @@ fun CabinetInformationScreen(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    signageViewModel: SignageViewModel
-) {
+    signageViewModel: SignageViewModel,
+    detailViewModel: SignageDetailViewModel,
+    mode: String
+    ) {
 
     val focusManager = LocalFocusManager.current
     var selectedId: Long by remember { mutableStateOf(-1) }
@@ -126,9 +116,28 @@ fun CabinetInformationScreen(
                                     selectedId = cabinet.id
                                 }
                             }
-                        }, selectedId = selectedId)
+                        }, selectedId = selectedId,
+                            navController = navController)
                     }
+                    // 이거 지우나요?
+                    if (selectedId != -1L) {
+                        if (mode == "edit") {
+                            Button(onClick = {
+                                detailViewModel.newCabinetId.value = selectedId
+                                navController.popBackStack()
+                            }) {
+                                Text(text = "선택")
+                            }
+                        } else {
+                            Button(onClick = {
+                                signageViewModel.selectedCabinetId.value = selectedId
+                                navController.popBackStack()
+                            }) {
+                                Text(text = "선택")
+                            }
+                        }
 
+                    }
                 }
             }
         }
@@ -140,7 +149,8 @@ fun CabinetList(
     onItemClick: (Cabinet) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CabinetViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    selectedId: Long
+    selectedId: Long,
+    navController:NavController
 ) {
     val cabinetListState by viewModel.cabinetListState.collectAsState()
     val itemList = cabinetListState.itemList
@@ -158,8 +168,8 @@ fun CabinetList(
                 InventoryItem(
                     cabinet = item,
                     onItemClick = onItemClick,
-                    selectedId = selectedId
-                )
+                    selectedId = selectedId,
+                    navController = navController)
                 Divider(
                     modifier = Modifier
                         .height(1.dp)
@@ -176,19 +186,21 @@ private fun InventoryItem(
     cabinet: Cabinet,
     onItemClick: (Cabinet) -> Unit,
     modifier: Modifier = Modifier,
-    selectedId: Long
+    selectedId: Long,
+    navController: NavController
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .conditional(selectedId == cabinet.id) {
-                background(
-                    color = Color(0xFFE6E6E6)
-                )
-            },
+    Row(modifier = modifier
+        .clickable { navController.navigate(DetailCabinetScreenDestination.route + "/${cabinet.id}") }
+        .fillMaxWidth()
+        .conditional(selectedId == cabinet.id) {
+            background(
+                color = Color(0xFFE6E6E6)
+            )
+        },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         var bitmap: Bitmap
         Row(
             modifier = Modifier
@@ -234,13 +246,15 @@ private fun InventoryItem(
                     }
                 }
             }// 대표 이미지
-            Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp)) {
+            Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp))
+            {
                 Text(
                     text = cabinet.name,
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSecondary,
                     modifier = Modifier.padding(bottom = 5.dp)
                 )
+
                 Row(modifier = modifier.padding(top = 3.dp)) {
                     Text(
                         text = "W : " + NumberFormat.getNumberInstance(Locale.getDefault())
