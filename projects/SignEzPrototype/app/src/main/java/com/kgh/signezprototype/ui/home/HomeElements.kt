@@ -1,11 +1,9 @@
 package com.kgh.signezprototype.ui.home
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.kgh.signezprototype.R
 import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Signage
-import com.kgh.signezprototype.ui.components.AnalyzeButton
+import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.components.FocusBlock
 
 @Composable //지난 분석 결과 틀
@@ -190,7 +188,7 @@ fun CabinetSpec(
 
 @Composable
 fun PictureAnalysisBtn(navigateToPicture: () -> Unit) {
-    AnalyzeButton(
+    WhiteButton(
         title = stringResource(id = R.string.analyze_photo),
         isUsable = true,
         onClickEvent = navigateToPicture
@@ -200,7 +198,7 @@ fun PictureAnalysisBtn(navigateToPicture: () -> Unit) {
 
 @Composable
 fun VideoAnalysisBtn(navigateToVideo: () -> Unit) {
-    AnalyzeButton(
+    WhiteButton(
         title = stringResource(id = R.string.analyze_video),
         isUsable = true,
         onClickEvent = navigateToVideo
