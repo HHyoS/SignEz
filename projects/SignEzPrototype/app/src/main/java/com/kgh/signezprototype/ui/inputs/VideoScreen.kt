@@ -153,19 +153,7 @@ fun VideoAnalysis(
                             IntentButton(title = "카메라") {
                                 dispatchTakeVideoIntent(activity, viewModel)
                             }
-//                        OutlinedButton(
-//                            onClick = { dispatchTakeVideoIntent(activity,viewModel) },
-//                            shape = RoundedCornerShape(20.dp),
-//                            border = BorderStroke(2.dp, Color.Blue),
-//                            colors = ButtonDefaults.outlinedButtonColors(
-//                                backgroundColor = Color.White,
-//                                contentColor = Color.Blue
-//                            ),
-//                            modifier = Modifier.padding(16.dp)
-//                        ) {
-//                            Text("동영상 촬영")
-//                        }
-//
+
 //                        OutlinedButton(
 //                            onClick = {
 //                                viewModel.videoUri.value = Uri.EMPTY
