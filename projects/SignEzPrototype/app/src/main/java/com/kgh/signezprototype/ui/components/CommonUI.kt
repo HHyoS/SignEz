@@ -33,8 +33,8 @@ import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 @Composable
 fun FocusBlock(
     title: String,
-    subtitle: String?,
-    infols: List<String>?,
+    subtitle: String? = null,
+    infols: List<String>? = null,
     buttonTitle: String?,
     isbuttonVisible: Boolean,
     buttonOnclickEvent: () -> Unit,
@@ -85,18 +85,20 @@ fun FocusBlock(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.h4,
-                    color = MaterialTheme.colors.onBackground,
+                    color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
                 )
             }
 
-            for (info in infols!!) {
+            if(infols!=null){
+            for (info in infols) {
                 Text(
                     text = info,
                     style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface,
+                    color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
                 )
+            }
             }
 
 //                Text(
