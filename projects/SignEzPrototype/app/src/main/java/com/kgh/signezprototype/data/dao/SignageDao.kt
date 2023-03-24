@@ -55,4 +55,7 @@ interface SignageDao {
         WHERE signages.id = :signageId
     """)
     suspend fun getSignageById(signageId: Long): Signage
+
+    @Query("SELECT * from signages ORDER BY name ASC")
+    fun getSignageList(): List<Signage>
 }
