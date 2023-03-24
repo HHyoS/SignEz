@@ -11,18 +11,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,8 +33,11 @@ import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.pickers.loadImageMetadata
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
+import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
+import com.kgh.signezprototype.ui.components.FocusBlock
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
+import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,17 +51,19 @@ object PictureScreenDestination : NavigationDestination {
 
 @Composable
 fun PictureAnalysis(
-    activity:Activity,
-    dispatchTakePictureIntent: (Activity, PictureViewModel,Int) -> Unit,
+    activity: Activity,
+    dispatchTakePictureIntent: (Activity, PictureViewModel, Int) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     viewModel: PictureViewModel,
-    analysisViewModel: AnalysisViewModel
+    analysisViewModel: AnalysisViewModel,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var imageTitle  by remember { mutableStateOf("") }
-    var imageSize  by remember { mutableStateOf(0L) }
+    val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
+    var imageTitle by remember { mutableStateOf("-") }
+    var imageSize by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
@@ -96,98 +100,171 @@ fun PictureAnalysis(
     }
 
     Scaffold(
+        modifier = Modifier
+            .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = PictureScreenDestination.titleRes,
+//                title = PictureScreenDestination.titleRes,
+                title = "사진 분석",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
+        },
+        bottomBar = {
+            BottomDoubleFlatButton(
+                leftTitle = "취소",
+                rightTitle = "분석하기",
+                isLeftUsable = true,
+                isRightUsable = false,
+                leftOnClickEvent = onNavigateUp,
+                rightOnClickEvent = {  /* 분석하기 이벤트를 넣으면 됨 */ }
+            )
         }
     ) { innerPadding ->
+        Spacer(modifier = modifier.padding(innerPadding))
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .padding(start = 16.dp, end = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.TopCenter
         ) {
             Column(
-                modifier = Modifier
-                    .align(alignment = Alignment.TopCenter)
-                    .padding(start = 16.dp, end = 16.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
+//                modifier = Modifier
+//                    .align(alignment = Alignment.TopCenter)
+//                    .padding(start = 16.dp, end = 16.dp)
+//                    .fillMaxHeight(),
+//                verticalArrangement = Arrangement.SpaceBetween,
+//                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
-                ) {
-                    Text(
-                        text = "사진 분석",
-                        modifier = Modifier.align(Alignment.Start),
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row (
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ){
-                        Column (
-                            modifier = Modifier.weight(0.5f)
-                        ){
-                            ImagePicker(onImageSelected = { address ->
-                                viewModel.imageUri.value = Uri.parse(address)
-                                imageBitmap = null
-                            })
-                        }
+                Spacer(modifier = modifier.padding(15.dp))
 
-                        Column (
-                            modifier = Modifier.weight(0.5f)
-                        ){
-                            IntentButton(title = "카메라") {
-                                dispatchTakePictureIntent(activity, viewModel,2)
-                            }
-
-//                        OutlinedButton(
-//                            onClick = {
-//                                imageBitmap = null
-//                                viewModel.imageUri.value = Uri.EMPTY
-//                            },
-//                            shape = RoundedCornerShape(20.dp),
-//                            border = BorderStroke(2.dp, Color.Blue),
-//                            colors = ButtonDefaults.outlinedButtonColors(
-//                                backgroundColor = Color.White,
-//                                contentColor = Color.Blue
-//                            ),
-//                            modifier = Modifier.padding(16.dp)
-//                        ) {
-//                            Text("Clear")
-//                        }
-                        }
-                    }
-
-                    Log.d("compare", viewModel.imageUri.value.toString())
-                    //imageBitmap != null && last.value == "take"
-                    if (viewModel.imageUri.value != Uri.EMPTY) {
-                        Column {
-                            Box(
+                if (viewModel.imageUri.value == Uri.EMPTY) {
+                    Box(
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+                        imageBitmap.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "rep Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
-                                    .height(400.dp)
-                            ) {
-                                imageBitmap?.let {
-                                    Image(
-                                        bitmap = it.asImageBitmap(),
-                                        contentDescription = "Picture frame",
-                                        contentScale = ContentScale.FillBounds,
-                                        modifier = Modifier
-                                    )
-                                }
-                            }
-                            Text(text = "이미지 제목 : $imageTitle")
-                            Text(text = "이미지 크기 : $imageSize byte")
+                                    .height(200.dp)
+//                                    .fillMaxHeight(0.4f)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = OneBGDarkGrey)
+                            )
+                        }
+                        Text(
+                            text = "분석할 사진을 추가해 주세요.",
+                            modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
+                            style = TextStyle(color = Color.Black), // Customize the text style
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+                        imageBitmap?.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "Picture frame",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+//                                    .fillMaxHeight(0.4f)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = MaterialTheme.colors.onSurface)
+                            )
                         }
                     }
                 }
+
+                FocusBlock(
+                    title = "사진정보",
+                    subtitle = "제목 : $imageTitle",
+                    infols = listOf("용량 : $imageSize byte"),
+                    buttonTitle = "입력",
+                    isbuttonVisible = false,
+                    buttonOnclickEvent = {},
+                    modifier = Modifier,
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Column(
+                        modifier = Modifier.weight(0.5f)
+                    ) {
+                        ImagePicker(onImageSelected = { address ->
+                            viewModel.imageUri.value = Uri.parse(address)
+                            imageBitmap = bitmap
+                        })
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(0.5f)
+                    ) {
+                        IntentButton(title = "카메라") {
+                            dispatchTakePictureIntent(activity, viewModel, 2)
+                        }
+
+                    }
+                }
+//
+//                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+//                ) {
+//                    Text(
+//                        text = "사진 분석",
+//                        modifier = Modifier.align(Alignment.Start),
+//                        fontSize = 40.sp,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                    Row (
+//                        horizontalArrangement = Arrangement.SpaceAround
+//                    ){
+//                        Column (
+//                            modifier = Modifier.weight(0.5f)
+//                        ){
+//                            ImagePicker(onImageSelected = { address ->
+//                                viewModel.imageUri.value = Uri.parse(address)
+//                                imageBitmap = bitmap
+//                            })
+//                        }
+//
+//                        Column (
+//                            modifier = Modifier.weight(0.5f)
+//                        ){
+//                            IntentButton(title = "카메라") {
+//                                dispatchTakePictureIntent(activity, viewModel,2)
+//                            }
+//
+//                        }
+//                    }
+
+//                    Log.d("compare", viewModel.imageUri.value.toString())
+//                    //imageBitmap != null && last.value == "take"
+//                    if (viewModel.imageUri.value != Uri.EMPTY) {
+//                        Column {
+//                            Box(
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
+//                                    .height(400.dp)
+//                            ) {
+//                                imageBitmap?.let {
+//                                    Image(
+//                                        bitmap = it.asImageBitmap(),
+//                                        contentDescription = "Picture frame",
+//                                        contentScale = ContentScale.FillBounds,
+//                                        modifier = Modifier
+//                                    )
+//                                }
+//                            }
+//                            Text(text = "이미지 제목 : $imageTitle")
+//                            Text(text = "이미지 크기 : $imageSize byte")
+//                        }
+//                    }
             }
         }
-    } // 최외곽 컬럼 끝
-}
+    }
+} // 최외곽 컬럼 끝
