@@ -8,9 +8,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
@@ -35,6 +33,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.pickers.loadImageMetadata
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
+import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,15 +50,16 @@ object PictureScreenDestination : NavigationDestination {
 @Composable
 fun PictureAnalysis(
     activity:Activity,
-    dispatchTakePictureIntent: (Activity, PictureViewModel) -> Unit,
+    dispatchTakePictureIntent: (Activity, PictureViewModel,Int) -> Unit,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
-    viewModel: PictureViewModel
+    viewModel: PictureViewModel,
+    analysisViewModel: AnalysisViewModel
 ) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var imageTitle by remember { mutableStateOf("") }
-    var imageSize by remember { mutableStateOf(0L) }
+    var imageTitle  by remember { mutableStateOf("") }
+    var imageSize  by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
@@ -66,11 +67,13 @@ fun PictureAnalysis(
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
-            contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-        }
-        else {
+            contentUri =
+                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } else {
             contentUri = viewModel.imageUri.value
         }
+        analysisViewModel.videoContentUri.value = Uri.EMPTY
+        analysisViewModel.imageContentUri.value = contentUri
     }
 
 //    var tempUri by remember { mutableStateOf(Uri.EMPTY) }
@@ -100,58 +103,69 @@ fun PictureAnalysis(
                 navigateUp = onNavigateUp
             )
         }
-    ){ innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Column(
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "사진 분석",
-                    modifier = Modifier.align(Alignment.Start),
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Column {
-                    Row {
-                        ImagePicker(onImageSelected = { address ->
-                            viewModel.imageUri.value = Uri.parse(address)
-                            imageBitmap = null
-                        })
-                    }
-
-                    Row {
-                        OutlinedButton(
-                            onClick = { dispatchTakePictureIntent(activity, viewModel) },
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(2.dp, Color.Blue),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Blue
-                            ),
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text("사진 촬영")
+                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
+                ) {
+                    Text(
+                        text = "사진 분석",
+                        modifier = Modifier.align(Alignment.Start),
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Row (
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ){
+                        Column (
+                            modifier = Modifier.weight(0.5f)
+                        ){
+                            ImagePicker(onImageSelected = { address ->
+                                viewModel.imageUri.value = Uri.parse(address)
+                                imageBitmap = null
+                            })
                         }
 
-                        OutlinedButton(
-                            onClick = {
-                                imageBitmap = null
-                                viewModel.imageUri.value = Uri.EMPTY
-                            },
-                            shape = RoundedCornerShape(20.dp),
-                            border = BorderStroke(2.dp, Color.Blue),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                backgroundColor = Color.White,
-                                contentColor = Color.Blue
-                            ),
-                            modifier = Modifier.padding(16.dp)
-                        ) {
-                            Text("Clear")
+                        Column (
+                            modifier = Modifier.weight(0.5f)
+                        ){
+                            IntentButton(title = "카메라") {
+                                dispatchTakePictureIntent(activity, viewModel,2)
+                            }
+
+//                        OutlinedButton(
+//                            onClick = {
+//                                imageBitmap = null
+//                                viewModel.imageUri.value = Uri.EMPTY
+//                            },
+//                            shape = RoundedCornerShape(20.dp),
+//                            border = BorderStroke(2.dp, Color.Blue),
+//                            colors = ButtonDefaults.outlinedButtonColors(
+//                                backgroundColor = Color.White,
+//                                contentColor = Color.Blue
+//                            ),
+//                            modifier = Modifier.padding(16.dp)
+//                        ) {
+//                            Text("Clear")
+//                        }
                         }
                     }
 
                     Log.d("compare", viewModel.imageUri.value.toString())
                     //imageBitmap != null && last.value == "take"
-                    if (viewModel.imageUri.value != Uri.EMPTY ) {
+                    if (viewModel.imageUri.value != Uri.EMPTY) {
                         Column {
                             Box(
                                 modifier = Modifier
@@ -174,6 +188,6 @@ fun PictureAnalysis(
                     }
                 }
             }
-        } // 최외곽 컬럼 끝
-    }
+        }
+    } // 최외곽 컬럼 끝
 }

@@ -23,9 +23,13 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.kgh.signezprototype.SignEzApplication
+import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.inputs.MainViewModel
 import com.kgh.signezprototype.ui.inputs.PictureViewModel
 import com.kgh.signezprototype.ui.inputs.VideoViewModel
+import com.kgh.signezprototype.ui.signage.CabinetDetailViewModel
+import com.kgh.signezprototype.ui.signage.CabinetViewModel
+import com.kgh.signezprototype.ui.signage.SignageDetailViewModel
 import com.kgh.signezprototype.ui.signage.SignageViewModel
 
 /**
@@ -44,7 +48,22 @@ object AppViewModelProvider {
         }
 
         initializer {
-            SignageViewModel(SignEzApplication().container.signagesRepository)
+            SignageViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+        }
+
+        initializer {
+            CabinetViewModel(SignEzApplication().container.cabinetsRepository)
+        }
+
+        initializer {
+            AnalysisViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+        }
+
+        initializer {
+            SignageDetailViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+        }
+        initializer {
+            CabinetDetailViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
         }
     }
 }

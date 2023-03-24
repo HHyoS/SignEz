@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.kgh.signezprototype.ui.components.IntentButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,104 +38,109 @@ fun ImagePicker(onImageSelected: (videoUri: String) -> Unit) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var imageUri by remember { mutableStateOf("") }
-    var imageTitle by remember { mutableStateOf("") }
-    var imageSize by remember { mutableStateOf(0L) }
-    val coroutineScope = rememberCoroutineScope()
 
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-                imageUri = uri.toString()
-                onImageSelected(imageUri)
-            }
-        }
-    }
-
-    Column {
-        Row {
-            OutlinedButton(
-                onClick = {
-                    val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    launcher.launch(intent)
-                },
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(2.dp, Color.Blue),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Blue
-                ),
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("사진 가져오기")
-            }
-
-            OutlinedButton(
-                onClick = {
-                    imageBitmap = null
-                },
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(2.dp, Color.Blue),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Blue
-                ),
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("Clear")
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                    imageUri = uri.toString()
+                    onImageSelected(imageUri)
+                }
             }
         }
 
-    }
+//    Column {
+//        Row {
+            IntentButton(title = "갤러리") {
+                val intent =
+                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                launcher.launch(intent)
+            }
+//            OutlinedButton(
+//                onClick = {
+//                    val intent =
+//                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+//                    launcher.launch(intent)
+//                },
+//                shape = RoundedCornerShape(20.dp),
+//                border = BorderStroke(2.dp, Color.Blue),
+//                colors = ButtonDefaults.outlinedButtonColors(
+//                    backgroundColor = Color.White,
+//                    contentColor = Color.Blue
+//                ),
+//                modifier = Modifier.padding(8.dp)
+//            ) {
+//                Text("사진 가져오기")
+//            }
+
+//            OutlinedButton(
+//                onClick = {
+//                    imageBitmap = null
+//                },
+//                shape = RoundedCornerShape(20.dp),
+//                border = BorderStroke(2.dp, Color.Blue),
+//                colors = ButtonDefaults.outlinedButtonColors(
+//                    backgroundColor = Color.White,
+//                    contentColor = Color.Blue
+//                ),
+//                modifier = Modifier.padding(8.dp)
+//            ) {
+//                Text("Clear")
+//            }
+//        }
+//
+//    }
 }
 
 @Composable
 fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit) {
     val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     var videoUri by remember { mutableStateOf("") }
-    var videoFrame by remember { mutableStateOf(defaultBitmap) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         videoUri = uri.toString()
         onVideoSelected(videoUri)
-        Log.d("VideoPicker", "Selected video: $uri")
     }
 
-    Column {
-        Row {
-            OutlinedButton(
-                onClick = {
-                    launcher.launch("video/mp4")
-                },
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(2.dp, Color.Blue),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Blue
-                ),
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Text("동영상 가져오기")
+//    Column {
+//        Row {
+            IntentButton(title = "갤러리") {
+                launcher.launch("video/mp4")
             }
-
-            OutlinedButton(
-                onClick = {
-                    videoUri = ""
-                    videoFrame = defaultBitmap
-                          },
-                shape = RoundedCornerShape(20.dp),
-                border = BorderStroke(2.dp, Color.Blue),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    backgroundColor = Color.White,
-                    contentColor = Color.Blue
-                ),
-                modifier = Modifier.padding(8.dp)
-            ){
-                Text("Clear")
-            }
-        }
-    }
+//            OutlinedButton(
+//                onClick = {
+//                    launcher.launch("video/mp4")
+//                },
+//                shape = RoundedCornerShape(20.dp),
+//                border = BorderStroke(2.dp, Color.Blue),
+//                colors = ButtonDefaults.outlinedButtonColors(
+//                    backgroundColor = Color.White,
+//                    contentColor = Color.Blue
+//                ),
+//                modifier = Modifier.padding(8.dp)
+//            ) {
+//                Text("동영상 가져오기")
+//            }
+//
+//            OutlinedButton(
+//                onClick = {
+//                    videoUri = ""
+//                    videoFrame = defaultBitmap
+//                },
+//                shape = RoundedCornerShape(20.dp),
+//                border = BorderStroke(2.dp, Color.Blue),
+//                colors = ButtonDefaults.outlinedButtonColors(
+//                    backgroundColor = Color.White,
+//                    contentColor = Color.Blue
+//                ),
+//                modifier = Modifier.padding(8.dp)
+//            ) {
+//                Text("Clear")
+//            }
+//        }
+//    }
 }
 
 @SuppressLint("Range")
