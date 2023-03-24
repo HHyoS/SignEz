@@ -79,9 +79,6 @@ fun SDetail(
     val context = LocalContext.current
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
-    val sWidth = remember { mutableStateOf("") } // 사이니지
-    val sHeight = remember { mutableStateOf("") } // 사이니지
-    val sName = remember { mutableStateOf("") }
 //    CompositionLocalProvider(LocalSignageDetailViewModel provides viewModel!!) { 로컬 뷰모델 3
         val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
             value = viewModel.getCabinet(signageId)
@@ -93,9 +90,9 @@ fun SDetail(
         val signage = signageState.value
 
         if (signage != null) {
-            sName.value = signage.name
-            sHeight.value = signage.height.toString()
-            sWidth.value = signage.width.toString()
+            viewModel.sName.value = signage.name
+            viewModel.sHeight.value = signage.height.toString()
+            viewModel.sWidth.value = signage.width.toString()
         }
 
 
@@ -175,8 +172,8 @@ fun SDetail(
                     }
                 }
                 CustomTextInput(
-                    value = sName.value,
-                    onValueChange = { it -> sName.value = it },
+                    value = viewModel.sName.value,
+                    onValueChange = { it -> viewModel.sName.value = it },
                     placeholder = "사이니지 이름")
                 EditNumberField(
                         // 가로 길이
@@ -188,8 +185,8 @@ fun SDetail(
                         keyboardActions = KeyboardActions(
                             onDone = { focusManager.clearFocus() }
                         ),
-                        value = sWidth.value,
-                        onValueChange = { sWidth.value = it },
+                        value = viewModel.sWidth.value,
+                        onValueChange = { viewModel.sWidth.value = it },
                         unit = "mm"
                     )
                 EditNumberField(
@@ -203,8 +200,8 @@ fun SDetail(
                     keyboardActions = KeyboardActions(
                         onDone = { focusManager.clearFocus() }
                     ),
-                    value = sHeight.value,
-                    onValueChange = { sHeight.value = it },
+                    value = viewModel.sHeight.value,
+                    onValueChange = { viewModel.sHeight.value = it },
                     unit = "mm"
                 )
 
@@ -241,18 +238,12 @@ fun SDetail(
                                 if (signage != null) {
                                     if (imageBitmap == null ){
                                         viewModel.updateRecord(
-                                            name = sName.value,
-                                            width = sWidth.value.toDouble(),
-                                            height = sHeight.value.toDouble(),
                                             bitmap = null,
                                             signage = signage
                                         )
                                     }
                                     else {
                                         viewModel.updateRecord(
-                                            name = sName.value,
-                                            width = sWidth.value.toDouble(),
-                                            height = sHeight.value.toDouble(),
                                             bitmap = imageBitmap,
                                             signage = signage
                                         )

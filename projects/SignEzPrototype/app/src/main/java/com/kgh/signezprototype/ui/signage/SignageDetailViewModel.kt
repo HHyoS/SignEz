@@ -24,6 +24,10 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
 
     override var mCurrentPhotoPath = mutableStateOf("")
     override var imageUri = mutableStateOf(Uri.EMPTY)
+    val sWidth = mutableStateOf("") // 사이니지
+    val sHeight = mutableStateOf("")  // 사이니지
+    val sName = mutableStateOf("")
+
     override var type = 0;
     lateinit var cabinet: MutableState<Cabinet>
     var newCabinetId = mutableStateOf(-1L)
@@ -32,16 +36,16 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    fun updateRecord(name:String,width:Double,height:Double,bitmap:Bitmap?,signage:Signage) = viewModelScope.launch {
+    fun updateRecord(bitmap:Bitmap?,signage:Signage) = viewModelScope.launch {
         if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             val byteArray = outputStream.toByteArray()
             signage.repImg = byteArray
         }
-        signage.name = name
-        signage.width = width
-        signage.height = height
+        signage.name = sName.value
+        signage.width = sWidth.value.toDouble()
+        signage.height = sHeight.value.toDouble()
 
         // 모듈 개수 계산식 반영 필요
         signage.modelId = if (newCabinetId.value > -1 ) {
