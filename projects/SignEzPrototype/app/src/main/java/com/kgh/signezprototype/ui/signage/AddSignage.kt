@@ -62,16 +62,17 @@ fun AddSignageScreen(
     val context = LocalContext.current
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
-
-    val sWidth = remember { mutableStateOf("") } // 사이니지
-    val sHeight = remember { mutableStateOf("") } // 사이니지
-    val sName = remember { mutableStateOf("") }
     val allFieldsNotEmpty = (
-            sName.value.isNotEmpty() &&
-                    sWidth.value.isNotEmpty() &&
-                    sHeight.value.isNotEmpty()
+            viewModel.sName.value.isNotEmpty() &&
+            viewModel.sWidth.value.isNotEmpty() &&
+            viewModel.sHeight.value.isNotEmpty()
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
+
+    DisposableEffect(Unit) {
+        viewModel.imageUri.value = Uri.EMPTY
+        onDispose {} // Cleanup logic here, if needed
+    }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
@@ -108,9 +109,6 @@ fun AddSignageScreen(
                     coroutineScope.launch {
                         try {
                             viewModel.saveItem(
-                                name = sName.value,
-                                width = sWidth.value.toDouble(),
-                                height = sHeight.value.toDouble(),
                                 bitmap = imageBitmap,
                                 modelId = viewModel.selectedCabinetId.value
                             )
@@ -244,8 +242,8 @@ fun AddSignageScreen(
 
                         ) {
                             CustomTextInput(
-                                value = sName.value,
-                                onValueChange = { it -> sName.value = it },
+                                value = viewModel.sName.value,
+                                onValueChange = { it -> viewModel.sName.value = it },
                                 placeholder = "사이니지 이름"
                             )
                         }
@@ -262,8 +260,8 @@ fun AddSignageScreen(
                                 keyboardActions = KeyboardActions(
                                     onDone = { focusManager.clearFocus() }
                                 ),
-                                value = sWidth.value,
-                                onValueChange = { sWidth.value = it },
+                                value = viewModel.sWidth.value,
+                                onValueChange = { viewModel.sWidth.value = it },
                                 unit = "mm"
                             )
                         }
@@ -281,8 +279,8 @@ fun AddSignageScreen(
                                 keyboardActions = KeyboardActions(
                                     onDone = { focusManager.clearFocus() }
                                 ),
-                                value = sHeight.value,
-                                onValueChange = { sHeight.value = it },
+                                value = viewModel.sHeight.value,
+                                onValueChange = { viewModel.sHeight.value = it },
                                 unit = "mm"
                             )
                         }
@@ -290,12 +288,9 @@ fun AddSignageScreen(
                     }
                 }
 
-
-
-
                 if (viewModel.selectedCabinetId.value == -1L) {
                     WhiteButton(title = "캐비닛 스펙 추가하기", isUsable = true) {
-                        navController.navigate(CabinetListScreenDestination.route + "/edit")
+                        navController.navigate(CabinetListScreenDestination.route+"/add")
                     }
 //                    OutlinedButton(
 //                        onClick = {
@@ -317,7 +312,7 @@ fun AddSignageScreen(
                         Column {
                             OutlinedButton(
                                 onClick = {
-                                    navController.navigate(CabinetListScreenDestination.route)
+                                    navController.navigate(CabinetListScreenDestination.route+"/add")
                                 },
                                 shape = RoundedCornerShape(20.dp),
                                 border = BorderStroke(2.dp, Color.Blue),
@@ -337,8 +332,6 @@ fun AddSignageScreen(
                         }
                     }
                 } // 캐비닛 변경 버튼 else문
-
-
             }// 화면 전체 컬럼 끝
         }// 화면 전체 박스 끝
     }

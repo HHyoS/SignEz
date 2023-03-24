@@ -39,7 +39,7 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
     fun updateRecord(bitmap:Bitmap?,signage:Signage) = viewModelScope.launch {
         if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
             val byteArray = outputStream.toByteArray()
             signage.repImg = byteArray
         }
@@ -75,5 +75,11 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         val signage: Signage =
             signageRepository.getSignageById(signageId)
         return signage
+    }
+
+    suspend fun getNewCabinet(): Cabinet {
+        val cabinet: Cabinet =
+            cabinetRepository.getNewCabinet(newCabinetId.value)
+        return cabinet
     }
 }

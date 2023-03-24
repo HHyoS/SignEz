@@ -72,6 +72,11 @@ fun AddCabinetScreen(modifier:Modifier = Modifier
                 colModuleCount.value.isNotEmpty() &&
                 rowModuleCount.value.isNotEmpty()
             )
+    DisposableEffect(Unit) {
+        viewModel.imageUri.value = Uri.EMPTY
+        onDispose {} // Cleanup logic here, if needed
+    }
+
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
