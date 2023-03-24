@@ -2,16 +2,14 @@ package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -22,37 +20,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.kgh.signezprototype.R
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
-import com.kgh.signezprototype.ui.navigation.NavigationDestination
-import com.kgh.signezprototype.ui.theme.OneBGGrey
-import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
-import java.text.NumberFormat
-import java.util.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.ui.composed
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
-import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
 import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
 import com.kgh.signezprototype.ui.components.SignEzFloatingButton
-import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
+import com.kgh.signezprototype.ui.navigation.NavigationDestination
+import java.text.NumberFormat
+import java.util.*
 
 object SignageListScreenDestination : NavigationDestination {
     override val route = "SignageList"
     override val titleRes = "Total Signage"
 }
+
 // clickable의 ripple효과 없애는 메서드
 inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier = composed {
     clickable(indication = null,
@@ -75,8 +61,7 @@ fun SignageInformationScreen(
     androidx.compose.material.Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
-//            .clickable{ focusManager.clearFocus() }
-            .background(OneBGGrey),
+            .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
                 title = "사이니지 정보 입력",
@@ -96,7 +81,7 @@ fun SignageInformationScreen(
                 }
             }
         }
-    ){ innerPadding ->
+    ) { innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
@@ -128,16 +113,18 @@ fun SignageInformationScreen(
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        SignageList(onItemClick = { signage ->
-                            run {
-                                if (selectedId == signage.id) {
-                                    selectedId = -1
-                                } else {
-                                    selectedId = signage.id
+                        SignageList(
+                            onItemClick = { signage ->
+                                run {
+                                    if (selectedId == signage.id) {
+                                        selectedId = -1
+                                    } else {
+                                        selectedId = signage.id
+                                    }
                                 }
-                            }
-                        }, selectedId = selectedId,
-                            navController=navController)
+                            }, selectedId = selectedId,
+                            navController = navController
+                        )
                     }
 
                     // 삭제하시나여?
@@ -163,7 +150,7 @@ fun SignageList(
     modifier: Modifier = Modifier,
     viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
     selectedId: Long,
-    navController:NavHostController
+    navController: NavHostController
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
@@ -194,8 +181,9 @@ fun SignageList(
                 InventoryItem(
                     signage = item,
                     onItemClick = onItemClick,
-                    selectedId=selectedId,
-                    navController=navController)
+                    selectedId = selectedId,
+                    navController = navController
+                )
                 Divider(
                     modifier = Modifier
                         .height(1.dp)
@@ -227,12 +215,12 @@ private fun InventoryItem(
 ) {
     Row(
         modifier = Modifier
-        .fillMaxWidth()
-        .conditional(selectedId == signage.id) {
-            background(
-                color = Color(0xFFE6E6E6)
-            )
-        },
+            .fillMaxWidth()
+            .conditional(selectedId == signage.id) {
+                background(
+                    color = Color(0xFFE6E6E6)
+                )
+            },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -264,7 +252,7 @@ private fun InventoryItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clickable { navController.navigate(DetailSignageScreenDestination.route+"/${signage.id}") }
+                .clickable { navController.navigate(DetailSignageScreenDestination.route + "/${signage.id}") }
                 .padding(vertical = 5.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
