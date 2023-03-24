@@ -27,18 +27,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.fields.CustomTextInput
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
-import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
-import com.kgh.signezprototype.ui.theme.OneBGGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,11 +65,10 @@ fun AddSignageScreen(
             viewModel.sHeight.value.isNotEmpty()
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
-
-    DisposableEffect(Unit) {
-        viewModel.imageUri.value = Uri.EMPTY
-        onDispose {} // Cleanup logic here, if needed
-    }
+//    DisposableEffect(Unit) {
+//        viewModel.imageUri.value = Uri.EMPTY
+//        onDispose {} // Cleanup logic here, if needed
+//    }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
