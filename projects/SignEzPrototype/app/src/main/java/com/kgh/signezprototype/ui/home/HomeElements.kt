@@ -123,7 +123,8 @@ fun SignEzSpec(
 //    )
     FocusBlock(
         title = stringResource(id = R.string.signage_spec_title),
-        subtitle = stringResource(id = R.string.need_signage_info),
+//        subtitle = ,
+        infols = listOf(stringResource(id = R.string.need_signage_info)),
         buttonTitle = "입력",
         isbuttonVisible = true,
         buttonOnclickEvent = navigateToSignageList,
@@ -172,7 +173,8 @@ fun CabinetSpec(
 //    )
     FocusBlock(
         title = stringResource(id = R.string.cabinet_spec_title),
-        subtitle = stringResource(id = R.string.need_cabinet_info),
+//        subtitle = ,
+        infols = listOf(stringResource(id = R.string.need_cabinet_info)),
         buttonTitle = null,
         isbuttonVisible = false,
         buttonOnclickEvent = {},
