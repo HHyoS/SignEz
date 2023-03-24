@@ -74,15 +74,15 @@ fun EditNumberField(
                 .heightIn(min = 20.dp) // set min height to 48dp
                 .padding(start = 30.dp)
                 .align(Alignment.Bottom) // center vertically with TextField
-                .weight(0.2f)
+                .weight(0.3f)
         )
-        Spacer(modifier = Modifier.weight(0.2f))
+        Spacer(modifier = Modifier.weight(0.15f))
         TextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
                 .heightIn(min = 20.dp) // set min height to 48dp
-                .weight(0.4f),
+                .weight(0.35f),
 //                .fillMaxWidth(0.4f),
 //                .padding(3.dp),
             singleLine = true,
