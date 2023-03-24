@@ -1,9 +1,11 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -36,11 +39,11 @@ import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
 import com.kgh.signezprototype.ui.theme.OneBGGrey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-
 object AddCabinetDestination : NavigationDestination {
     override val route = "AddCabinet"
     override val titleRes = "Add Cabinet"
@@ -77,6 +80,22 @@ fun AddCabinetScreen(
         onDispose {} // Cleanup logic here, if needed
     }
 
+    val imageLoadingScope = CoroutineScope(Dispatchers.Main)
+    // Load the image asynchronously using coroutines
+    fun loadImageAsync(context: Context, contentUri: Uri) {
+        imageLoadingScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    // Load the image bitmap on a background thread
+                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+                } catch (e: Exception) {
+                    // Handle any errors that occur while loading the image
+                    Log.e("Error", "Error loading image", e)
+                }
+            }
+        }
+    }
+
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
@@ -88,7 +107,8 @@ fun AddCabinetScreen(
     }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
-        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+        loadImageAsync(context, contentUri)
     }
 
     androidx.compose.material.Scaffold(
