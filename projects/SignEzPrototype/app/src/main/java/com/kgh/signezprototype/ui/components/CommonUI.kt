@@ -43,8 +43,8 @@ fun FocusBlock(
     Card(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 8.dp)
-            .fillMaxWidth()
-            .clickable(onClick = buttonOnclickEvent),
+            .fillMaxWidth(),
+//            .clickable(onClick = buttonOnclickEvent),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colors.surface
         )
@@ -77,6 +77,19 @@ fun FocusBlock(
                             onClickEvent = buttonOnclickEvent
                         )
                     }
+                } else if(buttonTitle == null) {
+                    Spacer(
+                        modifier = Modifier.weight(0.3f)
+                    )
+                    Column(
+                        modifier = Modifier.weight(0.4f)
+                    ) {
+                        InFocusBlockButton(
+                            title = "버튼없어요",
+                            isVisible = isbuttonVisible,
+                            onClickEvent = buttonOnclickEvent
+                        )
+                    }
                 }
 
             }
@@ -96,7 +109,7 @@ fun FocusBlock(
                     text = info,
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(start = 18.dp, top = 4.dp, bottom = 4.dp)
                 )
             }
             }
@@ -110,7 +123,7 @@ fun FocusBlock(
 
         }
 
-
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }
 
