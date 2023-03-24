@@ -1,9 +1,11 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -36,6 +38,7 @@ import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -65,10 +68,22 @@ fun AddSignageScreen(
             viewModel.sHeight.value.isNotEmpty()
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
-//    DisposableEffect(Unit) {
-//        viewModel.imageUri.value = Uri.EMPTY
-//        onDispose {} // Cleanup logic here, if needed
-//    }
+
+    val imageLoadingScope = CoroutineScope(Dispatchers.Main)
+    // Load the image asynchronously using coroutines
+    fun loadImageAsync(context: Context, contentUri: Uri) {
+        imageLoadingScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    // Load the image bitmap on a background thread
+                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+                } catch (e: Exception) {
+                    // Handle any errors that occur while loading the image
+                    Log.e("Error", "Error loading image", e)
+                }
+            }
+        }
+    }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
@@ -81,7 +96,8 @@ fun AddSignageScreen(
     }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
-        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+        loadImageAsync(context, contentUri)
     }
 
     androidx.compose.material.Scaffold(
