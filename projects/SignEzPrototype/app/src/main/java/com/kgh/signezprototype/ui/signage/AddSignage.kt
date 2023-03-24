@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -226,40 +227,71 @@ fun AddSignageScreen(
 //                        Text("Clear")
 //                    }
                 }
-                CustomTextInput(
-                    value = sName.value,
-                    onValueChange = { it -> sName.value = it },
-                    placeholder = "사이니지 이름"
-                )
-                EditNumberField(
-                    // 가로 길이
-                    head = "너비",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { focusManager.clearFocus() }
-                    ),
-                    value = sWidth.value,
-                    onValueChange = { sWidth.value = it },
-                    unit = "mm"
-                )
-                EditNumberField(
-                    // 세로 길이
-                    head = "높이",
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
 
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { focusManager.clearFocus() }
-                    ),
-                    value = sHeight.value,
-                    onValueChange = { sHeight.value = it },
-                    unit = "mm"
-                )
+                androidx.compose.material3.Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colors.surface
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+//                            verticalAlignment = Alignment.CenterVertically
+
+                        ) {
+                            CustomTextInput(
+                                value = sName.value,
+                                onValueChange = { it -> sName.value = it },
+                                placeholder = "사이니지 이름"
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            EditNumberField(
+                                // 가로 길이
+                                head = "너비",
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = { focusManager.clearFocus() }
+                                ),
+                                value = sWidth.value,
+                                onValueChange = { sWidth.value = it },
+                                unit = "mm"
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            EditNumberField(
+                                // 세로 길이
+                                head = "높이",
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done
+
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = { focusManager.clearFocus() }
+                                ),
+                                value = sHeight.value,
+                                onValueChange = { sHeight.value = it },
+                                unit = "mm"
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
+                }
+
+
+
 
                 if (viewModel.selectedCabinetId.value == -1L) {
                     WhiteButton(title = "캐비닛 스펙 추가하기", isUsable = true) {
