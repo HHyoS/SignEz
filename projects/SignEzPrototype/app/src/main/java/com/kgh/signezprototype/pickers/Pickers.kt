@@ -99,16 +99,30 @@ fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit) {
     val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     var videoUri by remember { mutableStateOf("") }
 
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        videoUri = uri.toString()
-        onVideoSelected(videoUri)
+//    val launcher =
+//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+//        videoUri = uri.toString()
+//        onVideoSelected(videoUri)
+//    }
+//
+//            IntentButton(title = "갤러리") {
+//                launcher.launch("video/mp4")
+//            }
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                videoUri = uri.toString()
+                onVideoSelected(videoUri)
+            }
+        }
     }
 
-//    Column {
-//        Row {
-            IntentButton(title = "갤러리") {
-                launcher.launch("video/mp4")
-            }
+// Column {
+//     Row {
+    IntentButton(title = "갤러리") {
+        val pickVideoIntent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+        launcher.launch(pickVideoIntent)
+    }
 //            OutlinedButton(
 //                onClick = {
 //                    launcher.launch("video/mp4")

@@ -258,7 +258,7 @@ fun SDetail(
                                         )
                                     }
 
-                                    navController.navigate(SignageListScreenDestination.route)
+                                    navController.popBackStack()
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
@@ -266,7 +266,7 @@ fun SDetail(
                                 }
                             }
                         }
-                        navController.popBackStack() }) {
+                        }) {
                         Text(text = "확인")
                     }
 
