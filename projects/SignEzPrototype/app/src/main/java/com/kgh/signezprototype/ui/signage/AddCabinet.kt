@@ -93,8 +93,8 @@ fun AddCabinetScreen(modifier:Modifier = Modifier
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
-            .clickable(onClick = { focusManager.clearFocus() })
-            .background(OneBGGrey),
+            .noRippleClickable { focusManager.clearFocus() }
+            .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
                 title = "새 캐비닛 추가",
