@@ -85,7 +85,7 @@ fun SignEzSpec(
         FocusBlock(
             title = stringResource(id = R.string.signage_spec_title),
             subtitle = "${signage.name}",
-            infols = listOf("높이 : ${signage.width}", "너비 : ${signage.height}"),
+            infols = listOf("너비 : ${signage.width}", "높이 : ${signage.height}"),
             buttonTitle = "입력",
             isbuttonVisible = true,
             buttonOnclickEvent = navigateToSignageList,
@@ -121,7 +121,11 @@ fun CabinetSpec(
         FocusBlock(
             title = stringResource(id = R.string.cabinet_spec_title),
             subtitle = "${cabinet.name}",
-            infols = listOf("높이 : ${cabinet.cabinetHeight}","너비 : ${cabinet.cabinetWidth}","모듈 : ${cabinet.moduleColCount}X${cabinet.moduleRowCount}"),
+            infols = listOf(
+                "너비 : ${cabinet.cabinetWidth}",
+                "높이 : ${cabinet.cabinetHeight}",
+                "모듈 : ${cabinet.moduleColCount}X${cabinet.moduleRowCount}"
+            ),
             buttonTitle = null,
             isbuttonVisible = false,
             buttonOnclickEvent = {},
