@@ -1,6 +1,7 @@
 package com.kgh.signezprototype.fields
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,10 +22,14 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
+import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import java.text.NumberFormat
 import java.util.*
+
 @Composable
 fun BasicTextField(
     value: String,
@@ -34,7 +39,8 @@ fun BasicTextField(
     var textFieldValue by remember { mutableStateOf(TextFieldValue(value)) }
 
     androidx.compose.foundation.text.BasicTextField(
-        modifier = modifier,
+        modifier = modifier
+            .background(color = MaterialTheme.colors.surface),
         value = textFieldValue,
         onValueChange = {
             textFieldValue = it
@@ -48,7 +54,7 @@ fun BasicTextField(
 
 @Composable
 fun EditNumberField(
-    head:String,
+    head: String,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
     value: String,
@@ -57,40 +63,51 @@ fun EditNumberField(
     unit: String
 ) {
     Row(
-        Modifier.fillMaxWidth(0.9f),
+        Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceAround // set width to 70% of screen width
     ) {
         Text(
             text = head,
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface,
             modifier = Modifier
                 .heightIn(min = 20.dp) // set min height to 48dp
-                .padding(8.dp)
-                .align(Alignment.CenterVertically) // center vertically with TextField
+                .padding(start = 30.dp)
+                .align(Alignment.Bottom) // center vertically with TextField
+                .weight(0.2f)
         )
+        Spacer(modifier = Modifier.weight(0.2f))
         TextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
                 .heightIn(min = 20.dp) // set min height to 48dp
-                .fillMaxWidth(0.4f)
-                .padding(3.dp),
+                .weight(0.4f),
+//                .fillMaxWidth(0.4f),
+//                .padding(3.dp),
             singleLine = true,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
-            visualTransformation = NumberCommaVisualTransformation()
+            visualTransformation = NumberCommaVisualTransformation(),
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = MaterialTheme.colors.onSurface,
+                backgroundColor = MaterialTheme.colors.surface
+            )
         )
         Text(
             text = unit,
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface,
             modifier = Modifier
                 .heightIn(min = 20.dp) // set min height to 48dp
-                .padding(8.dp)
-                .align(Alignment.CenterVertically) // center vertically with TextField
+                .padding(start = 15.dp)
+                .align(Alignment.Bottom) // center vertically with TextField
+                .weight(0.2f)
         )
         //디자인 참고
         //https://developer.android.com/jetpack/compose/text?hl=ko#styling-textfield
         //https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#textfield
     }
-
 }
 
 @Composable
@@ -101,22 +118,29 @@ fun CustomTextInput(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    placeholder:String
+    placeholder: String
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier.padding(8.dp),
+        modifier = modifier
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .fillMaxWidth(),
         placeholder = {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.h3,
+                color = MaterialTheme.colors.onBackground
             )
         },
         singleLine = true,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        visualTransformation = visualTransformation
+        visualTransformation = visualTransformation,
+        colors = TextFieldDefaults.textFieldColors(
+            textColor = MaterialTheme.colors.onSurface,
+            backgroundColor = MaterialTheme.colors.surface,
+        )
     )
 }
 
@@ -155,3 +179,13 @@ fun String.getCommaNumber(): String {
     return replace(regex, "\$1,")
 }
 //https://dealicious-inc.github.io/2022/03/14/android-compose-apply.html 참고
+
+//@Preview
+//@Composable
+//fun TextFieldsPreview() {
+//    SignEzPrototypeTheme(darkTheme = false) {
+//        Column() {
+//
+//        }
+//    }
+//}
