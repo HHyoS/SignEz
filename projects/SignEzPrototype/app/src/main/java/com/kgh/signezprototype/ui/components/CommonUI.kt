@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -17,8 +19,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.kgh.signezprototype.fields.CustomTextInput
+import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 
 /**
@@ -41,16 +47,6 @@ fun FocusBlock(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colors.surface
         )
-//            .border(
-//                border = BorderStroke(
-//                    1.dp,
-//                    androidx.compose.material.MaterialTheme.colors.onSurface
-//                ),
-//                shape = Shapes.medium
-//            )
-//            .background(MaterialTheme.colors.surface),
-//        horizontalArrangement = Arrangement.SpaceBetween
-//            .background(MaterialTheme.colors.background)
     ) {
         Column(
             Modifier
@@ -379,6 +375,31 @@ fun BottomDoubleFlatButton(
 
 }
 
+//@Composable
+//fun InputFocusBlock(
+//    ,
+//    modifier: Modifier = Modifier
+//) {
+//    Card(
+//        modifier = Modifier
+//            .padding(top = 8.dp, bottom = 8.dp)
+//            .fillMaxWidth(),
+//        colors = CardDefaults.cardColors(
+//            containerColor = MaterialTheme.colors.surface
+//        )
+//    ) {
+//        Column(
+//            Modifier
+//        ) {
+//            for (textField in textFields) {
+//                Row {
+//                    textField
+//                }
+//            }
+//        }
+//    }
+//}
+
 @Preview
 @Composable
 fun ComponentPreview() {
@@ -399,12 +420,14 @@ fun ComponentPreview() {
 //            SignEzFloatingButton(onClickEvent = {})
 //            TutorialStartButton(title = "시작하기", onClickEvent = {})
 //            BottomSingleFlatButton(title = "확인", true, onClickEvent = {})
-            BottomDoubleFlatButton(leftTitle = "취소",
-                rightTitle = "확인",
-                isLeftUsable = true,
-                isRightUsable = false,
-                leftOnClickEvent = {},
-                rightOnClickEvent = {})
+//            BottomDoubleFlatButton(leftTitle = "취소",
+//                rightTitle = "확인",
+//                isLeftUsable = true,
+//                isRightUsable = false,
+//                leftOnClickEvent = {},
+//                rightOnClickEvent = {})
+//            InputFocusBlock(textFields =    )
         }
     }
 }
+

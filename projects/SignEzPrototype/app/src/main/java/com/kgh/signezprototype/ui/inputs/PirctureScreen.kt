@@ -58,8 +58,8 @@ fun PictureAnalysis(
 ) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var imageTitle by remember { mutableStateOf("") }
-    var imageSize by remember { mutableStateOf(0L) }
+    var imageTitle  by remember { mutableStateOf("") }
+    var imageSize  by remember { mutableStateOf(0L) }
     val coroutineScope = rememberCoroutineScope()
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
@@ -161,33 +161,33 @@ fun PictureAnalysis(
 //                            Text("Clear")
 //                        }
                         }
+                    }
 
-                        Log.d("compare", viewModel.imageUri.value.toString())
-                        //imageBitmap != null && last.value == "take"
-                        if (viewModel.imageUri.value != Uri.EMPTY) {
-                            Column {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .border(BorderStroke(width = 4.dp, color = Color.Black))
-                                        .height(400.dp)
-                                ) {
-                                    imageBitmap?.let {
-                                        Image(
-                                            bitmap = it.asImageBitmap(),
-                                            contentDescription = "Picture frame",
-                                            contentScale = ContentScale.FillBounds,
-                                            modifier = Modifier
-                                        )
-                                    }
+                    Log.d("compare", viewModel.imageUri.value.toString())
+                    //imageBitmap != null && last.value == "take"
+                    if (viewModel.imageUri.value != Uri.EMPTY) {
+                        Column {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
+                                    .height(400.dp)
+                            ) {
+                                imageBitmap?.let {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = "Picture frame",
+                                        contentScale = ContentScale.FillBounds,
+                                        modifier = Modifier
+                                    )
                                 }
-                                Text(text = "이미지 제목 : $imageTitle")
-                                Text(text = "이미지 크기 : $imageSize byte")
                             }
+                            Text(text = "이미지 제목 : $imageTitle")
+                            Text(text = "이미지 크기 : $imageSize byte")
                         }
                     }
                 }
             }
-        } // 최외곽 컬럼 끝
-    }
+        }
+    } // 최외곽 컬럼 끝
 }

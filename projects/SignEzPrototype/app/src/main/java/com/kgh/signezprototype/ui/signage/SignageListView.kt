@@ -31,7 +31,6 @@ import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
 import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
 import com.kgh.signezprototype.ui.components.SignEzFloatingButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
-import com.kgh.signezprototype.ui.theme.OneBGGrey
 import java.text.NumberFormat
 import java.util.*
 
@@ -39,6 +38,7 @@ object SignageListScreenDestination : NavigationDestination {
     override val route = "SignageList"
     override val titleRes = "Total Signage"
 }
+
 // clickable의 ripple효과 없애는 메서드
 inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier = composed {
     clickable(indication = null,
@@ -60,8 +60,7 @@ fun SignageInformationScreen(
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
-//            .noRippleClickable { focusManager.clearFocus() }
-            .clickable{ focusManager.clearFocus() }
+            .noRippleClickable { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
@@ -82,7 +81,7 @@ fun SignageInformationScreen(
                 }
             }
         }
-    ){ innerPadding ->
+    ) { innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
@@ -114,16 +113,18 @@ fun SignageInformationScreen(
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        SignageList(onItemClick = { signage ->
-                            run {
-                                if (selectedId == signage.id) {
-                                    selectedId = -1
-                                } else {
-                                    selectedId = signage.id
+                        SignageList(
+                            onItemClick = { signage ->
+                                run {
+                                    if (selectedId == signage.id) {
+                                        selectedId = -1
+                                    } else {
+                                        selectedId = signage.id
+                                    }
                                 }
-                            }
-                        }, selectedId = selectedId,
-                            navController=navController)
+                            }, selectedId = selectedId,
+                            navController = navController
+                        )
                     }
 
                     // 삭제하시나여?
@@ -149,7 +150,7 @@ fun SignageList(
     modifier: Modifier = Modifier,
     viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
     selectedId: Long,
-    navController:NavHostController
+    navController: NavHostController
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
@@ -180,8 +181,9 @@ fun SignageList(
                 InventoryItem(
                     signage = item,
                     onItemClick = onItemClick,
-                    selectedId=selectedId,
-                    navController=navController)
+                    selectedId = selectedId,
+                    navController = navController
+                )
                 Divider(
                     modifier = Modifier
                         .height(1.dp)
@@ -213,15 +215,12 @@ private fun InventoryItem(
 ) {
     Row(
         modifier = Modifier
-        .fillMaxWidth()
-        .conditional(selectedId == signage.id) {
-            background(
-                color = Color(0xFFE6E6E6)
-            )
-        }
-        .clickable {
-            navController.navigate(DetailSignageScreenDestination.route+"/${signage.id}")
-        },
+            .fillMaxWidth()
+            .conditional(selectedId == signage.id) {
+                background(
+                    color = Color(0xFFE6E6E6)
+                )
+            },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -253,7 +252,7 @@ private fun InventoryItem(
         Row(
             modifier = modifier
                 .fillMaxWidth()
-                .clickable { /*여기에 해당 사이니지 정보로가는 이벤트 넣으면 됩니다*/ }
+                .clickable { navController.navigate(DetailSignageScreenDestination.route + "/${signage.id}") }
                 .padding(vertical = 5.dp),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically

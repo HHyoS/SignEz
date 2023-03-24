@@ -32,8 +32,8 @@ class CabinetDetailViewModel(private val signageRepository: SignagesRepository, 
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    fun updateRecord(name:String,width:Double,height:Double,bitmap:Bitmap,colNum:Int,rowNum:Int,cabinet:Cabinet) = viewModelScope.launch {
-        if (!bitmap.equals(defaultBitmap)) {
+    fun updateRecord(name:String,width:Double,height:Double,bitmap:Bitmap?,colNum:Int,rowNum:Int,cabinet:Cabinet) = viewModelScope.launch {
+        if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
             val byteArray = outputStream.toByteArray()
