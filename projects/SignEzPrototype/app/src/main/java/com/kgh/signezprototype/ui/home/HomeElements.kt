@@ -81,60 +81,33 @@ fun SignEzSpec(
     navigateToSignageList: () -> Unit,
     signage: Signage?
 ) {
-//    Surface(
-//        shape = MaterialTheme.shapes.large,
-//        border = BorderStroke(
-//            width = 1.dp,
-//            color = MaterialTheme.colorScheme.outline
-//
-//        ),
-//        modifier = modifier
-//            .clip(MaterialTheme.shapes.small)
-//            .clickable(onClick = navigateToSignageList)
-//    ) {
-//        Column {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth(0.9f),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text("사이니지 스펙", Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-//                OutlinedButton(
-//                    onClick = {},
-//                    shape = RoundedCornerShape(20.dp),
-//                    border = BorderStroke(2.dp, Color.Blue),
-//                    colors = ButtonDefaults.outlinedButtonColors(
-//                        contentColor = Color.Blue
-//                    ),
-//                    modifier = Modifier
-//                        .padding(4.dp)
-//                ) {
-//                    Text("입력")
-//                }
-//            }
-//            Text(text = "정보 입력이 필요 합니다.", modifier = Modifier.padding(10.dp))
-//        }
-
-    //ㅇㅇㅇㅇㅇㅇ
-//    FocusBlock(
-//        title = stringResource(id = R.string.signage_spec_title), subtitle = stringResource(id = R.string.need_signage_info), modifier = modifier
-//            .clip(MaterialTheme.shapes.small)
-//            .clickable(onClick = navigateToSignageList)
-//    )
-    FocusBlock(
-        title = stringResource(id = R.string.signage_spec_title),
-//        subtitle = ,
-        infols = listOf(stringResource(id = R.string.need_signage_info)),
-        buttonTitle = "입력",
-        isbuttonVisible = true,
-        buttonOnclickEvent = navigateToSignageList,
-        modifier = Modifier,
-    )
     if (signage != null) {
-        Text(text = "설치 장소 = ${signage.name}")
-        Text(text = "높이 : ${signage.width}")
-        Text(text = "너비 : ${signage.height}")
+        FocusBlock(
+            title = stringResource(id = R.string.signage_spec_title),
+            subtitle = "${signage.name}",
+            infols = listOf("높이 : ${signage.width}", "너비 : ${signage.height}"),
+            buttonTitle = "입력",
+            isbuttonVisible = true,
+            buttonOnclickEvent = navigateToSignageList,
+            modifier = Modifier,
+        )
+    } else if (signage == null) {
+        FocusBlock(
+            title = stringResource(id = R.string.signage_spec_title),
+            infols = listOf(stringResource(id = R.string.need_signage_info)),
+            buttonTitle = "입력",
+            isbuttonVisible = true,
+            buttonOnclickEvent = navigateToSignageList,
+            modifier = Modifier,
+        )
     }
+
+//    if (signage != null) {
+//        Text(text = "설치 장소 = ${signage.name}")
+//        Text(text = "높이 : ${signage.width}")
+//        Text(text = "너비 : ${signage.height}")
+//    }
+
 
 //}
 }
@@ -144,48 +117,28 @@ fun CabinetSpec(
     modifier: Modifier = Modifier,
     cabinet: Cabinet?
 ) {
-//    Surface(
-//        shape = MaterialTheme.shapes.large,
-//        border = BorderStroke(
-//            width = 1.dp,
-//            color = MaterialTheme.colorScheme.outline
-//
-//        ),
-//        modifier = modifier
-//            .clip(MaterialTheme.shapes.small)
-//            .clickable(onClick = {})
-//    ) {
-//        Column {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth(0.9f),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text("캐비닛 스펙", Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge)
-//            }
-//            Text(text = "사이니지의 캐비닛 정보", modifier = Modifier.padding(10.dp))
-//        }
-//    }
-
-    ///ㅇㅇㅇㅇㅇㅇㅇㅇ
-//    FocusBlock(
-//        title = stringResource(id = R.string.cabinet_spec_title), subtitle = stringResource(id = R.string.need_cabinet_info), modifier = modifier
-//    )
-    FocusBlock(
-        title = stringResource(id = R.string.cabinet_spec_title),
-//        subtitle = ,
-        infols = listOf(stringResource(id = R.string.need_cabinet_info)),
-        buttonTitle = null,
-        isbuttonVisible = false,
-        buttonOnclickEvent = {},
-        modifier = Modifier
-    )
     if (cabinet != null) {
-        Text(text = "설치 장소 = ${cabinet.name}")
-        Text(text = "높이 : ${cabinet.cabinetHeight}")
-        Text(text = "너비 : ${cabinet.cabinetWidth}")
-        Text(text = "모듈 : ${cabinet.moduleColCount}X${cabinet.moduleRowCount}")
+        FocusBlock(
+            title = stringResource(id = R.string.cabinet_spec_title),
+            subtitle = "${cabinet.name}",
+            infols = listOf("높이 : ${cabinet.cabinetHeight}","너비 : ${cabinet.cabinetWidth}","모듈 : ${cabinet.moduleColCount}X${cabinet.moduleRowCount}"),
+            buttonTitle = null,
+            isbuttonVisible = false,
+            buttonOnclickEvent = {},
+            modifier = Modifier
+        )
+
+    } else if (cabinet == null) {
+        FocusBlock(
+            title = stringResource(id = R.string.cabinet_spec_title),
+            infols = listOf(stringResource(id = R.string.need_cabinet_info)),
+            buttonTitle = null,
+            isbuttonVisible = false,
+            buttonOnclickEvent = {},
+            modifier = Modifier
+        )
     }
+
 }
 
 @Composable
