@@ -51,7 +51,7 @@ class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : View
         // Save image as a Blob
         val bitmap = createSimpleBitmap(100, 100, Color.RED)
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
 
         val testAnalysisResult = Cabinet(id = 1L,

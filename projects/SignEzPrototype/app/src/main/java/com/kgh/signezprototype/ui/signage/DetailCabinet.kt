@@ -70,11 +70,15 @@ fun CDetail(
     val cabinetName = remember { mutableStateOf("") }
     val colModuleCount = remember { mutableStateOf("") }
     val rowModuleCount = remember { mutableStateOf("") }
-
     val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
         value = viewModel.getCabinet(cabinetId)
     })
     val cabinet = cabinetState.value
+
+    DisposableEffect(Unit) {
+        viewModel.imageUri.value = Uri.EMPTY
+        onDispose {} // Cleanup logic here, if needed
+    }
 
     if (cabinet != null) {
         cabinetWidth.value = cabinet.cabinetWidth.toString()

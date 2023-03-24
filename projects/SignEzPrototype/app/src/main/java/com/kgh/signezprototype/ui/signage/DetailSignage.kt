@@ -79,150 +79,169 @@ fun SDetail(
     val context = LocalContext.current
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
+
 //    CompositionLocalProvider(LocalSignageDetailViewModel provides viewModel!!) { 로컬 뷰모델 3
-        val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-            value = viewModel.getCabinet(signageId)
-        })
-        val cabinet = cabinetState.value
-        val signageState = produceState(initialValue = null as Signage?, producer = {
-            value = viewModel.getSignage(signageId)
-        })
-        val signage = signageState.value
+    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
+        value = viewModel.getCabinet(signageId)
+    })
+    val cabinet = cabinetState.value
+    val signageState = produceState(initialValue = null as Signage?, producer = {
+        value = viewModel.getSignage(signageId)
+    })
+    val signage = signageState.value
 
-        if (signage != null) {
-            viewModel.sName.value = signage.name
-            viewModel.sHeight.value = signage.height.toString()
-            viewModel.sWidth.value = signage.width.toString()
+    DisposableEffect(Unit) {
+        viewModel.imageUri.value = Uri.EMPTY
+        onDispose {} // Cleanup logic here, if needed
+    }
+
+    if (signage != null) {
+        viewModel.sName.value = signage.name
+        viewModel.sHeight.value = signage.height.toString()
+        viewModel.sWidth.value = signage.width.toString()
+    }
+
+
+    if (viewModel.imageUri.value != Uri.EMPTY) {
+        // content uri가 아니면 content uri로 바꿔줌.
+        if (!viewModel.imageUri.value.toString().contains("content")) {
+            contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         }
-
-
-        if (viewModel.imageUri.value != Uri.EMPTY) {
-            // content uri가 아니면 content uri로 바꿔줌.
-            if (!viewModel.imageUri.value.toString().contains("content")) {
-                contentUri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
-            }
-            else {
-                contentUri = viewModel.imageUri.value
-            }
+        else {
+            contentUri = viewModel.imageUri.value
         }
-        if (viewModel.imageUri.value != Uri.EMPTY) {
-            imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
-        }
+    }
+    if (viewModel.imageUri.value != Uri.EMPTY) {
+        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+    }
 
-        androidx.compose.material.Scaffold(
-            modifier = Modifier
-                .clickable(onClick = { focusManager.clearFocus() })
-                .background(OneBGGrey),
-            topBar = {
-                SignEzTopAppBar(
-                    title = "사이니지 정보",
-                    canNavigateBack = true
-                )
-            },
-        ) { innerPadding ->
-            Column {
-                Spacer(modifier = Modifier.padding(innerPadding))
-                if (viewModel.imageUri.value == Uri.EMPTY) {
-                    signage?.repImg?.let { byteArray ->
-                        byteArray.let {
-                            bitmap = byteArrayToBitmap(it)
-                            Image(
-                                bitmap = bitmap!!.asImageBitmap(),
-                                contentDescription = "Signage Image",
-                                modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .fillMaxHeight(0.3f)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = OneBGDarkGrey)
-                            )
-                        }
-                    }
-                } else {
-                    imageBitmap.let {
-                        if (it != null) {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = "rep Image",
-                                modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .fillMaxHeight(0.3f)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = OneBGDarkGrey)
-                            )
-                        }
+    androidx.compose.material.Scaffold(
+        modifier = Modifier
+            .clickable(onClick = { focusManager.clearFocus() })
+            .background(OneBGGrey),
+        topBar = {
+            SignEzTopAppBar(
+                title = "사이니지 정보",
+                canNavigateBack = true
+            )
+        },
+    ) { innerPadding ->
+        Column {
+            Spacer(modifier = Modifier.padding(innerPadding))
+            if (viewModel.imageUri.value == Uri.EMPTY) {
+                signage?.repImg?.let { byteArray ->
+                    byteArray.let {
+                        bitmap = byteArrayToBitmap(it)
+                        Image(
+                            bitmap = bitmap!!.asImageBitmap(),
+                            contentDescription = "Signage Image",
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .fillMaxHeight(0.3f)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = OneBGDarkGrey)
+                        )
                     }
                 }
-                Row {
-                    ImagePicker(onImageSelected = { address ->
-                        imageBitmap = bitmap
-                        viewModel.imageUri.value = Uri.parse(address)
-                    })
-
-                    OutlinedButton(
-                        onClick = { dispatchTakePictureIntent(activity, viewModel=viewModel,type=22) },
-                        shape = RoundedCornerShape(20.dp),
-                        border = BorderStroke(2.dp, Color.Blue),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.Blue
-                        ),
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text("카메라")
+            } else {
+                imageBitmap.let {
+                    if (it != null) {
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = "rep Image",
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .fillMaxHeight(0.3f)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = OneBGDarkGrey)
+                        )
                     }
                 }
-                CustomTextInput(
-                    value = viewModel.sName.value,
-                    onValueChange = { it -> viewModel.sName.value = it },
-                    placeholder = "사이니지 이름")
-                EditNumberField(
-                        // 가로 길이
-                        head = "너비",
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = { focusManager.clearFocus() }
-                        ),
-                        value = viewModel.sWidth.value,
-                        onValueChange = { viewModel.sWidth.value = it },
-                        unit = "mm"
-                    )
-                EditNumberField(
-                    // 세로 길이
-                    head = "높이",
+            }
+            Row {
+                ImagePicker(onImageSelected = { address ->
+                    imageBitmap = bitmap
+                    viewModel.imageUri.value = Uri.parse(address)
+                })
+
+                OutlinedButton(
+                    onClick = { dispatchTakePictureIntent(activity, viewModel=viewModel,type=22) },
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(2.dp, Color.Blue),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = Color.White,
+                        contentColor = Color.Blue
+                    ),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("카메라")
+                }
+            }
+            CustomTextInput(
+                value = viewModel.sName.value,
+                onValueChange = { it -> viewModel.sName.value = it },
+                placeholder = "사이니지 이름")
+            EditNumberField(
+                    // 가로 길이
+                    head = "너비",
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
-
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = { focusManager.clearFocus() }
                     ),
-                    value = viewModel.sHeight.value,
-                    onValueChange = { viewModel.sHeight.value = it },
+                    value = viewModel.sWidth.value,
+                    onValueChange = { viewModel.sWidth.value = it },
                     unit = "mm"
                 )
+            EditNumberField(
+                // 세로 길이
+                head = "높이",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
 
-                    Box {
-                        Column {
-                            OutlinedButton(
-                                onClick = {
-                                    navController.navigate(CabinetListScreenDestination.route+"/edit")
-                                },
-                                shape = RoundedCornerShape(20.dp),
-                                border = BorderStroke(2.dp, Color.Blue),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    backgroundColor = Color.White,
-                                    contentColor = Color.Blue
-                                ),
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text("선택")
-                            }
-                            Text(text="캐비닛 스펙")
-                            if (cabinet != null) {
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = { focusManager.clearFocus() }
+                ),
+                value = viewModel.sHeight.value,
+                onValueChange = { viewModel.sHeight.value = it },
+                unit = "mm"
+            )
+
+                Box {
+                    Column {
+                        OutlinedButton(
+                            onClick = {
+                                navController.navigate(CabinetListScreenDestination.route+"/edit")
+                            },
+                            shape = RoundedCornerShape(20.dp),
+                            border = BorderStroke(2.dp, Color.Blue),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                backgroundColor = Color.White,
+                                contentColor = Color.Blue
+                            ),
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text("선택")
+                        }
+                        Text(text="캐비닛 스펙")
+                        if (cabinet != null) {
+                            if (viewModel.newCabinetId.value > -1) {
+                                val newCabinetState = produceState(initialValue = null as Cabinet?, producer = {
+                                    value = viewModel.getNewCabinet()
+                                })
+                                val newCabinet = cabinetState.value
+                                if (newCabinet != null) {
+                                    Text(text = newCabinet.name)
+                                    Text(text = "${newCabinet.cabinetWidth} mm")
+                                    Text(text = "${newCabinet.cabinetHeight} mm")
+                                    Text(text = "${newCabinet.moduleColCount}X${cabinet.moduleRowCount}")
+                                }
+
+                            } else {
                                 Text(text = cabinet.name)
                                 Text(text = "${cabinet.cabinetWidth} mm")
                                 Text(text = "${cabinet.cabinetHeight} mm")
@@ -230,58 +249,58 @@ fun SDetail(
                             }
 
                         }
-                    }
-                Row {
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                if (signage != null) {
-                                    if (imageBitmap == null ){
-                                        viewModel.updateRecord(
-                                            bitmap = null,
-                                            signage = signage
-                                        )
-                                    }
-                                    else {
-                                        viewModel.updateRecord(
-                                            bitmap = imageBitmap,
-                                            signage = signage
-                                        )
-                                    }
 
-                                    navController.popBackStack()
-                                }
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(context, "정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                        }) {
-                        Text(text = "확인")
-                    }
-
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                if (signage != null) {
-                                    viewModel.delete(signage = signage)
-                                    navController.navigate(SignageListScreenDestination.route)
-                                }
-                            } catch (e: Exception) {
-                                withContext(Dispatchers.Main) {
-                                    Toast.makeText(context, "정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                    }) {
-                        Text(text = "삭제")
                     }
                 }
-            } // 캐비닛 변경 버튼 else문
+            Row {
+                Button(onClick = {
+                    coroutineScope.launch {
+                        try {
+                            if (signage != null) {
+                                if (imageBitmap == null ){
+                                    viewModel.updateRecord(
+                                        bitmap = null,
+                                        signage = signage
+                                    )
+                                }
+                                else {
+                                    viewModel.updateRecord(
+                                        bitmap = imageBitmap,
+                                        signage = signage
+                                    )
+                                }
+                                navController.popBackStack()
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                    }) {
+                    Text(text = "확인")
+                }
 
-        }// 화면 전체 컬럼 끝
+                Button(onClick = {
+                    coroutineScope.launch {
+                        try {
+                            if (signage != null) {
+                                viewModel.delete(signage = signage)
+                                navController.navigate(SignageListScreenDestination.route)
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }) {
+                    Text(text = "삭제")
+                }
+            }
+        } // 캐비닛 변경 버튼 else문
 
+    }// 화면 전체 컬럼 끝
 //    } 로컬 뷰모델 4
     // Use viewModel here
 }
