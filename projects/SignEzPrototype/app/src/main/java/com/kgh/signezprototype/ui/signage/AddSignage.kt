@@ -162,15 +162,6 @@ fun AddSignageScreen(
                     ) {
 
                         imageBitmap.let {
-//                        Image(
-//                            bitmap = it.asImageBitmap(),
-//                            contentDescription = "rep Image",
-//                            modifier = Modifier
-//                                .fillMaxWidth(0.9f)
-//                                .fillMaxHeight(0.3f)
-//                                .clip(RoundedCornerShape(15.dp))
-//                                .background(color = OneBGDarkGrey)
-//                        )
                             Image(
                                 bitmap = it.asImageBitmap(),
                                 contentDescription = "rep Image",
