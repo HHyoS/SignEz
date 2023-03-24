@@ -119,7 +119,8 @@ fun VideoAnalysis(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = VideoScreenDestination.titleRes,
+//                title = VideoScreenDestination.titleRes,
+                title = "영상 분석",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -130,7 +131,7 @@ fun VideoAnalysis(
                 rightTitle = "분석하기",
                 isLeftUsable = true,
                 isRightUsable = false,
-                leftOnClickEvent = { onNavigateUp },
+                leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {  /* 분석하기 이벤트를 넣으면 됨 */ }
             )
         }
