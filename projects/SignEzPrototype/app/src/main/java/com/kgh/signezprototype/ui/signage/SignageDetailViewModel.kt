@@ -36,6 +36,15 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+    fun init() {
+        mCurrentPhotoPath.value = ""
+        imageUri.value = Uri.EMPTY
+        sWidth.value = ""
+        sHeight.value = ""
+        sName.value = ""
+        newCabinetId.value = -1L
+    }
+
     fun updateRecord(bitmap:Bitmap?,signage:Signage) = viewModelScope.launch {
         if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()

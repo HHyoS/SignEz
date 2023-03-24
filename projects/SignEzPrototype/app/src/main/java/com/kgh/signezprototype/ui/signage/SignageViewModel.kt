@@ -48,6 +48,15 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
+    fun init() {
+        mCurrentPhotoPath.value = ""
+        imageUri.value = Uri.EMPTY
+        sWidth.value = ""
+        sHeight.value = ""
+        sName.value = ""
+        selectedCabinetId.value = -1L
+    }
+
     fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)

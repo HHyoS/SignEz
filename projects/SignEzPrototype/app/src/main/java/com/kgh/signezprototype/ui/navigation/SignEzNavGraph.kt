@@ -72,7 +72,8 @@ fun SignEzNavHost(
                 onItemClick = {},
                 modifier = Modifier,
                 navController = navController,
-                viewModel =  viewModel5
+                viewModel =  viewModel5,
+                detailViewModel = viewModel3
             )
         }
 
