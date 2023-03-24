@@ -22,17 +22,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
+import com.kgh.signezprototype.R
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.fields.CustomTextInput
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
+import com.kgh.signezprototype.ui.components.FocusBlock
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
@@ -64,8 +67,8 @@ fun AddSignageScreen(
     var contentUri: Uri = Uri.EMPTY
     val allFieldsNotEmpty = (
             viewModel.sName.value.isNotEmpty() &&
-            viewModel.sWidth.value.isNotEmpty() &&
-            viewModel.sHeight.value.isNotEmpty()
+                    viewModel.sWidth.value.isNotEmpty() &&
+                    viewModel.sHeight.value.isNotEmpty()
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
 
@@ -174,15 +177,6 @@ fun AddSignageScreen(
                     ) {
 
                         imageBitmap.let {
-//                        Image(
-//                            bitmap = it.asImageBitmap(),
-//                            contentDescription = "rep Image",
-//                            modifier = Modifier
-//                                .fillMaxWidth(0.9f)
-//                                .fillMaxHeight(0.3f)
-//                                .clip(RoundedCornerShape(15.dp))
-//                                .background(color = OneBGDarkGrey)
-//                        )
                             Image(
                                 bitmap = it.asImageBitmap(),
                                 contentDescription = "rep Image",
@@ -302,7 +296,7 @@ fun AddSignageScreen(
 
                 if (viewModel.selectedCabinetId.value == -1L) {
                     WhiteButton(title = "캐비닛 스펙 추가하기", isUsable = true) {
-                        navController.navigate(CabinetListScreenDestination.route+"/add")
+                        navController.navigate(CabinetListScreenDestination.route + "/add")
                     }
 //                    OutlinedButton(
 //                        onClick = {
@@ -320,31 +314,45 @@ fun AddSignageScreen(
 //                    }
                 } // 캐비닛 정보 선택 구간
                 else {
-                    Box {
-                        Column {
-                            OutlinedButton(
-                                onClick = {
-                                    navController.navigate(CabinetListScreenDestination.route+"/add")
-                                },
-                                shape = RoundedCornerShape(20.dp),
-                                border = BorderStroke(2.dp, Color.Blue),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    backgroundColor = Color.White,
-                                    contentColor = Color.Blue
-                                ),
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text("변경")
-                            }
-                            Text(text = "캐비닛 스펙")
-                            Text(text = cabinetState.cabinet.name)
-                            Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
-                            Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
-                            Text(text = "${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}")
-                        }
-                    }
-                } // 캐비닛 변경 버튼 else문
-            }// 화면 전체 컬럼 끝
-        }// 화면 전체 박스 끝
-    }
+                    FocusBlock(
+                        title = "캐비닛 스펙",
+                        subtitle = cabinetState.cabinet.name,
+                        infols = listOf(
+                            "너비 : ${cabinetState.cabinet.cabinetWidth} mm",
+                            "높이 : ${cabinetState.cabinet.cabinetHeight} mm",
+                            "모듈 : ${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}"
+                        ),
+                        buttonTitle = "변경",
+                        isbuttonVisible = true,
+                        buttonOnclickEvent = { navController.navigate(CabinetListScreenDestination.route + "/add") },
+                        modifier = Modifier,
+                    )
+
+                    //
+//                    Box {
+//                        Column {
+//                            OutlinedButton(
+//                                onClick = {
+//                                    navController.navigate(CabinetListScreenDestination.route+"/add")
+//                                },
+//                                shape = RoundedCornerShape(20.dp),
+//                                border = BorderStroke(2.dp, Color.Blue),
+//                                colors = ButtonDefaults.outlinedButtonColors(
+//                                    backgroundColor = Color.White,
+//                                    contentColor = Color.Blue
+//                                ),
+//                                modifier = Modifier.padding(16.dp)
+//                            ) {
+//                                Text("변경")
+//                            }
+//                            Text(text = "캐비닛 스펙")
+//                            Text(text = cabinetState.cabinet.name)
+//                            Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
+//                            Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
+//                            Text(text = "${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}")
+//                        }
+                }
+            } // 캐비닛 변경 버튼 else문
+        }// 화면 전체 컬럼 끝
+    }// 화면 전체 박스 끝
 }
