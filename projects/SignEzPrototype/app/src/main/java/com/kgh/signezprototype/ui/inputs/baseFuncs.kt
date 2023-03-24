@@ -10,6 +10,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.core.content.FileProvider
@@ -28,7 +29,7 @@ const val REQUEST_CODE_IMAGE_CAPTURE = 2
 
 @SuppressLint("SimpleDateFormat")
 @Throws(IOException::class)
-fun createImageFile(viewModel: PictureViewModel): File {
+fun createImageFile(viewModel: MediaViewModel): File {
     // Create an image file name
     val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
     val imageFileName = "JPEG_$timeStamp.jpg"
@@ -69,10 +70,11 @@ fun createVideoFile(viewModel: VideoViewModel): File {
     //    mCurrentVideoPath.value = videoFile.absolutePath
     val videoFile = File(appDir, videoFileName)
     viewModel.mCurrentVideoPath.value = videoFile.absolutePath
+
     return videoFile
 }
 
-fun dispatchTakePictureIntent(activity: Activity, viewModel: PictureViewModel) {
+fun dispatchTakePictureIntent(activity: Activity, viewModel: MediaViewModel,type:Int) {
     Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
         // Ensure that there's a camera activity to handle the intent
         takePictureIntent.resolveActivity(activity.packageManager)?.also {
@@ -89,8 +91,13 @@ fun dispatchTakePictureIntent(activity: Activity, viewModel: PictureViewModel) {
                 val providerURI = FileProvider.getUriForFile(activity, "com.kgh.signezprototype.provider", photoFile)
                 // 인텐트에 전달할 때는 FileProvier의 Return값인 content://로만!!, providerURI의 값에 카메라 데이터를 넣어 보냄
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI)
-                viewModel.type = 2
-                activity.startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE)
+                viewModel.type = type
+                if (type == REQUEST_CODE_IMAGE_CAPTURE) {
+                    activity.startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE)
+                }
+                else {
+                    activity.startActivityForResult(takePictureIntent, type)
+                }
             }
         }
     }
@@ -119,7 +126,7 @@ fun dispatchTakeVideoIntent(activity: Activity, viewModel: VideoViewModel) {
     }
 }
 
-fun galleryAddPic(context: Context, viewModel: PictureViewModel) {
+fun galleryAddPic(context: Context, viewModel: MediaViewModel) {
     // Get the absolute path of the image file
     val imagePath = viewModel.mCurrentPhotoPath.value ?: return
     // Insert the image into the MediaStore
