@@ -1,6 +1,7 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -52,7 +53,8 @@ fun SignageInformationScreen(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: AnalysisViewModel
+    viewModel: AnalysisViewModel,
+    detailViewModel: SignageViewModel
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -70,7 +72,10 @@ fun SignageInformationScreen(
         },
         floatingActionButton = {
             SignEzFloatingButton(
-                onClickEvent = { navController.navigate(AddSignageDestination.route) }
+                onClickEvent = {
+                    detailViewModel.init()
+                    navController.navigate(AddSignageDestination.route)
+                }
             )
         },
         bottomBar = {
