@@ -299,7 +299,7 @@ fun SDetail(
                             dispatchTakePictureIntent(
                                 activity,
                                 viewModel = viewModel,
-                                type = 22
+                                type = 2222
                             )
                         }
                     }
