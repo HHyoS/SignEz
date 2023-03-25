@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
         MainViewModelFactory((application as SignEzApplication).container)
     }
     private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
-
+    var canRun: MutableState<Boolean> = mutableStateOf(false)
 //    var imageUri: MutableState<Uri> = mutableStateOf(Uri.EMPTY) // 기본 촬영 사진 uri
 //    var videoUri: MutableState<Uri> = mutableStateOf(Uri.EMPTY) // 기본 촬영 영상 uri
 //    private var imageUri:MutableLiveData<Uri> = MutableLiveData(Uri.EMPTY)
@@ -116,22 +116,21 @@ class MainActivity : ComponentActivity() {
     private val REQUEST_CODE_IMAGE_CAPTURE_3 = 222
     private val REQUEST_CODE_IMAGE_CAPTURE_4 = 2222
     private val REQUEST_CODE_IMAGE_CAPTURE_5 = 22222
-    private val PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 3
     private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
 
     private val finishtimeed = 1000L;
     private var presstime = 0L;
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            Log.i("kgh", "Permission granted")
-            shouldShowCamera.value = false
-        } else {
-            Log.i("kgh", "Permission denied")
-        }
-    }
+//    private val requestPermissionLauncher = registerForActivityResult(
+//        ActivityResultContracts.RequestPermission()
+//    ) { isGranted ->
+//        if (isGranted) {
+//            Log.i("kgh", "Permission granted")
+//            shouldShowCamera.value = false
+//        } else {
+//            Log.i("kgh", "Permission denied")
+//        }
+//    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -173,11 +172,10 @@ class MainActivity : ComponentActivity() {
 //        }
 //        return false
 //    }
-
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val appContainer = (application as SignEzApplication).container
+
         viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
@@ -212,6 +210,19 @@ class MainActivity : ComponentActivity() {
         mainViewModel.insertTestRecord()
         setContent {
             SignEzPrototypeTheme {
+//                while (!canRun.value) {
+//                    Log.d("startppp","${canRun.value}")
+//                    requestPermissions(canRun) // If the user denies any permission, exit the app.
+//                    Log.d("midppp","${canRun.value}")
+//                    if (!canRun.value) {
+//                        PermissionAlertDialog(canRun)
+//
+//                    } else {
+//                        finishAffinity()
+//                    }
+//                    Log.d("endppp","${canRun.value}")
+//                }
+
                 SignEzApp(
                     activity = this,
                     viewModel1 = viewModel1,
@@ -224,61 +235,119 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-        requestCameraPermission() // 카메라 권한 받기 , 앱 열때
-        requestWriteExternalStoragePermission() // 외부 저장소 읽기 권한
-        requestReadExternalStoragePermission() // 외부 저장소 쓰기 권한
+//        requestCameraPermission() // 카메라 권한 받기 , 앱 열때
+//        requestWriteExternalStoragePermission() // 외부 저장소 읽기 권한
+//        requestReadExternalStoragePermission() // 외부 저장소 쓰기 권한
         // 권한 없으면 동작 못하게 처리 해줘야함 or 재요청, 나중에 ㄱ
     }
+    private fun requestPermissions(canRun: MutableState<Boolean>) {
+        val permissions = arrayOf(
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+
+        val permissionsToRequest = mutableListOf<String>()
+
+        for (permission in permissions) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsToRequest.add(permission)
+            }
+        }
+
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                permissionsToRequest.toTypedArray(),
+                10000
+            )
+        } else {
+            canRun.value = true
+        }
+    }
+
 
     // 현재 권한 승인상태를 확인하고, 충족되지 않았다면 권한 요청.
-    private fun requestCameraPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.CAMERA
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                Log.i("kgh", "Permission previously granted")
-                shouldShowCamera.value = true
-            }
-
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.CAMERA
-            ) -> Log.i("kgh", "Show camera permissions dialog")
-
-            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-        }
-    }
-
-    private fun requestWriteExternalStoragePermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE
-            )
-        }
-    }
-
-    private fun requestReadExternalStoragePermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
-            )
-        }
-    }
+//    private fun requestCameraPermission() {
+//        when {
+//            ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.CAMERA
+//            ) == PackageManager.PERMISSION_GRANTED -> {
+//                Log.i("kgh", "Permission previously granted")
+//                shouldShowCamera.value = true
+//            }
+//
+//            ActivityCompat.shouldShowRequestPermissionRationale(
+//                this,
+//                Manifest.permission.CAMERA
+//            ) -> Log.i("kgh", "Show camera permissions dialog")
+//
+//            else -> requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+//        }
+//    }
+//
+//    private fun requestWriteExternalStoragePermission() {
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+//                PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE
+//            )
+//        }
+//    }
+//
+//    private fun requestReadExternalStoragePermission() {
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.READ_EXTERNAL_STORAGE
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+//                PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE
+//            )
+//        }
+//    }
 }
 
 //@Preview(showBackground = true)
 // 일단 찍기, 불러오기 uri 따로 분리했는데 합쳐도 될듯.
 
+@Composable
+fun PermissionAlertDialog(
+    canRun:MutableState<Boolean>
+) {
+    AlertDialog(
+        onDismissRequest = {},
+        title = {
+            Text(text="앱사용을 위한 권한이 부족합니다.")
+        },
+        text = {
+            Text(text = "권한을 재설정 합니다.")
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { }
+            ) {
+                Text("재설정")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = {
+                canRun.value = true
+            }) {
+                Text("종료")
+            }
+        },
+        shape = RoundedCornerShape(24.dp)
+    )
+}
