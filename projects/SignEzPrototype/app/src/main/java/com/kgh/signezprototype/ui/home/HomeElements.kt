@@ -2,8 +2,10 @@ package com.kgh.signezprototype.ui.home
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,66 +14,66 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kgh.signezprototype.R
 import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.data.entities.Signage
 import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.components.FocusBlock
+import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 
 @Composable //지난 분석 결과 틀
 fun PastResult(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        shape = MaterialTheme.shapes.extraSmall,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline
-
-        ),
         modifier = modifier
-            .clip(MaterialTheme.shapes.small)
-            .clickable(onClick = {})
+            .background(androidx.compose.material.MaterialTheme.colors.surface)
     ) {
         Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(start = 32.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "지난 분석 결과",
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(bottom = 3.dp)
-                        .align(alignment = Alignment.Top),
+                        .weight(1f),
+//                        .align(alignment = Alignment.Top),
                     style = MaterialTheme.typography.bodyLarge
                 )
-                Box {
-                    Canvas(modifier = Modifier.size(56.dp)) {
-                        val strokeWidth = 4.dp.toPx()
-                        val sizePx = 30.dp.toPx()
-                        val path = Path().apply {
-                            moveTo(strokeWidth * 2, strokeWidth * 2)
-                            lineTo(sizePx - strokeWidth * 2, sizePx / 2)
-                            lineTo(strokeWidth * 2, sizePx - strokeWidth * 2)
-                        }
-
-                        drawPath(
-                            path = path,
-                            color = Color.Black,
-                            style = Stroke(width = strokeWidth)
-                        )
-                    }
+                androidx.compose.material.IconButton(onClick = {}) {
+                    androidx.compose.material.Icon(
+                        painter = painterResource(id = R.drawable.arrow_forward_ios_fill1_wght300_grad0_opsz48),
+                        contentDescription = "지난 결과 보기",
+                        tint = androidx.compose.material.MaterialTheme.colors.onSurface,
+                        modifier = Modifier
+                            .height(21.dp)
+                            .width(21.dp)
+                            .padding(end = 5.dp)
+                    )
                 }
             } // Row 끝
-            Text(text = "최근 기록 이미지 슬라이드", modifier = Modifier.padding(10.dp))
+            Spacer(modifier = Modifier.padding(50.dp))
         } // Col 끝
+    }
+}
+
+@Preview
+@Composable
+fun ComponentPreview() {
+    SignEzPrototypeTheme(darkTheme = false) {
+        Column {
+            PastResult()
+        }
     }
 }
 
