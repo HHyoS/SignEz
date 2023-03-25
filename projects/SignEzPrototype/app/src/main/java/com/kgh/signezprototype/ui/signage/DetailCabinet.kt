@@ -1,6 +1,7 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
@@ -40,6 +41,7 @@ import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
 import com.kgh.signezprototype.ui.theme.OneBGGrey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,6 +77,22 @@ fun CDetail(
     })
     val cabinet = cabinetState.value
 
+    val imageLoadingScope = CoroutineScope(Dispatchers.Main)
+    // Load the image asynchronously using coroutines
+    fun loadImageAsync(context: Context, contentUri: Uri) {
+        imageLoadingScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    // Load the image bitmap on a background thread
+                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+                } catch (e: Exception) {
+                    // Handle any errors that occur while loading the image
+                    Log.e("Error", "Error loading image", e)
+                }
+            }
+        }
+    }
+
     DisposableEffect(Unit) {
         viewModel.imageUri.value = Uri.EMPTY
         onDispose {} // Cleanup logic here, if needed
@@ -98,7 +116,8 @@ fun CDetail(
         }
     }
     if (viewModel.imageUri.value != Uri.EMPTY) {
-        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+        loadImageAsync(context, contentUri)
     }
 
     androidx.compose.material.Scaffold(
