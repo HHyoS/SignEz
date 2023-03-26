@@ -40,6 +40,8 @@ import com.kgh.signezprototype.ui.AppViewModelProvider
 import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
 import com.kgh.signezprototype.ui.components.FocusBlock
 import com.kgh.signezprototype.ui.components.IntentButton
+import com.kgh.signezprototype.ui.home.PictureAnalysisBtn
+import com.kgh.signezprototype.ui.home.VideoAnalysisBtn
 import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
@@ -148,6 +150,7 @@ fun SDetail(
             )
         },
         bottomBar = {
+
             BottomDoubleFlatButton(
                 leftTitle = "확인",
                 rightTitle = "삭제",
@@ -198,12 +201,14 @@ fun SDetail(
         Spacer(modifier = modifier.padding(innerPadding))
         Box(
             modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.91f)
                 .padding(start = 16.dp, end = 16.dp)
                 .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
         ) {
-            Column {
-                Spacer(modifier = modifier.padding(15.dp))
+            Column() {
+                Spacer(modifier = modifier.padding(5.dp))
                 if (viewModel.imageUri.value == Uri.EMPTY) {
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
@@ -222,11 +227,6 @@ fun SDetail(
                                 )
                             }
                         }
-//                        Text(
-//                            text = "사이니지 사진을 추가해 주세요.",
-//                            modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
-//                            style = TextStyle(color = Color.Black), // Customize the text style
-//                        )
                     }
                 } else {
                     Box(
@@ -247,40 +247,7 @@ fun SDetail(
                         }
                     }
                 }
-                //
-//                Column {
-//                    Spacer(modifier = Modifier.padding(innerPadding))
-//                    if (viewModel.imageUri.value == Uri.EMPTY) {
-//                        signage?.repImg?.let { byteArray ->
-//                            byteArray.let {
-//                                bitmap = byteArrayToBitmap(it)
-//                                Image(
-//                                    bitmap = bitmap!!.asImageBitmap(),
-//                                    contentDescription = "Signage Image",
-//                                    modifier = Modifier
-//                                        .fillMaxWidth(0.9f)
-//                                        .fillMaxHeight(0.3f)
-//                                        .clip(RoundedCornerShape(15.dp))
-//                                        .background(color = OneBGDarkGrey)
-//                                )
-//                            }
-//                        }
-//                    } else {
-//                        imageBitmap.let {
-//                            if (it != null) {
-//                                Image(
-//                                    bitmap = it.asImageBitmap(),
-//                                    contentDescription = "rep Image",
-//                                    modifier = Modifier
-//                                        .fillMaxWidth(0.9f)
-//                                        .fillMaxHeight(0.3f)
-//                                        .clip(RoundedCornerShape(15.dp))
-//                                        .background(color = OneBGDarkGrey)
-//                                )
-//                            }
-//                        }
-//                    }
-//                  //
+
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
