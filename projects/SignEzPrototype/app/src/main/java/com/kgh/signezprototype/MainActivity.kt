@@ -10,6 +10,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -23,6 +24,8 @@ import android.util.Log
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -76,11 +79,14 @@ import com.kgh.signezprototype.ui.signage.SignageDetailViewModel
 import com.kgh.signezprototype.ui.signage.SignageViewModel
 import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.CountDownLatch
 
 enum class Screen {
     MAIN,
@@ -120,6 +126,13 @@ class MainActivity : ComponentActivity() {
 
     private val finishtimeed = 1000L;
     private var presstime = 0L;
+
+    private val REQUEST_CODE_PERMISSIONS = 1000
+    private val PERMISSIONS = arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+    private lateinit var permissionLatch: CountDownLatch
 
 //    private val requestPermissionLauncher = registerForActivityResult(
 //        ActivityResultContracts.RequestPermission()
@@ -210,18 +223,6 @@ class MainActivity : ComponentActivity() {
         mainViewModel.insertTestRecord()
         setContent {
             SignEzPrototypeTheme {
-//                while (!canRun.value) {
-//                    Log.d("startppp","${canRun.value}")
-//                    requestPermissions(canRun) // If the user denies any permission, exit the app.
-//                    Log.d("midppp","${canRun.value}")
-//                    if (!canRun.value) {
-//                        PermissionAlertDialog(canRun)
-//
-//                    } else {
-//                        finishAffinity()
-//                    }
-//                    Log.d("endppp","${canRun.value}")
-//                }
 
                 SignEzApp(
                     activity = this,
@@ -235,17 +236,23 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+
+        requestPermissions()
+
+        Log.d("gogogo","${canRun.value}")
+
 //        requestCameraPermission() // 카메라 권한 받기 , 앱 열때
 //        requestWriteExternalStoragePermission() // 외부 저장소 읽기 권한
 //        requestReadExternalStoragePermission() // 외부 저장소 쓰기 권한
         // 권한 없으면 동작 못하게 처리 해줘야함 or 재요청, 나중에 ㄱ
     }
-    private fun requestPermissions(canRun: MutableState<Boolean>) {
+
+
+    private fun requestPermissions() {
         val permissions = arrayOf(
             Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
-
         val permissionsToRequest = mutableListOf<String>()
 
         for (permission in permissions) {
@@ -257,18 +264,42 @@ class MainActivity : ComponentActivity() {
                 permissionsToRequest.add(permission)
             }
         }
+        permissionLatch = CountDownLatch(1)
 
         if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(
                 this,
                 permissionsToRequest.toTypedArray(),
-                10000
+                REQUEST_CODE_PERMISSIONS
             )
         } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(),
+                REQUEST_CODE_PERMISSIONS
+            )
             canRun.value = true
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (permissions.isEmpty()) {
+                // Permissions granted
+                permissionLatch.countDown()
+                canRun.value = true
+            } else {
+                // Permissions denied
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+//                finishAffinity() // Close the app if permissions are denied
+            }
+        }
+    }
 
     // 현재 권한 승인상태를 확인하고, 충족되지 않았다면 권한 요청.
 //    private fun requestCameraPermission() {
@@ -321,33 +352,3 @@ class MainActivity : ComponentActivity() {
 
 //@Preview(showBackground = true)
 // 일단 찍기, 불러오기 uri 따로 분리했는데 합쳐도 될듯.
-
-@Composable
-fun PermissionAlertDialog(
-    canRun:MutableState<Boolean>
-) {
-    AlertDialog(
-        onDismissRequest = {},
-        title = {
-            Text(text="앱사용을 위한 권한이 부족합니다.")
-        },
-        text = {
-            Text(text = "권한을 재설정 합니다.")
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { }
-            ) {
-                Text("재설정")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = {
-                canRun.value = true
-            }) {
-                Text("종료")
-            }
-        },
-        shape = RoundedCornerShape(24.dp)
-    )
-}

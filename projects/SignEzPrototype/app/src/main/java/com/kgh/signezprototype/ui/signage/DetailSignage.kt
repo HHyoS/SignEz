@@ -67,6 +67,8 @@ fun SDetail(
     activity: Activity,
     viewModel: SignageDetailViewModel,
     modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
 // 로컬 뷰모델 2
 //    val viewModel = LocalViewModelStoreOwner.current?.let {
@@ -146,7 +148,8 @@ fun SDetail(
         topBar = {
             SignEzTopAppBar(
                 title = "사이니지 정보",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         bottomBar = {

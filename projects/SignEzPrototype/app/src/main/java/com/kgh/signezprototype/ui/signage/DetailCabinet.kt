@@ -56,7 +56,9 @@ fun CDetail(
     cabinetId: Long = -1,
     activity: Activity,
     viewModel: CabinetDetailViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -128,7 +130,8 @@ fun CDetail(
         topBar = {
             SignEzTopAppBar(
                 title = "캐비닛 정보",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         bottomBar = {
