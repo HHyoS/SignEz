@@ -54,7 +54,9 @@ fun SignageInformationScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: AnalysisViewModel,
-    detailViewModel: SignageViewModel
+    detailViewModel: SignageViewModel,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -67,7 +69,8 @@ fun SignageInformationScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "사이니지 정보 입력",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         floatingActionButton = {

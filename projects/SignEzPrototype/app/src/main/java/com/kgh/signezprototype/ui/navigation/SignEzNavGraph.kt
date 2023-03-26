@@ -73,7 +73,9 @@ fun SignEzNavHost(
                 modifier = Modifier,
                 navController = navController,
                 viewModel =  viewModel5,
-                detailViewModel = viewModel3
+                detailViewModel = viewModel3,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
             )
         }
 
@@ -81,7 +83,9 @@ fun SignEzNavHost(
             AddSignageScreen(
                 activity=activity,
                 viewModel = viewModel3,
-                navController = navController)
+                navController = navController,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },)
         }
 
         composable(route = CabinetListScreenDestination.route+"/{mode}") {
@@ -93,7 +97,9 @@ fun SignEzNavHost(
                     navController = navController,
                     signageViewModel =  viewModel3,
                     detailViewModel = viewModel6,
-                    mode=it
+                    mode=it,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
                 )
             }
 
@@ -103,7 +109,9 @@ fun SignEzNavHost(
             AddCabinetScreen(
                 activity=activity,
                 viewModel = viewModel4,
-                navController = navController)
+                navController = navController,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },)
         }
 
         composable(route = DetailSignageScreenDestination.route+"/{signageId}") {
@@ -112,7 +120,9 @@ fun SignEzNavHost(
                 SDetail(navController,
                     signageId=it.toLong(),
                     activity=activity,
-                    viewModel=viewModel6) }
+                    viewModel=viewModel6,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },) }
         }
         composable(route = DetailCabinetScreenDestination.route+"/{cabinetId}") {
                 backStackEntry ->
@@ -120,7 +130,9 @@ fun SignEzNavHost(
                 CDetail(navController,
                     cabinetId=it.toLong(),
                     activity=activity,
-                    viewModel=viewModel7) }
+                    viewModel=viewModel7,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },) }
         }
     }
 }
