@@ -21,3 +21,5 @@ val OneTextLightBlack = Color(0xFF575757)
 val OneTextGrey = Color(0xFF969696)
 val OneTextWhite = Color(0xFFFAFAFA)
 
+val OneRippleGrey = Color(0x80000000)
+
