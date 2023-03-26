@@ -1,9 +1,11 @@
 package com.kgh.signezprototype.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -72,10 +74,10 @@ fun HomeScreen(
     ) { innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-//            .background(androidx.compose.material.MaterialTheme.colors.onSurface)
         ) {
             Column(
                 modifier = Modifier
@@ -84,24 +86,22 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.padding(5.dp))
                 PastResult(modifier = Modifier)
                 Spacer(modifier = Modifier.padding(8.dp))
-            Column(
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            )
-            {
-                if (viewModel.signageId.value > -1) {
-                    SignEzSpec(modifier = Modifier, navigateToSignageList, signageState.signage)
-                    CabinetSpec(modifier = Modifier, cabinet)
-                } else {
-                    SignEzSpec(modifier = Modifier, navigateToSignageList, null)
-                    CabinetSpec(modifier = Modifier, null)
+                Column(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
+                {
+                    if (viewModel.signageId.value > -1) {
+                        SignEzSpec(modifier = Modifier, navigateToSignageList, signageState.signage)
+                        CabinetSpec(modifier = Modifier, cabinet)
+                    } else {
+                        SignEzSpec(modifier = Modifier, navigateToSignageList, null)
+                        CabinetSpec(modifier = Modifier, null)
+                    }
                 }
-
-            }
-
             }
         }
     }

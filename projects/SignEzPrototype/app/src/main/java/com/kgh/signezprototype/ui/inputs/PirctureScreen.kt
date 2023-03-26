@@ -128,15 +128,8 @@ fun PictureAnalysis(
                 .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
         ) {
-            Column(
-//                modifier = Modifier
-//                    .align(alignment = Alignment.TopCenter)
-//                    .padding(start = 16.dp, end = 16.dp)
-//                    .fillMaxHeight(),
-//                verticalArrangement = Arrangement.SpaceBetween,
-//                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = modifier.padding(15.dp))
+            Column() {
+                Spacer(modifier = modifier.padding(5.dp))
 
                 if (viewModel.imageUri.value == Uri.EMPTY) {
                     Box(

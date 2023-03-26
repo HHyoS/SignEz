@@ -113,7 +113,7 @@ fun SignageInformationScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.99F)
+                            .fillMaxHeight( if (selectedId > -1) {0.89F} else {0.99F})
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
@@ -132,15 +132,6 @@ fun SignageInformationScreen(
                         )
                     }
 
-                    // 삭제하시나여?
-                    if (selectedId > -1) {
-                        Button(onClick = {
-                            viewModel.signageId.value = selectedId
-                            navController.popBackStack()
-                        }) {
-                            Text(text = "선택")
-                        }
-                    }
 
                 }
             }

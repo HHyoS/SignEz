@@ -198,11 +198,13 @@ fun CDetail(
         Box(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
+                .fillMaxWidth()
+                .fillMaxHeight(0.91f)
                 .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
-                Spacer(modifier = modifier.padding(15.dp))
+                Spacer(modifier = modifier.padding(5.dp))
                 if (viewModel.imageUri.value == Uri.EMPTY) {
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
