@@ -53,7 +53,9 @@ object AddCabinetDestination : NavigationDestination {
 @Composable
 fun AddCabinetScreen(
     modifier: Modifier = Modifier, activity: Activity, viewModel: CabinetViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
@@ -118,7 +120,8 @@ fun AddCabinetScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "새 캐비닛 추가",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         bottomBar = {

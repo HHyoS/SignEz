@@ -78,7 +78,6 @@ fun SignEzTopAppBar(
         mutableStateOf(false)
     }
 
-
     if (canNavigateBack) {
         TopAppBar(
             title = {

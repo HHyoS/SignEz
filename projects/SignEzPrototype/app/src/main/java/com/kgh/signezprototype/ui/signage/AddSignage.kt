@@ -56,7 +56,9 @@ object AddSignageDestination : NavigationDestination {
 @Composable
 fun AddSignageScreen(
     modifier: Modifier = Modifier, activity: Activity, viewModel: SignageViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
@@ -110,7 +112,8 @@ fun AddSignageScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "새 사이니지 추가",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         bottomBar = {

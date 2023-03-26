@@ -47,7 +47,9 @@ fun CabinetInformationScreen(
     navController: NavHostController,
     signageViewModel: SignageViewModel,
     detailViewModel: SignageDetailViewModel,
-    mode: String
+    mode: String,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -59,7 +61,8 @@ fun CabinetInformationScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "캐비닛 정보 입력",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         floatingActionButton = {
