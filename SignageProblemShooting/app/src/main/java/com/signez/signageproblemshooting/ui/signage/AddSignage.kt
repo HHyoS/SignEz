@@ -29,6 +29,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.fields.CustomTextInput
@@ -53,6 +56,7 @@ object AddSignageDestination : NavigationDestination {
 }
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AddSignageScreen(
     modifier: Modifier = Modifier, activity: Activity, viewModel: SignageViewModel,
@@ -75,13 +79,16 @@ fun AddSignageScreen(
     val cabinetState by viewModel.getCabinet().collectAsState()
 
     val imageLoadingScope = CoroutineScope(Dispatchers.Main)
+
     // Load the image asynchronously using coroutines
     fun loadImageAsync(context: Context, contentUri: Uri) {
+
         imageLoadingScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     // Load the image bitmap on a background thread
-                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+                    imageBitmap =
+                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
                 } catch (e: Exception) {
                     // Handle any errors that occur while loading the image
                     Log.e("Error", "Error loading image", e)
@@ -178,7 +185,16 @@ fun AddSignageScreen(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-
+//                        GlideImage(
+//                            model = imageBitmap,
+//                            contentDescription = "글라이드",
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(200.dp)
+////                                    .fillMaxHeight(0.4f)
+//                                .clip(RoundedCornerShape(15.dp))
+//                                .background(color = MaterialTheme.colors.onSurface)
+//                        )
                         imageBitmap.let {
                             Image(
                                 bitmap = it.asImageBitmap(),
@@ -186,7 +202,6 @@ fun AddSignageScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-//                                    .fillMaxHeight(0.4f)
                                     .clip(RoundedCornerShape(15.dp))
                                     .background(color = MaterialTheme.colors.onSurface)
                             )
