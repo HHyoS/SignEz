@@ -3,11 +3,21 @@ package com.signez.signageproblemshooting.data.entities
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import java.io.ByteArrayOutputStream
 
-@Entity(tableName = "error_images")
+@Entity(tableName = "error_images",
+    foreignKeys = [
+        ForeignKey(
+            entity = ErrorModule::class,
+            parentColumns = ["id"],
+            childColumns = ["error_module_id"],
+            onUpdate = ForeignKey.CASCADE,
+            onDelete = ForeignKey.CASCADE
+        )
+    ])
 data class ErrorImage(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,

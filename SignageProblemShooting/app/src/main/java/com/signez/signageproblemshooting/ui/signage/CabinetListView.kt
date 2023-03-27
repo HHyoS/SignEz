@@ -54,6 +54,7 @@ fun CabinetInformationScreen(
 
     val focusManager = LocalFocusManager.current
     var selectedId: Long by remember { mutableStateOf(-1) }
+    var searchQuery by remember { mutableStateOf("") }
     androidx.compose.material.Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
@@ -98,7 +99,7 @@ fun CabinetInformationScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    SearchBar(placeholder = "모델 명 검색")
+                    SearchBar(placeholder = "모델 명 검색", onValueChange = { it -> searchQuery = it }, searchQuery = searchQuery)
                     Spacer(modifier.padding(10.dp))
                     Text(
                         text = "전체 캐비닛",
@@ -128,7 +129,8 @@ fun CabinetInformationScreen(
                                     }
                                 }
                             }, selectedId = selectedId,
-                            navController = navController
+                            navController = navController,
+                            searchQuery=searchQuery
                         )
                     }
                     // 이거 지우나요?
@@ -161,7 +163,8 @@ fun CabinetList(
     modifier: Modifier = Modifier,
     viewModel: CabinetViewModel = viewModel(factory = AppViewModelProvider.Factory),
     selectedId: Long,
-    navController: NavController
+    navController: NavController,
+    searchQuery:String
 ) {
     val cabinetListState by viewModel.cabinetListState.collectAsState()
     val itemList = cabinetListState.itemList
@@ -176,18 +179,20 @@ fun CabinetList(
 //            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = itemList, key = { it.id }) { item ->
-                InventoryItem(
-                    cabinet = item,
-                    onItemClick = onItemClick,
-                    selectedId = selectedId,
-                    navController = navController
-                )
-                Divider(
-                    modifier = Modifier
-                        .height(1.dp)
-                        .fillMaxWidth(0.95f),
-                    startIndent = 70.dp
-                )
+                if (item.name.uppercase().contains(searchQuery.uppercase())) {
+                    InventoryItem(
+                        cabinet = item,
+                        onItemClick = onItemClick,
+                        selectedId = selectedId,
+                        navController = navController
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillMaxWidth(0.95f),
+                        startIndent = 70.dp
+                    )
+                }
             }
         }
     }

@@ -33,14 +33,14 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
     val sWidth = mutableStateOf("") // 사이니지
     val sHeight = mutableStateOf("")  // 사이니지
     val sName = mutableStateOf("")
-    val searchQuery = mutableStateOf("")
     val signageListState: StateFlow<SignageListState> =
-        signageRepository.getAllSignagesStream(searchQuery.value).map{ SignageListState(it) }
+        signageRepository.getAllSignagesStream().map{ SignageListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = SignageListState()
             )
+
     fun setSelectedSignageId(id: Long) {
         _selectedSignageId.value = id
     }

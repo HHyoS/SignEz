@@ -54,7 +54,7 @@ import java.io.File
 
 object DetailSignageScreenDestination : NavigationDestination {
     override val route = "DetailSignage"
-    override val titleRes = "사이니지 정보"
+    override val titleRes = "사이트 정보"
 }
 
 // 로컬에서 뷰모델 사용하기1
@@ -147,7 +147,7 @@ fun SDetail(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "사이니지 정보",
+                title = "사이트 정보",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -322,7 +322,7 @@ fun SDetail(
                             CustomTextInput(
                                 value = viewModel.sName.value,
                                 onValueChange = { it -> viewModel.sName.value = it },
-                                placeholder = "사이니지 이름"
+                                placeholder = "사이트 이름"
                             )
                         }
                         Row(

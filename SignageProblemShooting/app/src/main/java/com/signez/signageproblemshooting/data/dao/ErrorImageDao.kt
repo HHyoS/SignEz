@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.signez.signageproblemshooting.data.entities.ErrorImage
+import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Item
 import kotlinx.coroutines.flow.Flow
 
@@ -48,4 +49,11 @@ interface ErrorImageDao {
 
     @Delete
     suspend fun delete(image: ErrorImage)
+
+    @Query("""
+        SELECT error_images.* FROM error_images
+        INNER JOIN error_modules ON error_modules.id = error_images.error_module_id
+        WHERE error_modules.id = :error_module_id
+    """)
+    suspend fun getImageByModuleId(error_module_id: Long): ErrorImage
 }
