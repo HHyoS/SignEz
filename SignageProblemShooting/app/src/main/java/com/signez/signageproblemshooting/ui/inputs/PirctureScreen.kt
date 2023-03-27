@@ -157,14 +157,14 @@ fun PictureAnalysis(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap?.let {
+                        imageBitmap.let {
                             Image(
                                 bitmap = it.asImageBitmap(),
                                 contentDescription = "Picture frame",
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-//                                    .fillMaxHeight(0.4f)
+                    //                                    .fillMaxHeight(0.4f)
                                     .clip(RoundedCornerShape(15.dp))
                                     .background(color = MaterialTheme.colors.onSurface)
                             )

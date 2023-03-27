@@ -303,15 +303,15 @@ private fun InventoryItem(
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
+    viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
     placeholder: String = "설치 장소 검색",
     onSearch: (String) -> Unit = {}
 ) {
-    val searchQuery = remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     OutlinedTextField(
-        value = searchQuery.value,
-        onValueChange = { newValue -> searchQuery.value = newValue },
+        value = viewModel.searchQuery.value,
+        onValueChange = { newValue -> viewModel.searchQuery.value = newValue },
         modifier = Modifier
             .fillMaxWidth(),
         textStyle = MaterialTheme.typography.h3,
@@ -325,7 +325,7 @@ fun SearchBar(
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = {
-            onSearch(searchQuery.value)
+            onSearch(viewModel.searchQuery.value)
             keyboardController?.hide()
         }),
         colors = androidx.compose.material.TextFieldDefaults.outlinedTextFieldColors(
