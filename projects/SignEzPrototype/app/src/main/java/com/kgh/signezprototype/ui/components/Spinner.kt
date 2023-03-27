@@ -68,6 +68,7 @@ fun SpinnerPreview() {
     SignEzPrototypeTheme(darkTheme = false) {
         var inprogressFrame =  remember { mutableStateOf(0) }
         var totalFrame = remember { mutableStateOf(0) }
+        totalFrame.value = 300
         var progressPercent = inprogressFrame.value/(totalFrame).value.toFloat()
 
         Column(modifier = Modifier.fillMaxSize()) {
