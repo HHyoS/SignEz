@@ -22,13 +22,7 @@ import java.io.ByteArrayOutputStream
 class SignageViewModel(private val signageRepository: SignagesRepository, private val cabinetRepository: CabinetsRepository) : ViewModel(),
     MediaViewModel {
      // Initialize this according to your app's architecture
-     val signageListState: StateFlow<SignageListState> =
-         signageRepository.getAllSignagesStream().map{ SignageListState(it) }
-             .stateIn(
-                 scope = viewModelScope,
-                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                 initialValue = SignageListState()
-             )
+
     private val _selectedSignageId = MutableStateFlow<Long?>(null)
     val selectedSignageId: StateFlow<Long?> get() = _selectedSignageId
     var selectedCabinetId = mutableStateOf(-1L)
@@ -39,7 +33,14 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
     val sWidth = mutableStateOf("") // 사이니지
     val sHeight = mutableStateOf("")  // 사이니지
     val sName = mutableStateOf("")
-
+    val searchQuery = mutableStateOf("")
+    val signageListState: StateFlow<SignageListState> =
+        signageRepository.getAllSignagesStream(searchQuery.value).map{ SignageListState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+                initialValue = SignageListState()
+            )
     fun setSelectedSignageId(id: Long) {
         _selectedSignageId.value = id
     }
