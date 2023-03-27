@@ -1,5 +1,15 @@
 package com.signez.signageproblemshooting.ui.home
 
+import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,16 +30,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.signez.signageproblemshooting.MainActivity
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.WhiteButton
+import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.theme.OneRippleGrey
 import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
 
@@ -125,7 +140,7 @@ fun SignEzSpec(
     if (signage != null) {
         FocusBlock(
             title = stringResource(id = R.string.signage_spec_title),
-            subtitle = "${signage.name}",
+            subtitle = signage.name,
             infols = listOf("너비 : ${signage.width}", "높이 : ${signage.height}"),
             buttonTitle = "입력",
             isbuttonVisible = true,
@@ -222,4 +237,60 @@ private object RippleCustomTheme : RippleTheme {
             Color.Black,
             lightTheme = true
         )
+}
+
+@Composable
+fun AppSettingsScreen(mainViewModel: MainViewModel) {
+    val context = LocalContext.current
+
+    val openAppSettingsLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+        mainViewModel.onAppSettingsResult()
+    }
+
+    val navigateToAppSettings = mainViewModel.navigateToAppSettings
+
+    if (navigateToAppSettings.value) {
+        openAppSettings(context, openAppSettingsLauncher)
+    }
+    // Your other composables
+}
+
+fun openAppSettings(context: Context, appSettingsResultLauncher: ActivityResultLauncher<Intent>) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri = Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    appSettingsResultLauncher.launch(intent)
+}
+
+fun onAppSettingsClosed() {
+    // Your code to execute when the Settings activity is closed
+    Log.d("gogogo","121212")
+}
+
+fun checkAndRequestPermissions(context: Context,mainViewModel:MainViewModel) {
+    val permissions = arrayOf(
+        Manifest.permission.CAMERA,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
+
+    val notGrantedPermissions = permissions.filter {
+        ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+    }.toTypedArray()
+
+    mainViewModel.permissionsGranted.value = notGrantedPermissions.isEmpty()
+}
+
+@Composable
+fun PermissionInfo() {
+    MaterialTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "정상적인 앱 사용을 위해서")
+            Text(text = "아래와 같은 권한이 필요합니다.")
+            Text(text = "- 카메라 권한")
+            Text(text = " : 사이니지 촬영\n")
+            Text(text = "- 파일 및 미디어 접근 권한")
+            Text(text = " : 디바이스의 사이니지 사진/영상 자료 불러오기")
+        }
+    }
 }

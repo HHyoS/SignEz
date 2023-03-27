@@ -29,6 +29,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
+import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.inputs.PictureViewModel
 import com.signez.signageproblemshooting.ui.inputs.VideoViewModel
 import com.signez.signageproblemshooting.ui.navigation.SignEzNavHost
@@ -48,7 +49,8 @@ fun SignEzApp(
     viewModel4: CabinetViewModel,
     viewModel5: AnalysisViewModel,
     viewModel6: SignageDetailViewModel,
-    viewModel7: CabinetDetailViewModel
+    viewModel7: CabinetDetailViewModel,
+    viewModel8: MainViewModel
     ) {
     SignEzNavHost(
         navController = navController,
@@ -59,7 +61,8 @@ fun SignEzApp(
         viewModel4 = viewModel4,
         viewModel5 = viewModel5,
         viewModel6 = viewModel6,
-        viewModel7 = viewModel7
+        viewModel7 = viewModel7,
+        viewModel8 = viewModel8
         )
 }
 
