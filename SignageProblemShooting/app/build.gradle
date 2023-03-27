@@ -116,6 +116,11 @@ dependencies {
     def nav_version = "2.5.3"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
+    // ------ torch ------
+    implementation 'org.pytorch:pytorch_android:1.13.1'
+    implementation 'org.pytorch:pytorch_android_torchvision:1.13.1'
+
+
     // ----------- opencv --------------
     implementation project(path: ':opencv')
 
