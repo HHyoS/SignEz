@@ -17,7 +17,8 @@ object PrePostProcessor {
     const val mThreshold = 0.10f // score above which a detection is generated
     const val mNmsLimit = 15
 
-    var mClasses: Array<String>? = null
+    val signageClass: Array<String> = arrayOf("signage")
+    val errorModuleClass: Array<String> = arrayOf("error-module")
 
     // The two methods nonMaxSuppression and IOU below are ported from https://github.com/hollance/YOLO-CoreML-MPSNNGraph/blob/master/Common/Helpers.swift
     /**
