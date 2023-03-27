@@ -29,7 +29,8 @@ fun SignEzNavHost(
     viewModel4: CabinetViewModel,
     viewModel5: AnalysisViewModel,
     viewModel6: SignageDetailViewModel,
-    viewModel7: CabinetDetailViewModel
+    viewModel7: CabinetDetailViewModel,
+    viewModel8: MainViewModel
 ) {
     NavHost(
         navController = navController,
@@ -41,7 +42,8 @@ fun SignEzNavHost(
                 navigateToVideo = { navController.navigate(VideoScreenDestination.route) },
                 navigateToPicture = { navController.navigate(PictureScreenDestination.route) },
                 navigateToSignageList = { navController.navigate(SignageListScreenDestination.route) },
-                viewModel = viewModel5
+                viewModel = viewModel5,
+                mainViewModel = viewModel8
             )
         }
 

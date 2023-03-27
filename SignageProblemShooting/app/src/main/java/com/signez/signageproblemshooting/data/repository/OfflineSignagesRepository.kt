@@ -21,7 +21,7 @@ import com.signez.signageproblemshooting.data.entities.*
 import kotlinx.coroutines.flow.Flow
 
 class OfflineSignagesRepository(private val signageDao: SignageDao) : SignagesRepository {
-    override fun getAllSignagesStream(): Flow<List<Signage>> = signageDao.getAllSignages()
+    override fun getAllSignagesStream(searchQuery:String): Flow<List<Signage>> = signageDao.getAllSignages(searchQuery)
 
     override fun getSignageStream(id: Long): Flow<Signage?> = signageDao.getSignage(id)
 
