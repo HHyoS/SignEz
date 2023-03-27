@@ -16,6 +16,7 @@
 
 package com.signez.signageproblemshooting.data.repository
 
+import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorImage
 import com.signez.signageproblemshooting.data.entities.ErrorModule
@@ -49,4 +50,6 @@ interface ErrorModulesRepository {
      * Update item in the data source
      */
     suspend fun updateErrorModule(module: ErrorModule)
+
+    suspend fun getModuleByResultId(resultId: Long): ErrorModule
 }
