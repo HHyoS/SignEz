@@ -68,7 +68,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 
     val permissions = arrayOf(
         Manifest.permission.CAMERA,
-        Manifest.permission.READ_EXTERNAL_STORAGE
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 1000
@@ -181,10 +182,10 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         Toast.makeText(this, "permissions granted: " + permissions.size, Toast.LENGTH_LONG).show()
     }
     private fun checkAndRequestPermissions(): Boolean {
-        val permissions = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        )
+//        val permissions = arrayOf(
+//            Manifest.permission.CAMERA,
+//            Manifest.permission.READ_EXTERNAL_STORAGE
+//        )
 
         val notGrantedPermissions = permissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
