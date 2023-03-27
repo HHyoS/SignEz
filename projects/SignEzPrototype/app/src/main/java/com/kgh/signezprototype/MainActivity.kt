@@ -134,18 +134,6 @@ class MainActivity : ComponentActivity() {
     )
     private lateinit var permissionLatch: CountDownLatch
 
-//    private val requestPermissionLauncher = registerForActivityResult(
-//        ActivityResultContracts.RequestPermission()
-//    ) { isGranted ->
-//        if (isGranted) {
-//            Log.i("kgh", "Permission granted")
-//            shouldShowCamera.value = false
-//        } else {
-//            Log.i("kgh", "Permission denied")
-//        }
-//    }
-
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -238,7 +226,6 @@ class MainActivity : ComponentActivity() {
         }
 
         requestPermissions()
-
         Log.d("gogogo","${canRun.value}")
 
 //        requestCameraPermission() // 카메라 권한 받기 , 앱 열때
@@ -264,20 +251,14 @@ class MainActivity : ComponentActivity() {
                 permissionsToRequest.add(permission)
             }
         }
-        permissionLatch = CountDownLatch(1)
 
-        if (permissionsToRequest.isNotEmpty()) {
+        if (permissionsToRequest.isNotEmpty()) { // 권한 요청할게 있으면 요청 날림.
             ActivityCompat.requestPermissions(
                 this,
                 permissionsToRequest.toTypedArray(),
                 REQUEST_CODE_PERMISSIONS
             )
         } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(),
-                REQUEST_CODE_PERMISSIONS
-            )
             canRun.value = true
         }
     }
@@ -289,9 +270,17 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (permissions.isEmpty()) {
+            var allPermissionsGranted = true
+
+            for (i in grantResults.indices) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    allPermissionsGranted = false
+                    break
+                }
+            }
+
+            if (allPermissionsGranted) {
                 // Permissions granted
-                permissionLatch.countDown()
                 canRun.value = true
             } else {
                 // Permissions denied
