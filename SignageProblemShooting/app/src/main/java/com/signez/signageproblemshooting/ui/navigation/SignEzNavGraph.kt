@@ -10,8 +10,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.signez.signageproblemshooting.SignEzApplication
+import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
-import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
+import com.signez.signageproblemshooting.ui.analysis.*
 import com.signez.signageproblemshooting.ui.home.HomeDestination
 import com.signez.signageproblemshooting.ui.home.HomeScreen
 import com.signez.signageproblemshooting.ui.inputs.*
@@ -43,7 +44,8 @@ fun SignEzNavHost(
                 navigateToPicture = { navController.navigate(PictureScreenDestination.route) },
                 navigateToSignageList = { navController.navigate(SignageListScreenDestination.route) },
                 viewModel = viewModel5,
-                mainViewModel = viewModel8
+                mainViewModel = viewModel8,
+                navController = navController
             )
         }
 
@@ -136,5 +138,50 @@ fun SignEzNavHost(
                     navigateBack = { navController.popBackStack() },
                     onNavigateUp = { navController.navigateUp() },) }
         }
+
+        composable(route = ResultsHistoryDestination.route) {
+            ResultsHistoryView(
+                onItemClick = {},
+                modifier = Modifier,
+                navController = navController,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+                viewModel = viewModel5
+            )
+        }
+
+        composable(route = ResultGridDestination.route) {
+            ResultGridView(
+                onItemClick = {},
+                modifier = Modifier,
+                navController = navController,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+                viewModel = viewModel5
+            )
+        }
+
+        composable(route = ResultGridDetailDestination.route) {
+            ResultGridDetailView(
+                onItemClick = {},
+                modifier = Modifier,
+                navController = navController,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+                viewModel = viewModel5
+            )
+        }
+
+        composable(route = ErrorImageDestination.route) {
+            ErrorImageView(
+                onItemClick = {},
+                modifier = Modifier,
+                navController = navController,
+                navigateBack = { navController.popBackStack() },
+                onNavigateUp = { navController.navigateUp() },
+                viewModel = viewModel5
+            )
+        }
+
     }
 }

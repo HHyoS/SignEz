@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
@@ -35,7 +36,8 @@ fun HomeScreen(
     navigateToVideo: () -> Unit,
     navigateToSignageList: () -> Unit,
     viewModel: AnalysisViewModel,
-    mainViewModel:MainViewModel
+    mainViewModel:MainViewModel,
+    navController: NavController
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -109,7 +111,7 @@ fun HomeScreen(
                 ) {
 
                     Spacer(modifier = Modifier.padding(5.dp))
-                    PastResult(modifier = Modifier)
+                    PastResult(modifier = Modifier, navController = navController)
                     Spacer(modifier = Modifier.padding(8.dp))
                     Column(
                         modifier = Modifier
