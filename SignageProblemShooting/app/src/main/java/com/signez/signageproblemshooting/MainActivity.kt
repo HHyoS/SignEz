@@ -164,7 +164,9 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 //        }, 200)
         AutoPermissions.Companion.loadSelectedPermissions(this, REQUEST_CODE_PERMISSIONS, permissions)
     }
-
+    fun go() {
+        applicationContext
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         AutoPermissions.Companion.parsePermissions(this, REQUEST_CODE_PERMISSIONS, permissions, this)
