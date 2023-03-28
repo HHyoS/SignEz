@@ -43,7 +43,7 @@ interface ErrorModuleDao {
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(errorModule: ErrorModule)
+    suspend fun insert(errorModule: ErrorModule): Long
 
     @Update
     suspend fun update(errorModule: ErrorModule)

@@ -36,7 +36,7 @@ interface CabinetsRepository {
     /**
      * Insert item in the data source
      */
-    suspend fun insertCabinet(cabinet: Cabinet)
+    suspend fun insertCabinet(cabinet: Cabinet): Long
 
     /**
      * Delete item from the data source
