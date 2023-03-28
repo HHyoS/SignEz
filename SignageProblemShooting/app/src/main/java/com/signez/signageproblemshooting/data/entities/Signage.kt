@@ -1,9 +1,6 @@
 package com.signez.signageproblemshooting.data.entities
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.signez.signageproblemshooting.data.Converters
 import java.sql.Blob
 
@@ -19,6 +16,7 @@ import java.sql.Blob
 @TypeConverters(Converters::class)
 data class Signage(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     var id: Long = 0,
     var name: String,
     var heightCabinetNumber: Int,
