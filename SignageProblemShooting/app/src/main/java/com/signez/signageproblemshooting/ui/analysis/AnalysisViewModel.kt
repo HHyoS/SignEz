@@ -10,7 +10,6 @@ import com.signez.signageproblemshooting.data.repository.CabinetsRepository
 import com.signez.signageproblemshooting.data.repository.SignagesRepository
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetState
-import com.signez.signageproblemshooting.ui.signage.SignageViewModel
 import kotlinx.coroutines.flow.*
 
 
@@ -26,10 +25,21 @@ class AnalysisViewModel(private val signageRepository: SignagesRepository, priva
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    suspend fun getCabinet(signageId:Long): Cabinet {
-        val cabinet: Cabinet =
-            cabinetRepository.getCabinetBySignageId(signageId)
-        return cabinet
+    suspend fun getCabinet(signageId: Long): Cabinet {
+        return cabinetRepository.getCabinetBySignageId(signageId)
+    }
+
+
+    fun getCabinet(): StateFlow<CabinetState> {
+        return cabinetRepository.getCabinetStream(signageId.value)
+            .filterNotNull()
+            .map { CabinetState( cabinet = it ) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
+                initialValue = CabinetState()
+            )
+
     }
 
     fun getSignage(): StateFlow<SignageState> {
