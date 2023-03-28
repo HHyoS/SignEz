@@ -23,6 +23,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
+import com.signez.signageproblemshooting.data.entities.ErrorImage
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Item
 import kotlinx.coroutines.flow.Flow
@@ -55,5 +56,12 @@ interface ErrorModuleDao {
         INNER JOIN results ON results.id = error_modules.resultId
         WHERE results.id = :resultId
     """)
-    suspend fun getModuleByResultId(resultId: Long): ErrorModule
+    suspend fun getModulesByResultId(resultId: Long): List<ErrorModule>
+
+    @Query("""
+        SELECT * FROM error_modules
+        WHERE resultId = :resultId
+    """)
+    suspend fun getModuleById(resultId: Long): ErrorModule
+
 }

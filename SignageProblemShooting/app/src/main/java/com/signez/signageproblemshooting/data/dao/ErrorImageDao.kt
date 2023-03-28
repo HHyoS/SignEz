@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.ErrorImage
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Item
@@ -55,5 +56,11 @@ interface ErrorImageDao {
         INNER JOIN error_modules ON error_modules.id = error_images.error_module_id
         WHERE error_modules.id = :error_module_id
     """)
-    suspend fun getImageByModuleId(error_module_id: Long): ErrorImage
+    suspend fun getImagesByModuleId(error_module_id: Long): List<ErrorImage>
+
+    @Query("""
+        SELECT * FROM error_images
+        WHERE error_module_id = :error_module_id
+    """)
+    suspend fun getImageById(error_module_id: Long): ErrorImage
 }
