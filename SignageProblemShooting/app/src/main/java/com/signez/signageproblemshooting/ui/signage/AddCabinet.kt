@@ -29,6 +29,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.fields.CustomTextInput
 import com.signez.signageproblemshooting.fields.EditNumberField
@@ -44,12 +49,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+
 object AddCabinetDestination : NavigationDestination {
     override val route = "AddCabinet"
     override val titleRes = "Add Cabinet"
 }
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun AddCabinetScreen(
     modifier: Modifier = Modifier, activity: Activity, viewModel: CabinetViewModel,
@@ -83,13 +90,27 @@ fun AddCabinetScreen(
     }
 
     val imageLoadingScope = CoroutineScope(Dispatchers.Main)
+
     // Load the image asynchronously using coroutines
     fun loadImageAsync(context: Context, contentUri: Uri) {
         imageLoadingScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     // Load the image bitmap on a background thread
-                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//                    imageBitmap =
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(contentUri)
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                // Save the bitmap here
+                                imageBitmap = resource
+                            }
+                        })
                 } catch (e: Exception) {
                     // Handle any errors that occur while loading the image
                     Log.e("Error", "Error loading image", e)
@@ -190,9 +211,9 @@ fun AddCabinetScreen(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
                         imageBitmap.let {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = "rep Image",
+                            GlideImage(
+                                model = contentUri,
+                                contentDescription = "글라이드",
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
