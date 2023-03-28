@@ -3,23 +3,11 @@ package com.signez.signageproblemshooting.service
 import android.content.Context
 import android.graphics.*
 import android.media.Image
-import androidx.camera.core.ImageProxy
-
-import androidx.lifecycle.lifecycleScope
-
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-import org.pytorch.IValue
 import org.pytorch.Module
-import org.pytorch.Tensor
-import org.pytorch.torchvision.TensorImageUtils
-
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 import java.io.File
 import java.io.IOException
+import java.nio.ByteBuffer
 
 object ObjectDetectService {
     private lateinit var mModule: Module
