@@ -151,6 +151,7 @@ class ErrorDetectActivity : ComponentActivity() {
             }
 
             try {
+                val resultId = analysisViewModel.saveResult()
                 inputStream?.copyTo(outputStream)
                 val videoCapture = VideoCapture()
                 videoCapture.open(tempFile.path)
@@ -172,7 +173,31 @@ class ErrorDetectActivity : ComponentActivity() {
                             }
                             if (points != null && points.size == 4) {
                                 val warpedMat = getWarp(frame, points, width, height)
-                                // val errorModuleList = getPredictions(warpedMat, errorDetectModule, width, height, moduleWidth, moduleHeight, resultId)
+                                val errorModuleList = getPredictions(
+                                    warpedMat,
+                                    errorDetectModule,
+                                    width,
+                                    height,
+                                    moduleWidth,
+                                    moduleHeight,
+                                    resultId
+                                )
+                                for (errorModule in errorModuleList) {
+                                    val processedMat: Mat = postProcess(
+                                        warpedMat,
+                                        errorModule,
+                                        moduleWidth,
+                                        moduleHeight
+                                    )
+                                    val processedBitmap =
+                                        Bitmap.createBitmap(
+                                            processedMat.cols(),
+                                            processedMat.rows(),
+                                            Bitmap.Config.ARGB_8888
+                                        )
+                                    Utils.matToBitmap(processedMat, processedBitmap)
+                                    analysisViewModel.saveImage(processedBitmap, errorModule.id)
+                                }
                             }
                             setProgresses(frameCount, i)
                         }
@@ -211,17 +236,71 @@ class ErrorDetectActivity : ComponentActivity() {
             val moduleHeight: Float =
                 height.toFloat() / (signage.heightCabinetNumber * cabinet.moduleColCount)
 
+            val resultId = analysisViewModel.saveResult()
+
             val originalMat: Mat = bitmapToMat(originalImage!!)
             val points: MutableList<Point> = getCorners(originalMat)
 
             val warpedMat = getWarp(originalMat, points, width, height)
 
-//            val errorModuleList = getPredictions(warpedMat, errorDetectModule, width, height, moduleWidth, moduleHeight, resultId)
-
+            val errorModuleList = getPredictions(
+                warpedMat,
+                errorDetectModule,
+                width,
+                height,
+                moduleWidth,
+                moduleHeight,
+                resultId
+            )
+            for (errorModule in errorModuleList) {
+                val processedMat: Mat =
+                    postProcess(warpedMat, errorModule, moduleWidth, moduleHeight)
+                val processedBitmap =
+                    Bitmap.createBitmap(
+                        processedMat.cols(),
+                        processedMat.rows(),
+                        Bitmap.Config.ARGB_8888
+                    )
+                Utils.matToBitmap(processedMat, processedBitmap)
+                analysisViewModel.saveImage(processedBitmap, errorModule.id)
+            }
         }
     }
 
-    private fun getPredictions(
+    private fun postProcess(
+        warpedMat: Mat,
+        errorModule: ErrorModule,
+        moduleWidth: Float,
+        moduleHeight: Float
+    ): Mat {
+        var processedMat: Mat = warpedMat
+        Imgproc.rectangle(
+            processedMat,
+            Point(errorModule.x.toDouble() * moduleWidth, errorModule.y.toDouble() * moduleHeight),
+            Point(
+                (errorModule.x + 1).toDouble() * moduleWidth,
+                (errorModule.y + 1).toDouble() * moduleHeight
+            ),
+            Scalar(0.0, 0.0, 255.0),
+            2
+        )
+        Imgproc.putText(
+            processedMat,
+            "%0.2f".format(errorModule.score),
+            Point(
+                errorModule.x.toDouble() * moduleWidth,
+                (errorModule.y - 1).toDouble() * moduleHeight
+            ),
+            Imgproc.FONT_HERSHEY_PLAIN,
+            20.0,
+            Scalar(0.0, 0.0, 255.0),
+            2
+        )
+
+        return processedMat
+    }
+
+    private suspend fun getPredictions(
         warpedMat: Mat,
         detectModule: Module,
         width: Int,
@@ -229,7 +308,7 @@ class ErrorDetectActivity : ComponentActivity() {
         moduleWidth: Float,
         moduleHeight: Float,
         resultId: Long
-    ): MutableList<ErrorModule> {
+    ): List<ErrorModule> {
         val imgScaleX = width.toFloat() / RESIZE_SIZE
         val imgScaleY = height.toFloat() / RESIZE_SIZE
         // 640x640 resize
@@ -258,15 +337,14 @@ class ErrorDetectActivity : ComponentActivity() {
 
     }
 
-    private fun outputFloatsToErrorModules(
+    private suspend fun outputFloatsToErrorModules(
         outputs: FloatArray,
         imgScaleX: Float,
         imgScaleY: Float,
         moduleWidth: Float,
         moduleHeight: Float,
         resultId: Long
-    ): MutableList<ErrorModule> {
-        val errorModuleList: MutableList<ErrorModule> = ArrayList()
+    ): List<ErrorModule> {
 
         for (i in 0 until mOutputRow) {
             if (outputs[i * mOutputColumn + 4] > scoreThreshold) {
@@ -291,19 +369,17 @@ class ErrorDetectActivity : ComponentActivity() {
                 ) {
                     val moduleX: Int = (centerX / moduleWidth.toInt()) + 1
                     val moduleY: Int = (centerY / moduleHeight.toInt()) + 1
-                    errorModuleList.add(
-                        ErrorModule(
-                            0,
-                            resultId,
-                            score.toDouble(),
-                            moduleX,
-                            moduleY
-                        )
+                    analysisViewModel.saveModule(
+                        resultId = resultId,
+                        score = score.toDouble(),
+                        x = moduleX,
+                        y = moduleY
                     )
                 }
             }
+
         }
-        return errorModuleList
+        return analysisViewModel.getRelatedModule(resultId)
     }
 
 
