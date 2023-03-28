@@ -25,6 +25,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
@@ -204,6 +206,7 @@ fun Modifier.conditional(condition: Boolean, modifier: Modifier.() -> Modifier):
 }
 
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun InventoryItem(
     signage: Signage,
@@ -258,16 +261,13 @@ private fun InventoryItem(
         ) {
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 signage.repImg?.let { byteArray ->
-                    byteArray.let {
-                        bitmap = byteArrayToBitmap(it)
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "Signage Image",
+                        GlideImage(
+                            model = byteArray,
+                            contentDescription = "글라이드",
                             modifier = Modifier
                                 .size(45.dp)
                                 .clip(RoundedCornerShape(10.dp))
                         )
-                    }
                 }
             } // 대표 이미지
 

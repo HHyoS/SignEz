@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
@@ -193,6 +195,7 @@ fun CabinetList(
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun InventoryItem(
     cabinet: Cabinet,
@@ -247,16 +250,13 @@ private fun InventoryItem(
         ) {
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 cabinet.repImg?.let { byteArray ->
-                    byteArray.let {
-                        bitmap = byteArrayToBitmap(it)
-                        Image(
-                            bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "Cabinet Image",
-                            modifier = Modifier
-                                .size(45.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                        )
-                    }
+                    GlideImage(
+                        model = byteArray,
+                        contentDescription = "글라이드",
+                        modifier = Modifier
+                            .size(45.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                    )
                 }
             }// 대표 이미지
             Column(modifier = modifier.padding(start = 16.dp, top = 10.dp, bottom = 10.dp))

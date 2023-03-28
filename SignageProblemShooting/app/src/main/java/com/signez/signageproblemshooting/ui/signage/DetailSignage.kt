@@ -30,6 +30,11 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
@@ -60,6 +65,7 @@ object DetailSignageScreenDestination : NavigationDestination {
 // 로컬에서 뷰모델 사용하기1
 //val LocalSignageDetailViewModel = compositionLocalOf<SignageDetailViewModel> { error("No SignageDetailViewModel found!") }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun SDetail(
     navController: NavController,
@@ -104,9 +110,21 @@ fun SDetail(
         imageLoadingScope.launch {
             withContext(Dispatchers.IO) {
                 try {
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(contentUri)
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                // Save the bitmap here
+                                imageBitmap = resource
+                            }
+                        })
                     // Load the image bitmap on a background thread
-                    imageBitmap =
-                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//                    imageBitmap =
+//                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
                 } catch (e: Exception) {
                     // Handle any errors that occur while loading the image
                     Log.e("Error", "Error loading image", e)
@@ -217,37 +235,30 @@ fun SDetail(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
                         signage?.repImg?.let { byteArray ->
-                            byteArray.let {
-                                bitmap = byteArrayToBitmap(it)
-                                Image(
-                                    bitmap = bitmap!!.asImageBitmap(),
-                                    contentDescription = "Signage Image",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .clip(RoundedCornerShape(15.dp))
-                                        .background(color = MaterialTheme.colors.onSurface)
-                                )
-                            }
+                            GlideImage(
+                                model = byteArray,
+                                contentDescription = "글라이드",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = MaterialTheme.colors.onSurface)
+                            )
                         }
                     }
                 } else {
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap.let {
-                            if (it != null) {
-                                Image(
-                                    bitmap = it.asImageBitmap(),
-                                    contentDescription = "rep Image",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .clip(RoundedCornerShape(15.dp))
-                                        .background(color = MaterialTheme.colors.onSurface)
-                                )
-                            }
-                        }
+                        GlideImage(
+                            model = contentUri,
+                            contentDescription = "글라이드",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = MaterialTheme.colors.onSurface)
+                        )
                     }
                 }
 
@@ -258,7 +269,19 @@ fun SDetail(
                         modifier = Modifier.weight(0.5f)
                     ) {
                         ImagePicker(onImageSelected = { address ->
-                            imageBitmap = bitmap
+//                            imageBitmap = bitmap
+                            Glide.with(context)
+                                .asBitmap()
+                                .load(contentUri)
+                                .into(object : SimpleTarget<Bitmap>() {
+                                    override fun onResourceReady(
+                                        resource: Bitmap,
+                                        transition: Transition<in Bitmap>?
+                                    ) {
+                                        // Save the bitmap here
+                                        imageBitmap = resource
+                                    }
+                                })
                             viewModel.imageUri.value = Uri.parse(address)
                         })
                     }

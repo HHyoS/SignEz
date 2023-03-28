@@ -9,6 +9,8 @@ import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
 import com.signez.signageproblemshooting.data.Converters
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
@@ -68,7 +70,7 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
         // Save image as a Blob
         val bitmap = createSimpleBitmap(100, 100, Color.BLUE)
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
         Log.d("testing",byteArray.size.toString() )
 

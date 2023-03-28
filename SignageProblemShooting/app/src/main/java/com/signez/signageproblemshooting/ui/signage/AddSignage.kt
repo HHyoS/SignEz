@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -32,7 +33,8 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.signez.signageproblemshooting.R
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.fields.CustomTextInput
 import com.signez.signageproblemshooting.fields.EditNumberField
@@ -87,8 +89,20 @@ fun AddSignageScreen(
             withContext(Dispatchers.IO) {
                 try {
                     // Load the image bitmap on a background thread
-                    imageBitmap =
-                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//                    imageBitmap =
+//                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(contentUri)
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                // Save the bitmap here
+                                imageBitmap = resource
+                            }
+                        })
                 } catch (e: Exception) {
                     // Handle any errors that occur while loading the image
                     Log.e("Error", "Error loading image", e)
@@ -185,27 +199,15 @@ fun AddSignageScreen(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-//                        GlideImage(
-//                            model = imageBitmap,
-//                            contentDescription = "글라이드",
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .height(200.dp)
-////                                    .fillMaxHeight(0.4f)
-//                                .clip(RoundedCornerShape(15.dp))
-//                                .background(color = MaterialTheme.colors.onSurface)
-//                        )
-                        imageBitmap.let {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = "rep Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = MaterialTheme.colors.onSurface)
-                            )
-                        }
+                        GlideImage(
+                            model = contentUri,
+                            contentDescription = "글라이드",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = MaterialTheme.colors.onSurface)
+                        )
                     }
                 }
 
