@@ -150,7 +150,7 @@ fun AddSignageScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
-                Spacer(modifier = modifier.padding(15.dp))
+                Spacer(modifier = modifier.padding(5.dp))
                 if (viewModel.imageUri.value == Uri.EMPTY) {
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)

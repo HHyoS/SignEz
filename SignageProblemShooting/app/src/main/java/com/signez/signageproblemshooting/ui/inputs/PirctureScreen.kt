@@ -29,6 +29,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.ImagePicker
 import com.signez.signageproblemshooting.pickers.loadImageMetadata
@@ -49,6 +51,7 @@ object PictureScreenDestination : NavigationDestination {
     override val titleRes = "SignEz_Picture"
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PictureAnalysis(
     activity: Activity,
@@ -157,18 +160,27 @@ fun PictureAnalysis(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap.let {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = "Picture frame",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                    //                                    .fillMaxHeight(0.4f)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = MaterialTheme.colors.onSurface)
-                            )
-                        }
+                        GlideImage(
+                            model = contentUri,
+                            contentDescription = "글라이드",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = MaterialTheme.colors.onSurface)
+                        )
+//                        imageBitmap?.let {
+//                            Image(
+//                                bitmap = it.asImageBitmap(),
+//                                contentDescription = "Picture frame",
+//                                modifier = Modifier
+//                                    .fillMaxWidth()
+//                                    .height(200.dp)
+////                                    .fillMaxHeight(0.4f)
+//                                    .clip(RoundedCornerShape(15.dp))
+//                                    .background(color = MaterialTheme.colors.onSurface)
+//                            )
+//                        }
                     }
                 }
 
