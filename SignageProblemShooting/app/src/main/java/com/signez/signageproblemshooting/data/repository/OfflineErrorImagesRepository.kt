@@ -30,4 +30,6 @@ class OfflineErrorImagesRepository(private val imageDao: ErrorImageDao) : ErrorI
     override suspend fun deleteImage(image: ErrorImage) = imageDao.delete(image)
 
     override suspend fun updateImage(image: ErrorImage) = imageDao.update(image)
+
+    override suspend fun getImageByModuleId(error_module_id: Long) = imageDao.getImageByModuleId(error_module_id)
 }

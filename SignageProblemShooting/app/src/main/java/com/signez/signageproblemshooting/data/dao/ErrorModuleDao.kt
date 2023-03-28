@@ -22,6 +22,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Item
 import kotlinx.coroutines.flow.Flow
@@ -48,4 +49,11 @@ interface ErrorModuleDao {
 
     @Delete
     suspend fun delete(errorModule: ErrorModule)
+
+    @Query("""
+        SELECT error_modules.* FROM error_modules
+        INNER JOIN results ON results.id = error_modules.resultId
+        WHERE results.id = :resultId
+    """)
+    suspend fun getModuleByResultId(resultId: Long): ErrorModule
 }

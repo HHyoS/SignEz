@@ -29,7 +29,7 @@ interface SignagesRepository {
     /**
      * Retrieve all the items from the the given data source.
      */
-    fun getAllSignagesStream(searchQuery:String = ""): Flow<List<Signage>>
+    fun getAllSignagesStream(): Flow<List<Signage>>
 
     /**
      * Retrieve an item from the given data source that matches with the [id].
