@@ -17,6 +17,7 @@ import androidx.room.PrimaryKey
     ])
 data class AnalysisResult(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     var id: Long = 0,
     var signageId: Long = 0,
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")

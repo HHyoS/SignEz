@@ -1,5 +1,6 @@
 package com.signez.signageproblemshooting.data.entities
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -16,6 +17,7 @@ import androidx.room.PrimaryKey
     ])
 data class ErrorModule(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     var id: Long = 0,
     val resultId: Long,
     val score: Double,
