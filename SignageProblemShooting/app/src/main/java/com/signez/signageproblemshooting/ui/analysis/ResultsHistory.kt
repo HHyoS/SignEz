@@ -3,6 +3,7 @@ package com.signez.signageproblemshooting.ui.analysis
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +27,6 @@ fun ResultsHistoryView(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: AnalysisViewModel,
-    detailViewModel: SignageViewModel,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
@@ -37,7 +37,7 @@ fun ResultsHistoryView(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "사이트 정보 입력",
+                title = "지난 분석 결과",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -55,6 +55,7 @@ fun ResultsHistoryView(
                 contentAlignment = Alignment.TopCenter
             ) {
 
+                Text(text="지난 분석 결과 페이지")
             }
         }
     }

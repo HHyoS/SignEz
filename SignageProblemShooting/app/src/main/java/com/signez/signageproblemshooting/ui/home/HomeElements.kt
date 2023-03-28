@@ -38,10 +38,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
 import com.signez.signageproblemshooting.MainActivity
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
+import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.WhiteButton
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
@@ -51,6 +53,7 @@ import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
 @Composable //지난 분석 결과 틀
 fun PastResult(
     modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     val itemList = listOf<Painter>(
         painterResource(id = R.drawable.bluesign),
@@ -81,7 +84,9 @@ fun PastResult(
 //                        .align(alignment = Alignment.Top),
                     style = MaterialTheme.typography.bodyLarge
                 )
-                androidx.compose.material.IconButton(onClick = {}) {
+                androidx.compose.material.IconButton(
+                    onClick = {navController.navigate(ResultsHistoryDestination.route)}
+                ) {
                     androidx.compose.material.Icon(
                         painter = painterResource(id = R.drawable.arrow_forward_ios_fill1_wght300_grad0_opsz48),
                         contentDescription = "지난 결과 보기",
@@ -121,15 +126,15 @@ fun PastResult(
     }
 }
 
-@Preview
-@Composable
-fun ComponentPreview() {
-    SignEzPrototypeTheme(darkTheme = false) {
-        Column {
-            PastResult()
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun ComponentPreview() {
+//    SignEzPrototypeTheme(darkTheme = false) {
+//        Column {
+//            PastResult(navController = navController)
+//        }
+//    }
+//}
 
 @Composable // 사이니지 스펙 틀
 fun SignEzSpec(

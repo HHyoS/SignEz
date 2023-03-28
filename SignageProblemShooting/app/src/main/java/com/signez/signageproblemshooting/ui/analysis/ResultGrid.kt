@@ -3,6 +3,7 @@ package com.signez.signageproblemshooting.ui.analysis
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +30,6 @@ fun ResultGridView(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: AnalysisViewModel,
-    detailViewModel: SignageViewModel,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
@@ -40,7 +40,7 @@ fun ResultGridView(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "사이트 정보 입력",
+                title = "전체 도식화 보기",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -57,7 +57,7 @@ fun ResultGridView(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
             ) {
-
+                Text(text="분석 도표 페이지")
             }
         }
     }
