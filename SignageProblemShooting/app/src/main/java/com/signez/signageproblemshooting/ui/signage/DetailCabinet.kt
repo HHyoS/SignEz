@@ -28,6 +28,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.fields.CustomTextInput
@@ -50,6 +55,7 @@ object DetailCabinetScreenDestination : NavigationDestination {
     override val titleRes = "캐비닛 정보"
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CDetail(
     navController: NavController,
@@ -85,9 +91,21 @@ fun CDetail(
         imageLoadingScope.launch {
             withContext(Dispatchers.IO) {
                 try {
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(contentUri)
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                // Save the bitmap here
+                                imageBitmap = resource
+                            }
+                        })
                     // Load the image bitmap on a background thread
-                    imageBitmap =
-                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//                    imageBitmap =
+//                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
                 } catch (e: Exception) {
                     // Handle any errors that occur while loading the image
                     Log.e("Error", "Error loading image", e)
@@ -213,38 +231,30 @@ fun CDetail(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
                         cabinet?.repImg?.let { byteArray ->
-                            byteArray.let {
-                                bitmap = byteArrayToBitmap(it)
-                                Image(
-                                    bitmap = bitmap!!.asImageBitmap(),
-                                    contentDescription = "Signage Image",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .clip(RoundedCornerShape(15.dp))
-                                        .background(color = MaterialTheme.colors.onSurface)
-                                )
-                            }
+                            GlideImage(
+                                model = byteArray,
+                                contentDescription = "글라이드",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = MaterialTheme.colors.onSurface)
+                            )
                         }
                     }
                 } else {
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ){
-                        imageBitmap.let {
-                            it?.let { it1 ->
-                                Image(
-                                    bitmap = it1.asImageBitmap(),
-                                    contentDescription = "rep Image",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .clip(RoundedCornerShape(15.dp))
-                                        .background(color = MaterialTheme.colors.onSurface)
-                                )
-                            }
-                        }
-
+                        GlideImage(
+                            model = contentUri,
+                            contentDescription = "글라이드",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = MaterialTheme.colors.onSurface)
+                        )
                     }
                 }
                 Row(
@@ -254,7 +264,19 @@ fun CDetail(
                         modifier = Modifier.weight(0.5f)
                     ) {
                         ImagePicker(onImageSelected = { address ->
-                            imageBitmap = bitmap
+//                            imageBitmap = bitmap
+                            Glide.with(context)
+                                .asBitmap()
+                                .load(contentUri)
+                                .into(object : SimpleTarget<Bitmap>() {
+                                    override fun onResourceReady(
+                                        resource: Bitmap,
+                                        transition: Transition<in Bitmap>?
+                                    ) {
+                                        // Save the bitmap here
+                                        imageBitmap = resource
+                                    }
+                                })
                             viewModel.imageUri.value = Uri.parse(address)
                         })
                     }

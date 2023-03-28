@@ -48,5 +48,8 @@ interface AnalysisResultsRepository {
      * Update item in the data source
      */
     suspend fun updateResult(analysisResult: AnalysisResult)
-    suspend fun getResultBySignageId(signageId: Long) : AnalysisResult
+    suspend fun getResultsBySignageId(signageId: Long) : List<AnalysisResult>
+    suspend fun getResultById(resultId: Long): AnalysisResult
+
+    suspend fun deleteById(id: Long)
 }

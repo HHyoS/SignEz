@@ -24,6 +24,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
+import com.signez.signageproblemshooting.data.entities.Signage
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -54,5 +55,14 @@ interface AnalysisResultDao {
         INNER JOIN signages ON signages.id = results.signageId
         WHERE signages.id = :signageId
     """)
-    suspend fun getResultBySignageId(signageId: Long): AnalysisResult
+    suspend fun getResultsBySignageId(signageId: Long): List<AnalysisResult>
+
+    @Query("""
+        SELECT * FROM results
+        WHERE results.id = :resultId
+    """)
+    suspend fun getResultById(resultId: Long): AnalysisResult
+
+    @Query("DELETE FROM results WHERE id = :id")
+    suspend fun deleteById(id: Long)
 }

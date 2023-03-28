@@ -68,7 +68,7 @@ class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : View
     fun saveItem(name:String, width:Double, height:Double, bitmap: Bitmap, colCount:Int, rowCount:Int) = viewModelScope.launch {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
 
         val newCabinet = Cabinet(

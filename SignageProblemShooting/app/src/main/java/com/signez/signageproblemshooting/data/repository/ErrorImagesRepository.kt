@@ -50,5 +50,7 @@ interface ErrorImagesRepository {
      */
     suspend fun updateImage(image: ErrorImage)
 
-    suspend fun getImageByModuleId(error_module_id: Long): ErrorImage
+    suspend fun getImagesByModuleId(error_module_id: Long): List<ErrorImage>
+
+    suspend fun getImageById(error_module_id: Long): ErrorImage
 }
