@@ -63,14 +63,14 @@ fun SignageInformationScreen(
 
     val focusManager = LocalFocusManager.current
     var selectedId: Long by remember { mutableStateOf(-1) }
-
+    var searchQuery by remember { mutableStateOf("") }
     androidx.compose.material.Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "사이니지 정보 입력",
+                title = "사이트 정보 입력",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -104,10 +104,10 @@ fun SignageInformationScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    SearchBar()
+                    SearchBar(placeholder = "사이트 명 검색", onValueChange = { it -> searchQuery = it }, searchQuery = searchQuery)
                     Spacer(modifier.padding(10.dp))
                     Text(
-                        text = "전체 사이니지",
+                        text = "전체 사이트",
                         modifier = modifier
                             .align(alignment = Alignment.Start)
                             .padding(start = 10.dp),
@@ -133,7 +133,8 @@ fun SignageInformationScreen(
                                     }
                                 }
                             }, selectedId = selectedId,
-                            navController = navController
+                            navController = navController,
+                            searchQuery = searchQuery
                         )
                     }
 
@@ -151,7 +152,8 @@ fun SignageList(
     modifier: Modifier = Modifier,
     viewModel: SignageViewModel = viewModel(factory = AppViewModelProvider.Factory),
     selectedId: Long,
-    navController: NavHostController
+    navController: NavHostController,
+    searchQuery: String
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
@@ -179,18 +181,20 @@ fun SignageList(
 //            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = itemList, key = { it.id }) { item ->
-                InventoryItem(
-                    signage = item,
-                    onItemClick = onItemClick,
-                    selectedId = selectedId,
-                    navController = navController
-                )
-                Divider(
-                    modifier = Modifier
-                        .height(1.dp)
-                        .fillMaxWidth(0.95f),
-                    startIndent = 70.dp
-                )
+                if (item.name.uppercase().contains(searchQuery.uppercase())) {
+                    InventoryItem(
+                        signage = item,
+                        onItemClick = onItemClick,
+                        selectedId = selectedId,
+                        navController = navController
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .height(1.dp)
+                            .fillMaxWidth(0.95f),
+                        startIndent = 70.dp
+                    )
+                }
             }
         }
     }
@@ -303,15 +307,15 @@ private fun InventoryItem(
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
+    onValueChange: (String) -> Unit,
     placeholder: String = "설치 장소 검색",
-    onSearch: (String) -> Unit = {}
+    onSearch: (String) -> Unit = {},
+    searchQuery:String
 ) {
-    val searchQuery = remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-
     OutlinedTextField(
-        value = searchQuery.value,
-        onValueChange = { newValue -> searchQuery.value = newValue },
+        value = searchQuery,
+        onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth(),
         textStyle = MaterialTheme.typography.h3,
@@ -325,7 +329,7 @@ fun SearchBar(
         singleLine = true,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = {
-            onSearch(searchQuery.value)
+            onSearch(searchQuery)
             keyboardController?.hide()
         }),
         colors = androidx.compose.material.TextFieldDefaults.outlinedTextFieldColors(

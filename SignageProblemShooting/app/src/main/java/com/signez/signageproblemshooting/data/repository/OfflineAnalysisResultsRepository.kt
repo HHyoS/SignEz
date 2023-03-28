@@ -30,4 +30,10 @@ class OfflineAnalysisResultsRepository(private val analysisResultDao: AnalysisRe
     override suspend fun deleteResult(analysisResult: AnalysisResult) = analysisResultDao.delete(analysisResult)
 
     override suspend fun updateResult(analysisResult: AnalysisResult) = analysisResultDao.update(analysisResult)
+
+    override suspend fun getResultsBySignageId(signageId: Long) = analysisResultDao.getResultsBySignageId(signageId)
+
+    override suspend fun getResultById(resultId: Long) = analysisResultDao.getResultById(resultId)
+
+    override suspend fun deleteById(id: Long) = analysisResultDao.deleteById(id)
 }

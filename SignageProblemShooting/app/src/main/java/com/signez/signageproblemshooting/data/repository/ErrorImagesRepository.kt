@@ -18,6 +18,7 @@ package com.signez.signageproblemshooting.data.repository
 
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorImage
+import com.signez.signageproblemshooting.data.entities.ErrorModule
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -48,4 +49,8 @@ interface ErrorImagesRepository {
      * Update item in the data source
      */
     suspend fun updateImage(image: ErrorImage)
+
+    suspend fun getImagesByModuleId(error_module_id: Long): List<ErrorImage>
+
+    suspend fun getImageById(error_module_id: Long): ErrorImage
 }

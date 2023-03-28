@@ -36,4 +36,8 @@ class OfflineErrorModulesRepository(private val moduleDao: ErrorModuleDao) : Err
     override suspend fun deleteErrorModule(module: ErrorModule) = moduleDao.delete(module)
 
     override suspend fun updateErrorModule(module: ErrorModule) = moduleDao.update(module)
+
+    override suspend fun getModulesByResultId(resultId: Long) = moduleDao.getModulesByResultId(resultId)
+
+    override suspend fun getModuleById(resultId: Long) = moduleDao.getModuleById(resultId)
 }

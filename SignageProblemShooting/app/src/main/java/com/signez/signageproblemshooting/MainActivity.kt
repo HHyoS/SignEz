@@ -39,12 +39,6 @@ import android.widget.Toast
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
 
-enum class Screen {
-    MAIN,
-    SECOND,
-    THIRD
-}
-
 class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private lateinit var viewModel1: PictureViewModel
     private lateinit var viewModel2: VideoViewModel
@@ -104,9 +98,11 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                     galleryAddVideo(this, viewModel2) // 영상 분석용
                 }
                 REQUEST_CODE_APP_SETTINGS -> {
-                    checkAndRequestPermissions()
+                    mainViewModel.permissionsGranted.value = checkAndRequestPermissions()
                 }
-
+                REQUEST_CODE_PERMISSIONS-> {
+                    mainViewModel.permissionsGranted.value = checkAndRequestPermissions()
+                }
             }
         }
     }
@@ -158,7 +154,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                     viewModel4 = viewModel4,
                     viewModel5 = viewModel5,
                     viewModel6 = viewModel6,
-                    viewModel7 = viewModel7
+                    viewModel7 = viewModel7,
+                    viewModel8 = mainViewModel
                 )
             }
         }
@@ -174,19 +171,16 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     }
 
     override fun onDenied(requestCode: Int, permissions: Array<String>) {
-        Toast.makeText(this, "permissions denied: " + permissions.size, Toast.LENGTH_LONG).show()
-        openAppSettings()
+        if (permissions.isNotEmpty()) {
+            mainViewModel.permissionsGranted.value=false
+            Toast.makeText(this, "거부된 권한 수: " + permissions.size, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onGranted(requestCode: Int, permissions: Array<String>) {
-        Toast.makeText(this, "permissions granted: " + permissions.size, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "허용된 권한 수: " + permissions.size, Toast.LENGTH_LONG).show()
     }
     private fun checkAndRequestPermissions(): Boolean {
-//        val permissions = arrayOf(
-//            Manifest.permission.CAMERA,
-//            Manifest.permission.READ_EXTERNAL_STORAGE
-//        )
-
         val notGrantedPermissions = permissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()

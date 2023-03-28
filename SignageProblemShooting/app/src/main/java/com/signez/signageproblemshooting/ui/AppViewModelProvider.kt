@@ -23,6 +23,8 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.signez.signageproblemshooting.SignEzApplication
+import com.signez.signageproblemshooting.data.repository.ErrorImagesRepository
+import com.signez.signageproblemshooting.data.repository.ErrorModulesRepository
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.inputs.PictureViewModel
@@ -56,7 +58,13 @@ object AppViewModelProvider {
         }
 
         initializer {
-            AnalysisViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+            AnalysisViewModel(
+                SignEzApplication().container.signagesRepository,
+                SignEzApplication().container.cabinetsRepository,
+                SignEzApplication().container.analysisResultsRepository,
+                SignEzApplication().container.errorModulesRepository,
+                SignEzApplication().container.errorImagesRepository,
+                SignEzApplication())
         }
 
         initializer {

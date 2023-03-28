@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SignageDao {
 
-    @Query("SELECT * from signages ORDER BY name ASC")
+    @Query(" SELECT * FROM signages ORDER BY name ASC")
     fun getAllSignages(): Flow<List<Signage>>
 
     @Query("SELECT * from signages WHERE id = :id")

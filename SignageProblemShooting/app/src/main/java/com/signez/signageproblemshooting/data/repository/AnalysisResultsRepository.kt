@@ -17,6 +17,7 @@
 package com.signez.signageproblemshooting.data.repository
 
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
+import com.signez.signageproblemshooting.data.entities.Signage
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -47,4 +48,8 @@ interface AnalysisResultsRepository {
      * Update item in the data source
      */
     suspend fun updateResult(analysisResult: AnalysisResult)
+    suspend fun getResultsBySignageId(signageId: Long) : List<AnalysisResult>
+    suspend fun getResultById(resultId: Long): AnalysisResult
+
+    suspend fun deleteById(id: Long)
 }
