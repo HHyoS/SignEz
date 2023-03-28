@@ -39,7 +39,7 @@ interface SignagesRepository {
     /**
      * Insert item in the data source
      */
-    suspend fun insertSignage(signage: Signage)
+    suspend fun insertSignage(signage: Signage): Long
 
     /**
      * Delete item from the data source

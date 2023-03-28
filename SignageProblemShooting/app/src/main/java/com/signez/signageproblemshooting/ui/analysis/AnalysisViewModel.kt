@@ -13,6 +13,7 @@ import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 
 
@@ -66,7 +67,7 @@ class AnalysisViewModel(
     }
 
     // 결과 저장, 모듈 저장, 이미지 저장 순으로 진행.
-    fun saveImage(bitmap: Bitmap, moduleId:Long=0L) = viewModelScope.launch {
+    fun saveImage(bitmap: Bitmap, moduleId:Long=0L) = runBlocking {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
@@ -76,10 +77,10 @@ class AnalysisViewModel(
             error_module_id = moduleId,
             evidence_image = byteArray
         )
-        errorImagesRepository.insertImage(newImage)
+        return@runBlocking errorImagesRepository.insertImage(newImage)
     }
 
-    fun saveModule(resultId:Long=0L,score:Double,x:Int,y:Int) = viewModelScope.launch {
+    fun saveModule(resultId:Long=0L,score:Double,x:Int,y:Int) = runBlocking {
         //
         val newModule = ErrorModule(
             resultId = resultId,
@@ -87,15 +88,15 @@ class AnalysisViewModel(
             x = x,
             y = y
         )
-        errorModulesRepository.insertErrorModule(newModule)
+        return@runBlocking errorModulesRepository.insertErrorModule(newModule)
     }
 
-    fun saveResult() = viewModelScope.launch {
+    fun saveResult() = runBlocking {
         //
         val newResult = AnalysisResult(
             signageId = signageId.value
         )
-        analysisResultRepository.insertResult(newResult)
+        return@runBlocking analysisResultRepository.insertResult(newResult)
     }
 
     suspend fun getRelatedImages(moduleId:Long): List<ErrorImage> {

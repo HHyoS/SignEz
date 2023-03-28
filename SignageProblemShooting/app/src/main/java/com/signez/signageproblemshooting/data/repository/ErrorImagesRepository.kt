@@ -38,7 +38,7 @@ interface ErrorImagesRepository {
     /**
      * Insert item in the data source
      */
-    suspend fun insertImage(image: ErrorImage)
+    suspend fun insertImage(image: ErrorImage): Long
 
     /**
      * Delete item from the data source
