@@ -8,6 +8,7 @@
     <uses-feature android:name="android.hardware.camera2" />
 
     <application
+        android:name=".SignEzApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,15 +16,19 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.SignageProblemShooting"
+        android:requestLegacyExternalStorage="true"
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.SignageProblemShooting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data android:name="@string/permissions_loader_meta_key"
+                android:value="android.permission.READ_EXTERNAL_STORAGE, android.permission.CAMERA"/>
         </activity>
 
         <!-- Define the FileProvider -->
