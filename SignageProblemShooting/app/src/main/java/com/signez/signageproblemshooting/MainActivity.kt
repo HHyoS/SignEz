@@ -147,6 +147,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 
         viewModel4.insertTestRecord()
         viewModel3.insertTestRecord()
+        viewModel5.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
             SignEzPrototypeTheme {
