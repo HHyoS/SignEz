@@ -41,7 +41,9 @@ fun HomeScreen(
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
+
     val cabinetState by viewModel.getCabinet().collectAsState()
+
     val signageState by viewModel.getSignage().collectAsState()
     val appSettingsResultLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

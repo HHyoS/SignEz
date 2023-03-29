@@ -2,7 +2,10 @@ package com.signez.signageproblemshooting.ui.analysis
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -11,6 +14,8 @@ import com.signez.signageproblemshooting.data.entities.*
 import com.signez.signageproblemshooting.data.repository.*
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetState
+import com.signez.signageproblemshooting.ui.signage.SignageListState
+import com.signez.signageproblemshooting.ui.signage.SignageViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -23,14 +28,17 @@ class AnalysisViewModel(
     private val analysisResultRepository: AnalysisResultsRepository,
     private val errorModulesRepository: ErrorModulesRepository,
     private val errorImagesRepository: ErrorImagesRepository,
+
     application: Application
 ) : AndroidViewModel(application), MediaViewModel {
+
     override var imageUri = mutableStateOf(Uri.EMPTY)
     override var mCurrentPhotoPath = mutableStateOf("")
     override var type = 0; // 0 = 선택 x, 1 = 갤러리에서 골랐을 때, 2 = 앱에서 찍었을 때
     var videoContentUri = mutableStateOf(Uri.EMPTY)
     var imageContentUri = mutableStateOf(Uri.EMPTY)
     var signageId = mutableStateOf(-1L)
+    var selectedResultId = mutableStateOf(-1L)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -50,7 +58,12 @@ class AnalysisViewModel(
                 started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
                 initialValue = CabinetState()
             )
+    }
 
+    suspend fun getSignageById(signageId: Long): Signage {
+        val signage: Signage =
+            signageRepository.getSignageById(signageId)
+        return signage
     }
 
     fun getSignage(): StateFlow<SignageState> {
@@ -66,6 +79,16 @@ class AnalysisViewModel(
                 )
         return signageState
     }
+
+
+    // 지난 분석 결과 목록
+    val resultListState: StateFlow<resultListState> =
+        analysisResultRepository.getAllResultsStream().map { resultListState(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
+                initialValue = resultListState()
+            )
 
     // 결과 저장, 모듈 저장, 이미지 저장 순으로 진행.
     fun saveImage(bitmap: Bitmap, moduleId: Long = 0L) = runBlocking {
@@ -139,6 +162,33 @@ class AnalysisViewModel(
     suspend fun deleteResult(resultId: Long) {
         analysisResultRepository.deleteById(resultId)
     }
+
+    fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        canvas.drawColor(color)
+        return bitmap
+    }
+
+    fun insertTestRecord() = viewModelScope.launch {
+        // Save image as a Blob
+        val bitmap = createSimpleBitmap(100, 100, Color.BLUE)
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
+        val byteArray = outputStream.toByteArray()
+
+        val testAnalysisResult = AnalysisResult(signageId = 1L)
+        val resultId = analysisResultRepository.insertResult(testAnalysisResult)
+        val testErrorModule = ErrorModule(
+            resultId = resultId,
+            score = 90.1,
+            x = 1,
+            y = 1
+        )
+        val moduleId = errorModulesRepository.insertErrorModule(testErrorModule)
+        val testErrorImage = ErrorImage(error_module_id = moduleId, evidence_image = byteArray)
+    }
+
 }
 
 data class SignageState(
@@ -153,3 +203,13 @@ data class SignageState(
         repImg = byteArrayOf(1)
     )
 )
+
+data class resultState(
+    val result: AnalysisResult = AnalysisResult(
+        id = 3L,
+        signageId = 1L,
+        resultDate = "2023-03-29"
+    )
+)
+
+data class resultListState(val itemList: List<AnalysisResult> = listOf())
