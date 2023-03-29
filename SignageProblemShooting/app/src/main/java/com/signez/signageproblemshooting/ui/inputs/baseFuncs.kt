@@ -192,11 +192,20 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openErrorDetectActivity(context: Context, type: Int) {
+fun openErrorDetectActivity(
+    context: Context,
+    type: Int,
+    signageId: Long,
+    uri: Uri
+) {
     val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
     val REQUEST_TYPE: String = "REQUEST_TYPE"
+    val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
+
     val intent = Intent(context, ErrorDetectActivity::class.java)
     intent.putExtra(REQUEST_TYPE, type)
+    intent.putExtra(REQUEST_SIGNAGE_ID, signageId)
+    intent.data = uri
 
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
 }

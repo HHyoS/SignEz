@@ -52,7 +52,9 @@ class AnalysisViewModel(
     fun getCabinet(): StateFlow<CabinetState> {
         return cabinetRepository.getCabinetStream(getSignage().value.signage.modelId)
             .filterNotNull()
-            .map { CabinetState(cabinet = it) }
+            .map {
+                CabinetState(cabinet = it)
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
@@ -91,7 +93,7 @@ class AnalysisViewModel(
             )
 
     // 결과 저장, 모듈 저장, 이미지 저장 순으로 진행.
-    fun saveImage(bitmap: Bitmap, moduleId: Long = 0L) = runBlocking {
+    fun saveImage(bitmap: Bitmap, moduleId: Long = 0L): Long = runBlocking {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
