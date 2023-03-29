@@ -35,7 +35,7 @@ class CabinetDetailViewModel(private val signageRepository: SignagesRepository, 
     fun updateRecord(name:String,width:Double,height:Double,bitmap:Bitmap?,colNum:Int,rowNum:Int,cabinet:Cabinet) = viewModelScope.launch {
         if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
             val byteArray = outputStream.toByteArray()
             cabinet.repImg = byteArray
         }

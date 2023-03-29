@@ -33,8 +33,8 @@ import com.kgh.signezprototype.ui.theme.SignEzPrototypeTheme
 @Composable
 fun FocusBlock(
     title: String,
-    subtitle: String?,
-    infols: List<String>?,
+    subtitle: String? = null,
+    infols: List<String>? = null,
     buttonTitle: String?,
     isbuttonVisible: Boolean,
     buttonOnclickEvent: () -> Unit,
@@ -43,8 +43,8 @@ fun FocusBlock(
     Card(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 8.dp)
-            .fillMaxWidth()
-            .clickable(onClick = buttonOnclickEvent),
+            .fillMaxWidth(),
+//            .clickable(onClick = buttonOnclickEvent),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colors.surface
         )
@@ -77,6 +77,19 @@ fun FocusBlock(
                             onClickEvent = buttonOnclickEvent
                         )
                     }
+                } else if(buttonTitle == null) {
+                    Spacer(
+                        modifier = Modifier.weight(0.3f)
+                    )
+                    Column(
+                        modifier = Modifier.weight(0.4f)
+                    ) {
+                        InFocusBlockButton(
+                            title = "버튼없어요",
+                            isVisible = isbuttonVisible,
+                            onClickEvent = buttonOnclickEvent
+                        )
+                    }
                 }
 
             }
@@ -85,18 +98,20 @@ fun FocusBlock(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.h4,
-                    color = MaterialTheme.colors.onBackground,
+                    color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
                 )
             }
 
-            for (info in infols!!) {
+            if(infols!=null){
+            for (info in infols) {
                 Text(
                     text = info,
                     style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(start = 18.dp, top = 4.dp, bottom = 4.dp)
                 )
+            }
             }
 
 //                Text(
@@ -108,7 +123,7 @@ fun FocusBlock(
 
         }
 
-
+        Spacer(modifier = Modifier.height(15.dp))
     }
 }
 
