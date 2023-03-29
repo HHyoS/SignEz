@@ -1,6 +1,6 @@
 package com.signez.signageproblemshooting
 
-//SignEzPrototypeTheme
+//SignEzTheme
 
 
 //
@@ -34,6 +34,7 @@ import java.util.*
 import android.Manifest
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController

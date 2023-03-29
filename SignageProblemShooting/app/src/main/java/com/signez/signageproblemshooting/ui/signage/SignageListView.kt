@@ -344,7 +344,7 @@ fun SearchBar(
 //@Preview
 //@Composable
 //fun ComponentPreview() {
-//    SignEzPrototypeTheme(darkTheme = false) {
+//    SignEzTheme(darkTheme = false) {
 //        Column {
 //            SearchBar()
 //        }

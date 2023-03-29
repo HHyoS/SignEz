@@ -19,7 +19,7 @@ import com.signez.signageproblemshooting.ui.MainViewModelFactory
 //import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -135,7 +135,7 @@ class ErrorDetectActivity : ComponentActivity() {
         }
 
         setContent {
-            SignEzPrototypeTheme {
+            SignEzTheme {
            //     AnalysisProgress()
             }
         }
