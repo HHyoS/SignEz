@@ -40,7 +40,7 @@ interface ErrorModulesRepository {
     /**
      * Insert item in the data source
      */
-    suspend fun insertErrorModule(module: ErrorModule)
+    suspend fun insertErrorModule(module: ErrorModule): Long
 
     /**
      * Delete item from the data source

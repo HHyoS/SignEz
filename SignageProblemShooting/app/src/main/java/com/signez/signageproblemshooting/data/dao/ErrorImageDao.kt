@@ -43,7 +43,7 @@ interface ErrorImageDao {
     // Specify the conflict strategy as IGNORE, when the user tries to add an
     // existing Item into the database Room ignores the conflict.
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(image: ErrorImage)
+    suspend fun insert(image: ErrorImage): Long
 
     @Update
     suspend fun update(image: ErrorImage)

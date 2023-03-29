@@ -37,7 +37,7 @@ interface AnalysisResultsRepository {
     /**
      * Insert item in the data source
      */
-    suspend fun insertResult(analysisResult: AnalysisResult)
+    suspend fun insertResult(analysisResult: AnalysisResult): Long
 
     /**
      * Delete item from the data source
