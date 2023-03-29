@@ -69,6 +69,7 @@ fun VideoAnalysis(
     var videoLength by remember { mutableStateOf(0L) }
     var videoSize by remember { mutableStateOf(0L) }
     var videoFrame by remember { mutableStateOf(bitmap) }
+    val REQUEST_DETECT_VIDEO: Int = 100
 
     val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
         val retriever = MediaMetadataRetriever()
@@ -137,12 +138,24 @@ fun VideoAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
-                /* 분석하기 이벤트를 넣으면 됨 */
+                    /* 분석하기 이벤트를 넣으면 됨 */
                     // .currentDestination?.let { navController.popBackStack(it.id , true) }
+//                    val s = analysisViewModel.getSignage().value.signage
+//                    val c = analysisViewModel.getCabinet().value.cabinet
+//                    val v = analysisViewModel.videoContentUri
+//                    val i = analysisViewModel.imageContentUri
+//                    val id = analysisViewModel.signageId
+//
+//                    Log.i("State", s.toString())
+//                    Log.i("State", c.toString())
+//                    Log.i("State", v.toString())
+//                    Log.i("State", i.toString())
+//                    Log.i("State", id.toString())
+
                     navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+                    openErrorDetectActivity(context, REQUEST_DETECT_VIDEO)
                 }
             )
         }
@@ -227,7 +240,6 @@ fun VideoAnalysis(
                     }
                 }
             }//Column
-
 
 
 //            if (!videoFrame.sameAs(bitmap)) {

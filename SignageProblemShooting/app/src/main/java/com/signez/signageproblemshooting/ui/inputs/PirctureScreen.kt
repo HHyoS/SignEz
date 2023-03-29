@@ -65,7 +65,7 @@ fun PictureAnalysis(
     viewModel: PictureViewModel,
     analysisViewModel: AnalysisViewModel,
     modifier: Modifier = Modifier,
-    navController:NavController
+    navController: NavController
 ) {
     val context = LocalContext.current
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -75,6 +75,7 @@ fun PictureAnalysis(
     val coroutineScope = rememberCoroutineScope()
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
+    val REQUEST_DETECT_PHOTO: Int = 101
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
@@ -126,12 +127,24 @@ fun PictureAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
-                /* 분석하기 이벤트를 넣으면 됨 */
+                    /* 분석하기 이벤트를 넣으면 됨 */
 //                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
+//                    val s = analysisViewModel.getSignage().value.signage
+//                    val c = analysisViewModel.getCabinet().value.cabinet
+//                    val v = analysisViewModel.videoContentUri
+//                    val i = analysisViewModel.imageContentUri
+//                    val id = analysisViewModel.signageId
+//
+//                    Log.i("State", s.toString())
+//                    Log.i("State", c.toString())
+//                    Log.i("State", v.toString())
+//                    Log.i("State", i.toString())
+//                    Log.i("State", id.toString())
+
                     navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+                    openErrorDetectActivity(context, REQUEST_DETECT_PHOTO)
                 }
             )
         }

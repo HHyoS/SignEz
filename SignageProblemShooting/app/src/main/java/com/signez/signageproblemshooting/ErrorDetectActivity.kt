@@ -20,10 +20,7 @@ import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
@@ -46,6 +43,8 @@ class ErrorDetectActivity : ComponentActivity() {
     private val REQUEST_DETECT_VIDEO: Int = 100
     private val REQUEST_DETECT_PHOTO: Int = 101
     private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+
+    private val REQUEST_TYPE: String = "REQUEST_TYPE"
 
 
     // viewModels
@@ -95,12 +94,17 @@ class ErrorDetectActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         analysisViewModel = ViewModelProvider(
-            this,
-            factory = AppViewModelProvider.Factory
-        )[AnalysisViewModel::class.java]
+            this
+        ).get(AnalysisViewModel::class.java)
 
         val intents: Intent = intent
-        val type = intents.extras?.getInt("REQUEST_TYPE")
+        val type = intents.extras?.getInt(REQUEST_TYPE)
+
+        setContent {
+            SignEzPrototypeTheme {
+                AnalysisProgress()
+            }
+        }
 
         try {
             signageDetectModule =
@@ -115,9 +119,21 @@ class ErrorDetectActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             when (type) {
-                REQUEST_DETECT_VIDEO -> detectVideo()
-                REQUEST_DETECT_PHOTO -> detectPhoto()
+//                REQUEST_DETECT_VIDEO -> detectVideo()
+//                REQUEST_DETECT_PHOTO -> detectPhoto()
                 else -> {
+//                    val s = analysisViewModel.getSignage().value.signage
+//                    val c = analysisViewModel.getCabinet().value.cabinet
+//                    val v = analysisViewModel.videoContentUri
+//                    val i = analysisViewModel.imageContentUri
+//                    val id = analysisViewModel.signageId
+//
+//                    Log.i("State", s.toString())
+//                    Log.i("State", c.toString())
+//                    Log.i("State", v.toString())
+//                    Log.i("State", i.toString())
+//                    Log.i("State", id.toString())
+                    delay(5000)
                     Log.e("ErrorDetectActivity", "Wrong Access to Activity!")
                     //
                     //
@@ -128,14 +144,10 @@ class ErrorDetectActivity : ComponentActivity() {
                     //
                     //
                 }
-            }
-        }
-
-        setContent {
-            SignEzPrototypeTheme {
-                AnalysisProgress()
-            }
-        }
+            } // when end
+            setResult(REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+            finish()
+        } // coroutine end
 
 
     }
@@ -225,6 +237,8 @@ class ErrorDetectActivity : ComponentActivity() {
                     inputStream?.close()
                 }
                 tempFile.delete()
+
+
             }
 
 
