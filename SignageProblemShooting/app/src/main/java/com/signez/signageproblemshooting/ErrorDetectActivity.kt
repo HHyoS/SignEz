@@ -93,6 +93,9 @@ class ErrorDetectActivity : ComponentActivity() {
         }
     }
 
+    fun getModel(): Module {
+        return Module.load(assetFilePath(SignEzApplication.instance, signageDetectModuleFileName))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

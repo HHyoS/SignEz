@@ -3,9 +3,11 @@ package com.signez.signageproblemshooting.ui.inputs
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.*
@@ -18,7 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -33,9 +38,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.signature.ObjectKey
+import com.signez.signageproblemshooting.ErrorDetectActivity
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.ImagePicker
 import com.signez.signageproblemshooting.pickers.loadImageMetadata
+import com.signez.signageproblemshooting.service.PrePostProcessor
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
@@ -47,6 +55,9 @@ import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.pytorch.IValue
+import org.pytorch.Module
+import org.pytorch.torchvision.TensorImageUtils
 import java.io.File
 import kotlin.reflect.KFunction1
 
@@ -77,6 +88,20 @@ fun PictureAnalysis(
     var contentUri: Uri = Uri.EMPTY
     val REQUEST_DETECT_PHOTO: Int = 101
 
+    //test start
+    var mModule: Module? = null
+    var mWidth: Int = 1
+    var mHeight: Int = 2
+    var mmWidth: Int = 3
+    var mmHeight: Int = 5
+    var mImgScaleX = 0f
+    var mImgScaleY = 0f
+    var mIvScaleX = 0f
+    var mIvScaleY = 0f
+    var mStartX = 0f
+    var mStartY = 0f
+    var imageUri by remember { mutableStateOf(contentUri) }
+    //test end
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
@@ -127,6 +152,75 @@ fun PictureAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
+
+                    // test
+                    if (contentUri == Uri.EMPTY)
+                        Toast.makeText(context, "사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    else {
+                        mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
+                        mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
+                        mIvScaleX = (if (mmWidth > mmHeight) mWidth
+                            .toFloat() / mmWidth else mHeight
+                            .toFloat() / mmHeight)
+                        mIvScaleY = (if (mmHeight > mmWidth) mHeight
+                            .toFloat() / mmHeight else mWidth
+                            .toFloat() / mmWidth)
+                        mStartX = (mWidth - mIvScaleX * mmWidth) / 2
+                        mStartY = (mHeight - mIvScaleY * mmHeight) / 2
+
+                        if (mModule == null) {
+                            val temp = ErrorDetectActivity()
+                            mModule = temp.getModel()
+                        }
+                        val thread = object : Thread() {
+                            override fun run() {
+                                Log.d("hyoyo", "1")
+                                val resizedBitmap = Bitmap.createScaledBitmap(
+                                    (BitmapFactory.decodeStream(
+                                        activity.contentResolver.openInputStream(
+                                            contentUri
+                                        )
+                                    ))!!,
+                                    PrePostProcessor.mInputWidth,
+                                    PrePostProcessor.mInputHeight,
+                                    true
+                                )
+                                Log.d("hyoyo", "{")
+                                val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
+                                    resizedBitmap,
+                                    PrePostProcessor.NO_MEAN_RGB,
+                                    PrePostProcessor.NO_STD_RGB
+                                )
+                                Log.d("hyoyo", "3")
+                                val outputTuple =
+                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
+                                val outputTensor = outputTuple[0].toTensor()
+                                val outputs = outputTensor.dataAsFloatArray
+                                Log.d("hyoyo", "4")
+                                val results = PrePostProcessor.outputsToNMSPredictions(
+                                    outputs,
+                                    mImgScaleX,
+                                    mImgScaleY,
+                                    mIvScaleX,
+                                    mIvScaleY,
+                                    mStartX,
+                                    mStartY
+                                )
+
+                                if (results != null) {
+                                    for (r in results!!) {
+                                        Log.d(
+                                            "test",
+                                            "${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
+                                                    "${r.rect.bottom} @ ${r.score}"
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        thread.start()
+                    }
+                    //
                     /* 분석하기 이벤트를 넣으면 됨 */
 //                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
 
@@ -187,7 +281,29 @@ fun PictureAnalysis(
                                 .height(200.dp)
                                 .clip(RoundedCornerShape(15.dp))
                                 .background(color = MaterialTheme.colors.onSurface)
+                                .onSizeChanged { ImageSize ->
+                                    val width = ImageSize.width
+                                    val height = ImageSize.height
+                                    Log.d("Image Size", "width: $width, height: $height")
+                                },
                         )
+
+                        mWidth = LocalConfiguration.current.screenWidthDp
+                        mHeight = LocalConfiguration.current.screenHeightDp
+                        val uri = Uri.parse(contentUri.toString()) // 실제 Uri 주소를 사용하여 초기화합니다.
+                        val options = BitmapFactory.Options().apply {
+                            inJustDecodeBounds = true
+                        }
+                        // 사진 진짜크기
+                        BitmapFactory.decodeStream(
+                            activity.contentResolver.openInputStream(uri),
+                            null,
+                            options
+                        )
+                        mmWidth = options.outWidth
+                        mmHeight = options.outHeight
+
+
 //                        imageBitmap?.let {
 //                            Image(
 //                                bitmap = it.asImageBitmap(),
