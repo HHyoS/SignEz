@@ -28,8 +28,10 @@ class AnalysisViewModel(
     private val analysisResultRepository: AnalysisResultsRepository,
     private val errorModulesRepository: ErrorModulesRepository,
     private val errorImagesRepository: ErrorImagesRepository,
-    application: Application):  AndroidViewModel(application), MediaViewModel
-{
+
+    application: Application
+) : AndroidViewModel(application), MediaViewModel {
+
     override var imageUri = mutableStateOf(Uri.EMPTY)
     override var mCurrentPhotoPath = mutableStateOf("")
     override var type = 0; // 0 = 선택 x, 1 = 갤러리에서 골랐을 때, 2 = 앱에서 찍었을 때
@@ -48,9 +50,11 @@ class AnalysisViewModel(
 
 
     fun getCabinet(): StateFlow<CabinetState> {
-        return cabinetRepository.getCabinetStream(signageId.value)
+        return cabinetRepository.getCabinetStream(getSignage().value.signage.modelId)
             .filterNotNull()
-            .map { CabinetState( cabinet = it ) }
+            .map {
+                CabinetState(cabinet = it)
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
@@ -58,7 +62,7 @@ class AnalysisViewModel(
             )
     }
 
-    suspend fun getSignageById(signageId:Long): Signage {
+    suspend fun getSignageById(signageId: Long): Signage {
         val signage: Signage =
             signageRepository.getSignageById(signageId)
         return signage
@@ -69,7 +73,7 @@ class AnalysisViewModel(
             signageRepository.getSignageStream(signageId.value)
                 .filterNotNull()
                 .map {
-                    SignageState( signage = it)
+                    SignageState(signage = it)
                 }.stateIn(
                     scope = viewModelScope,
                     started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
@@ -81,15 +85,15 @@ class AnalysisViewModel(
 
     // 지난 분석 결과 목록
     val resultListState: StateFlow<resultListState> =
-        analysisResultRepository.getAllResultsStream().map{ resultListState(it) }
+        analysisResultRepository.getAllResultsStream().map { resultListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(AnalysisViewModel.TIMEOUT_MILLIS),
                 initialValue = resultListState()
             )
-    
+
     // 결과 저장, 모듈 저장, 이미지 저장 순으로 진행.
-    fun saveImage(bitmap: Bitmap, moduleId:Long=0L) = runBlocking {
+    fun saveImage(bitmap: Bitmap, moduleId: Long = 0L): Long = runBlocking {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
@@ -102,7 +106,7 @@ class AnalysisViewModel(
         return@runBlocking errorImagesRepository.insertImage(newImage)
     }
 
-    fun saveModule(resultId:Long=0L,score:Double,x:Int,y:Int) = runBlocking {
+    fun saveModule(resultId: Long = 0L, score: Double, x: Int, y: Int) = runBlocking {
         //
         val newModule = ErrorModule(
             resultId = resultId,
@@ -121,42 +125,43 @@ class AnalysisViewModel(
         return@runBlocking analysisResultRepository.insertResult(newResult)
     }
 
-    suspend fun getRelatedImages(moduleId:Long): List<ErrorImage> {
+    suspend fun getRelatedImages(moduleId: Long): List<ErrorImage> {
         val images: List<ErrorImage> =
             errorImagesRepository.getImagesByModuleId(moduleId)
         return images
     }
 
-    suspend fun getRelatedModule(resultId:Long): List<ErrorModule> {
+    suspend fun getRelatedModule(resultId: Long): List<ErrorModule> {
         val modules: List<ErrorModule> =
             errorModulesRepository.getModulesByResultId(resultId)
         return modules
     }
 
-    suspend fun getRelatedResults(signageId:Long): List<AnalysisResult> {
+    suspend fun getRelatedResults(signageId: Long): List<AnalysisResult> {
         val results: List<AnalysisResult> =
             analysisResultRepository.getResultsBySignageId(signageId)
         return results
     }
 
-    suspend fun getImageById(imageId:Long): ErrorImage {
+    suspend fun getImageById(imageId: Long): ErrorImage {
         val image: ErrorImage =
             errorImagesRepository.getImageById(imageId)
         return image
     }
 
-    suspend fun getModuleById(moduleId:Long): ErrorModule {
+    suspend fun getModuleById(moduleId: Long): ErrorModule {
         val module: ErrorModule =
             errorModulesRepository.getModuleById(moduleId)
         return module
     }
-    suspend fun getResultById(resultId:Long): AnalysisResult {
+
+    suspend fun getResultById(resultId: Long): AnalysisResult {
         val result: AnalysisResult =
             analysisResultRepository.getResultById(resultId)
         return result
     }
 
-    suspend fun deleteResult(resultId:Long) {
+    suspend fun deleteResult(resultId: Long) {
         analysisResultRepository.deleteById(resultId)
     }
 
@@ -166,6 +171,7 @@ class AnalysisViewModel(
         canvas.drawColor(color)
         return bitmap
     }
+
     fun insertTestRecord() = viewModelScope.launch {
         // Save image as a Blob
         val bitmap = createSimpleBitmap(100, 100, Color.BLUE)
@@ -182,18 +188,19 @@ class AnalysisViewModel(
             y = 1
         )
         val moduleId = errorModulesRepository.insertErrorModule(testErrorModule)
-        val testErrorImage = ErrorImage(error_module_id=moduleId, evidence_image = byteArray)
+        val testErrorImage = ErrorImage(error_module_id = moduleId, evidence_image = byteArray)
     }
 
 }
+
 data class SignageState(
     val signage: Signage = Signage(
-        id = 3L,
-        name="TEST",
-        height =5.4,
-        width=5.2,
-        heightCabinetNumber = 5,
-        widthCabinetNumber = 7,
+        id = 0L,
+        name = "TEST",
+        height = 19.0,
+        width = 11.0,
+        heightCabinetNumber = 19,
+        widthCabinetNumber = 11,
         modelId = 1,
         repImg = byteArrayOf(1)
     )
