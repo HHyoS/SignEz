@@ -35,6 +35,8 @@ import android.Manifest
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Toast
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
 
@@ -58,6 +60,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private val REQUEST_CODE_IMAGE_CAPTURE_4 = 2222
     private val REQUEST_CODE_IMAGE_CAPTURE_5 = 22222
     private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
+    private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
 
     val permissions = arrayOf(
         Manifest.permission.CAMERA,
@@ -72,7 +75,6 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
             System.loadLibrary("signageproblemshooting")
         }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -101,6 +103,9 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                 }
                 REQUEST_CODE_PERMISSIONS-> {
                     mainViewModel.permissionsGranted.value = checkAndRequestPermissions()
+                }
+                REQUEST_CODE_ERROR_DETECT_ACTIVITY -> {
+                    Log.d("godetect","clear")
                 }
             }
         }
@@ -141,6 +146,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 
         viewModel4.insertTestRecord()
         viewModel3.insertTestRecord()
+        viewModel5.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
             SignEzTheme {
@@ -163,7 +169,9 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 //        }, 200)
         AutoPermissions.Companion.loadSelectedPermissions(this, REQUEST_CODE_PERMISSIONS, permissions)
     }
-
+    fun go() {
+        applicationContext
+    }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         AutoPermissions.Companion.parsePermissions(this, REQUEST_CODE_PERMISSIONS, permissions, this)
