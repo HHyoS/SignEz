@@ -42,7 +42,7 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
     val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-        value = viewModel.getCabinet(1)
+        value = viewModel.getCabinet(viewModel.signageId.value)
     })
     val cabinet = cabinetState.value
     val signageState by viewModel.getSignage().collectAsState()
