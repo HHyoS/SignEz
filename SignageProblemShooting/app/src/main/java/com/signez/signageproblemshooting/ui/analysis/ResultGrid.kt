@@ -17,6 +17,7 @@ import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
+import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
 
@@ -50,6 +51,11 @@ fun ResultGridView(
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
+        },
+        bottomBar = {
+            BottomSingleFlatButton(title = "사진보기", isUsable = true) {
+                navController.navigate(ErrorImageDestination.route)
+            }
         }
     ) { innerPadding ->
         Spacer(modifier = modifier.padding(innerPadding))
