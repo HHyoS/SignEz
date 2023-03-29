@@ -181,8 +181,8 @@ class ErrorDetectActivity : ComponentActivity() {
     private suspend fun detectVideo() = coroutineScope {
         launch {
 
-            val width = signage.width.toInt() * 100
-            val height = signage.height.toInt() * 100
+            val width = signage.width.toInt()/10
+            val height = signage.height.toInt()/10
             val moduleWidth: Float =
                 width.toFloat() / (signage.widthCabinetNumber * cabinet.moduleRowCount)
             val moduleHeight: Float =
@@ -272,10 +272,13 @@ class ErrorDetectActivity : ComponentActivity() {
 
     private suspend fun detectPhoto() = coroutineScope {
         launch {
-            val originalImage: Bitmap? = loadBitmapFromUriWithGlide(
-                applicationContext,
-                uri
-            )
+            Log.i("ImageProcess", uri.toString())
+            val originalImage: Bitmap? = withContext(Dispatchers.IO) {
+                loadBitmapFromUriWithGlide(
+                    applicationContext,
+                    uri
+                )
+            }
             if (originalImage != null) {
                 Log.d(
                     "Image Size",
@@ -286,40 +289,47 @@ class ErrorDetectActivity : ComponentActivity() {
 //                "${originalImage!!.width.toString()}   ${originalImage!!.width.toString()}"
 //            )
 
-                val width = signage.width.toInt() * 100
-                val height = signage.height.toInt() * 100
+                val width = signage.width.toInt()/10
+                val height = signage.height.toInt()/10
                 val moduleWidth: Float =
                     width.toFloat() / (signage.widthCabinetNumber * cabinet.moduleRowCount)
                 val moduleHeight: Float =
                     height.toFloat() / (signage.heightCabinetNumber * cabinet.moduleColCount)
 
-                val resultId = analysisViewModel.saveResult()
+                val resultId = analysisViewModel.saveResult(signage.id)
+                Log.d("ImageProcess","resultId = ${resultId.toString()}")
 
                 val originalMat: Mat = bitmapToMat(originalImage!!)
-                val points: MutableList<Point> = getCorners(originalMat)
+                try{
+                    val points: MutableList<Point> = getCorners(originalMat)
+                    Log.d("ImageProcess","resultId = ${points.toString()}")
 
-                val warpedMat = getWarp(originalMat, points, width, height)
+                    val warpedMat = getWarp(originalMat, points, width, height)
 
-                val errorModuleList = getPredictions(
-                    warpedMat,
-                    errorDetectModule,
-                    width,
-                    height,
-                    moduleWidth,
-                    moduleHeight,
-                    resultId
-                )
-                for (errorModule in errorModuleList) {
-                    val processedMat: Mat =
-                        postProcess(warpedMat, errorModule, moduleWidth, moduleHeight)
-                    val processedBitmap =
-                        Bitmap.createBitmap(
-                            processedMat.cols(),
-                            processedMat.rows(),
-                            Bitmap.Config.ARGB_8888
-                        )
-                    Utils.matToBitmap(processedMat, processedBitmap)
-                    analysisViewModel.saveImage(processedBitmap, errorModule.id)
+                    val errorModuleList = getPredictions(
+                        warpedMat,
+                        errorDetectModule,
+                        width,
+                        height,
+                        moduleWidth,
+                        moduleHeight,
+                        resultId
+                    )
+                    Log.d("ImageProcess","resultId = ${errorModuleList.toString()}")
+                    for (errorModule in errorModuleList) {
+                        val processedMat: Mat =
+                            postProcess(warpedMat, errorModule, moduleWidth, moduleHeight)
+                        val processedBitmap =
+                            Bitmap.createBitmap(
+                                processedMat.cols(),
+                                processedMat.rows(),
+                                Bitmap.Config.ARGB_8888
+                            )
+                        Utils.matToBitmap(processedMat, processedBitmap)
+                        analysisViewModel.saveImage(processedBitmap, errorModule.id)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             } else {
                 Log.e("ImageProcess", "Image Load Fail!")
