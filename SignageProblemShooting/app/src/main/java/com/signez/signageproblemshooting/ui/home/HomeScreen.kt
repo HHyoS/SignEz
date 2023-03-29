@@ -36,20 +36,20 @@ fun HomeScreen(
     navigateToVideo: () -> Unit,
     navigateToSignageList: () -> Unit,
     viewModel: AnalysisViewModel,
-    mainViewModel:MainViewModel,
+    mainViewModel: MainViewModel,
     navController: NavController
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-        value = viewModel.getCabinet(viewModel.signageId.value)
-    })
-    val cabinet = cabinetState.value
+
+    val cabinetState by viewModel.getCabinet().collectAsState()
+
     val signageState by viewModel.getSignage().collectAsState()
-    val appSettingsResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        onAppSettingsClosed()
-        checkAndRequestPermissions(context,mainViewModel)
-    }
+    val appSettingsResultLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            onAppSettingsClosed()
+            checkAndRequestPermissions(context, mainViewModel)
+        }
 
     androidx.compose.material.Scaffold(
         topBar = {
@@ -92,19 +92,19 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            if ( !mainViewModel.permissionsGranted.value) {
+            if (!mainViewModel.permissionsGranted.value) {
                 Column(
                     modifier = Modifier
-                    .align(alignment = Alignment.TopCenter),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
+                        .align(alignment = Alignment.TopCenter),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     PermissionInfo()
-                    Button(onClick = {openAppSettings(context, appSettingsResultLauncher)}) {
+                    Button(onClick = { openAppSettings(context, appSettingsResultLauncher) }) {
                         Text(text = "권한 설정")
                     }
                 }
 
-            }
-            else {
+            } else {
                 Column(
                     modifier = Modifier
                         .align(alignment = Alignment.TopCenter)
@@ -122,8 +122,12 @@ fun HomeScreen(
                     )
                     {
                         if (viewModel.signageId.value > -1) {
-                            SignEzSpec(modifier = Modifier, navigateToSignageList, signageState.signage)
-                            CabinetSpec(modifier = Modifier, cabinet)
+                            SignEzSpec(
+                                modifier = Modifier,
+                                navigateToSignageList,
+                                signageState.signage
+                            )
+                            CabinetSpec(modifier = Modifier, cabinetState.cabinet)
                         } else {
                             SignEzSpec(modifier = Modifier, navigateToSignageList, null)
                             CabinetSpec(modifier = Modifier, null)
