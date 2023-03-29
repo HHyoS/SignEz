@@ -208,6 +208,7 @@ fun PictureAnalysis(
                                 )
 
                                 if (results != null) {
+                                    Log.d("hyoyo", "5")
                                     for (r in results!!) {
                                         Log.d(
                                             "test",
@@ -215,6 +216,8 @@ fun PictureAnalysis(
                                                     "${r.rect.bottom} @ ${r.score}"
                                         )
                                     }
+                                } else {
+                                    Log.d("hyoyo", "555555555555555555")
                                 }
                             }
                         }
@@ -224,15 +227,15 @@ fun PictureAnalysis(
                     /* 분석하기 이벤트를 넣으면 됨 */
 //                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
 
-                    navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(
-                        context,
-                        REQUEST_DETECT_PHOTO,
-                        analysisViewModel.signageId.value,
-                        analysisViewModel.imageContentUri.value
-                    )
+//                    navController.popBackStack()
+//                    navController.navigate(ResultsHistoryDestination.route)
+//                    navController.navigate(ResultGridDestination.route)
+//                    openErrorDetectActivity(
+//                        context,
+//                        REQUEST_DETECT_PHOTO,
+//                        analysisViewModel.signageId.value,
+//                        analysisViewModel.imageContentUri.value
+//                    )
                 }
             )
         }
