@@ -56,7 +56,8 @@ fun SignEzNavHost(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel1,//viewModel(factory = AppViewModelProvider.Factory)
-                analysisViewModel = viewModel5
+                analysisViewModel = viewModel5,
+                navController = navController
             )
         }
 
@@ -67,7 +68,8 @@ fun SignEzNavHost(
                 navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel2,
-                analysisViewModel = viewModel5
+                analysisViewModel = viewModel5,
+                navController = navController
             )
         }
 
@@ -152,17 +154,6 @@ fun SignEzNavHost(
 
         composable(route = ResultGridDestination.route) {
             ResultGridView(
-                onItemClick = {},
-                modifier = Modifier,
-                navController = navController,
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel5
-            )
-        }
-
-        composable(route = ResultGridDetailDestination.route) {
-            ResultGridDetailView(
                 onItemClick = {},
                 modifier = Modifier,
                 navController = navController,
