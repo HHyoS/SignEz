@@ -1,5 +1,6 @@
 package com.signez.signageproblemshooting
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -7,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -14,8 +16,10 @@ import com.bumptech.glide.Glide
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.MainViewModelFactory
+import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
+import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -41,6 +45,7 @@ class ErrorDetectActivity : ComponentActivity() {
     // constants
     private val REQUEST_DETECT_VIDEO: Int = 100
     private val REQUEST_DETECT_PHOTO: Int = 101
+    private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
 
 
     // viewModels
@@ -123,6 +128,12 @@ class ErrorDetectActivity : ComponentActivity() {
                     //
                     //
                 }
+            }
+        }
+
+        setContent {
+            SignEzPrototypeTheme {
+                AnalysisProgress()
             }
         }
 
@@ -451,4 +462,8 @@ class ErrorDetectActivity : ComponentActivity() {
         return mat
     }
 
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK)
+        super.onBackPressed()
+    }
 }

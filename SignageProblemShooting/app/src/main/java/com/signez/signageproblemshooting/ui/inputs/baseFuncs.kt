@@ -17,6 +17,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.signez.signageproblemshooting.ErrorDetectActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -178,4 +179,10 @@ fun playVideoFromUri(context: Context, uri: Uri) {
         prepare()
         start()
     }
+}
+
+fun openErrorDetectActivity(context: Context) {
+    val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+    val intent = Intent(context, ErrorDetectActivity::class.java)
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
 }
