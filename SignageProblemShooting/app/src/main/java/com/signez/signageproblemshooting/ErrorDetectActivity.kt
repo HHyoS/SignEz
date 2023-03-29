@@ -134,8 +134,8 @@ class ErrorDetectActivity : ComponentActivity() {
             signage = analysisViewModel.getSignageById(signageId!!)
             cabinet = analysisViewModel.getCabinet(signageId)
             when (type) {
-//                REQUEST_DETECT_VIDEO -> detectVideo()
-//                REQUEST_DETECT_PHOTO -> detectPhoto()
+                REQUEST_DETECT_VIDEO -> detectVideo()
+                REQUEST_DETECT_PHOTO -> detectPhoto()
                 else -> {
                     Log.i("-------------State-----------", uri.toString())
                     Log.i("-------------State-----------", signage.toString())
@@ -175,12 +175,15 @@ class ErrorDetectActivity : ComponentActivity() {
             }
 
             try {
+                Log.d("VideoProcess", "1")
                 val resultId = analysisViewModel.saveResult()
                 inputStream?.copyTo(outputStream)
                 val videoCapture = VideoCapture()
                 videoCapture.open(tempFile.path)
+                Log.d("VideoProcess", "2")
 
                 val frameCount = videoCapture.get(Videoio.CAP_PROP_FRAME_COUNT).toInt()
+                Log.d("VideoProcess", "${frameCount.toString()}")
 
                 if (videoCapture.isOpened) {
                     val frameSize = Size(
@@ -191,6 +194,8 @@ class ErrorDetectActivity : ComponentActivity() {
                     var points: MutableList<Point>? = null
 
                     for (i in 0 until frameCount) {
+                        Log.d("VideoProcess", "${i.toString()}")
+
                         if (videoCapture.read(frame)) {
                             if (i == 0) {
                                 points = getCorners(frame)
@@ -231,6 +236,7 @@ class ErrorDetectActivity : ComponentActivity() {
                 }
 
             } catch (e: Exception) {
+                finish()
                 Log.e("VideoProcessing", "Error processing video file: ${e.localizedMessage}", e)
             } finally {
                 withContext(Dispatchers.IO) {
@@ -252,6 +258,19 @@ class ErrorDetectActivity : ComponentActivity() {
                 applicationContext,
                 uri
             )
+            if (originalImage == null) {
+                Log.e("비상---------------------", "초비상------------------------")
+                finish()
+            }
+
+            Log.d(
+                "Image Size",
+                "${originalImage!!.toString()}"
+            )
+//            Log.d(
+//                "Image Size",
+//                "${originalImage!!.width.toString()}   ${originalImage!!.width.toString()}"
+//            )
 
             val width = signage.width.toInt() * 100
             val height = signage.height.toInt() * 100
@@ -409,13 +428,49 @@ class ErrorDetectActivity : ComponentActivity() {
 
     private fun getCorners(originalMat: Mat): MutableList<Point> {
         var points = mutableListOf<Point>()
-        //
-        //
-        //
-        //
-        //
+
+        val grayMat = Mat()
+        Imgproc.cvtColor(originalMat, grayMat, Imgproc.COLOR_BGR2GRAY)
+        val gauss = Mat()
+        Imgproc.GaussianBlur(grayMat, gauss, Size(5.0, 5.0), 0.0)
+        val edged = Mat()
+        Imgproc.Canny(gauss, edged, 30.0, 80.0)
+
+        val contours: MutableList<MatOfPoint> = ArrayList()
+        val hierarchy = Mat()
+        Imgproc.findContours(
+            edged,
+            contours,
+            hierarchy,
+            Imgproc.RETR_CCOMP,
+            Imgproc.CHAIN_APPROX_SIMPLE
+        )
+
+        // contour 중 특정 크기 이상의 사각형인 contour를 찾습니다.
+        val filteredContours = contours.filter { Imgproc.contourArea(it) > 10000 }
+
+        // 근사치를 사용하여 다각형으로 변환합니다.
+        val approxContours = filteredContours.map { contour ->
+            val epsilon = 0.01 * Imgproc.arcLength(MatOfPoint2f(*contour.toArray()), true)
+            val approx = MatOfPoint2f()
+            Imgproc.approxPolyDP(MatOfPoint2f(*contour.toArray()), approx, epsilon, true)
+            MatOfPoint(*approx.toArray())
+        }
+
+        // 네 모서리를 가진 contour를 찾습니다.
+        val quadContours = approxContours.filter { it.toList().size == 4 }
+
+        // 면적이 가장 큰 contour를 찾습니다.
+        val maxContour = quadContours.maxByOrNull { Imgproc.contourArea(it) }
+
+        if (maxContour != null) {
+            points = maxContour.toList()
+        }
+
 
         if (points.size != 4) throw SignageNotFoundException("Signage Not Found")
+
+        Log.i("Points", points.toString())
         return points
     }
 
