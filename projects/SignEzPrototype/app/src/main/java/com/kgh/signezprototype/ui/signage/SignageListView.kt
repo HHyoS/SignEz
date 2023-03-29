@@ -1,6 +1,7 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -52,7 +53,10 @@ fun SignageInformationScreen(
     onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: AnalysisViewModel
+    viewModel: AnalysisViewModel,
+    detailViewModel: SignageViewModel,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -65,12 +69,16 @@ fun SignageInformationScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "사이니지 정보 입력",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         floatingActionButton = {
             SignEzFloatingButton(
-                onClickEvent = { navController.navigate(AddSignageDestination.route) }
+                onClickEvent = {
+                    detailViewModel.init()
+                    navController.navigate(AddSignageDestination.route)
+                }
             )
         },
         bottomBar = {
@@ -108,7 +116,7 @@ fun SignageInformationScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.99F)
+                            .fillMaxHeight( if (selectedId > -1) {0.89F} else {0.99F})
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
@@ -127,15 +135,6 @@ fun SignageInformationScreen(
                         )
                     }
 
-                    // 삭제하시나여?
-                    if (selectedId > -1) {
-                        Button(onClick = {
-                            viewModel.signageId.value = selectedId
-                            navController.popBackStack()
-                        }) {
-                            Text(text = "선택")
-                        }
-                    }
 
                 }
             }

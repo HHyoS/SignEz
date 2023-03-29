@@ -36,6 +36,9 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
     override var imageUri = mutableStateOf(Uri.EMPTY)
     override var type = 0;
     lateinit var cabinet: MutableState<Cabinet>
+    val sWidth = mutableStateOf("") // 사이니지
+    val sHeight = mutableStateOf("")  // 사이니지
+    val sName = mutableStateOf("")
 
     fun setSelectedSignageId(id: Long) {
         _selectedSignageId.value = id
@@ -43,6 +46,15 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+    }
+
+    fun init() {
+        mCurrentPhotoPath.value = ""
+        imageUri.value = Uri.EMPTY
+        sWidth.value = ""
+        sHeight.value = ""
+        sName.value = ""
+        selectedCabinetId.value = -1L
     }
 
     fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
@@ -162,16 +174,16 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
         signageRepository.insertSignage(testAnalysisResult10)
     }
 
-    fun saveItem(name:String,width:Double,height:Double,bitmap:Bitmap,modelId:Long=0) = viewModelScope.launch {
+    fun saveItem(bitmap:Bitmap,modelId:Long=0) = viewModelScope.launch {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
 
         val newSignage = Signage(
-            name=name,
-            height =height,
-            width=width,
+            name=sName.value,
+            height =sHeight.value.toDouble(),
+            width=sWidth.value.toDouble(),
             heightCabinetNumber = 1,
             widthCabinetNumber = 1,
             modelId = modelId,
@@ -200,6 +212,11 @@ class SignageViewModel(private val signageRepository: SignagesRepository, privat
         return cabinet
     }
 
+    suspend fun getSignageList(): List<Signage> {
+        val signageList: List<Signage> =
+            signageRepository.getSignageList()
+        return signageList
+    }
 }
 
 

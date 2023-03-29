@@ -8,26 +8,35 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import com.kgh.signezprototype.R
 import com.kgh.signezprototype.SignEzTopAppBar
 import com.kgh.signezprototype.pickers.VideoPicker
 import com.kgh.signezprototype.pickers.getVideoTitle
 import com.kgh.signezprototype.pickers.loadVideoMetadata
 import com.kgh.signezprototype.ui.analysis.AnalysisViewModel
+import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
+import com.kgh.signezprototype.ui.components.FocusBlock
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
+import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,15 +54,17 @@ fun VideoAnalysis(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     viewModel: VideoViewModel,
-    analysisViewModel: AnalysisViewModel
+    analysisViewModel: AnalysisViewModel,
+    modifier: Modifier = Modifier,
 ) {
-    val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
-    var videoTitle by remember { mutableStateOf("") }
+    var videoTitle by remember { mutableStateOf("-") }
     var videoLength by remember { mutableStateOf(0L) }
     var videoSize by remember { mutableStateOf(0L) }
-    var videoFrame by remember { mutableStateOf(defaultBitmap) }
+    var videoFrame by remember { mutableStateOf(bitmap) }
 
     val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
         val retriever = MediaMetadataRetriever()
@@ -104,112 +115,139 @@ fun VideoAnalysis(
     }
 
     Scaffold(
+        modifier = Modifier
+            .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = VideoScreenDestination.titleRes,
+//                title = VideoScreenDestination.titleRes,
+                title = "영상 분석",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
+        },
+        bottomBar = {
+            BottomDoubleFlatButton(
+                leftTitle = "취소",
+                rightTitle = "분석하기",
+                isLeftUsable = true,
+                isRightUsable = false,
+                leftOnClickEvent = onNavigateUp,
+                rightOnClickEvent = {  /* 분석하기 이벤트를 넣으면 됨 */ }
+            )
         }
     ) { innerPadding ->
+        Spacer(modifier = modifier.padding(innerPadding))
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
+                .padding(start = 16.dp, end = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            contentAlignment = Alignment.TopCenter
         ) {
-
-            Column(
-                modifier = Modifier
-                    .align(alignment = Alignment.TopCenter)
-                    .padding(start = 16.dp, end = 16.dp)
-                    .fillMaxHeight(),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
-                ) {
-                    Text(
-                        text = "영상 분석",
-                        modifier = Modifier.padding(16.dp),
-                        fontSize = 40.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceAround
+            Column {
+                Spacer(modifier = modifier.padding(5.dp))
+                if (viewModel.videoUri.value == Uri.EMPTY) {
+                    Box(
+                        modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.weight(0.5f)
-                        ) {
-                            VideoPicker(onVideoSelected = { address ->
-                                viewModel.videoUri.value = Uri.parse(address)
-                                videoFrame = defaultBitmap
-                            })
-                        }
-
-                        Column(
-                            modifier = Modifier.weight(0.5f)
-                        ) {
-                            IntentButton(title = "카메라") {
-                                dispatchTakeVideoIntent(activity, viewModel)
-                            }
-
-//                        OutlinedButton(
-//                            onClick = {
-//                                viewModel.videoUri.value = Uri.EMPTY
-//                                videoFrame = defaultBitmap
-//                            },
-//                            shape = RoundedCornerShape(20.dp),
-//                            border = BorderStroke(2.dp, Color.Blue),
-//                            colors = ButtonDefaults.outlinedButtonColors(
-//                                backgroundColor = Color.White,
-//                                contentColor = Color.Blue
-//                            ),
-//                            modifier = Modifier.padding(16.dp)
-//                        ){
-//                            Text("Clear")
-//                        }
-                        }
-                    }
-                    Log.d("compare", "$videoFrame $viewModel.videoUri")
-                    if (!videoFrame.sameAs(defaultBitmap)) {
-                        Column {
-                            Box(
+                        imageBitmap.let {
+                            Image(
+                                bitmap = it.asImageBitmap(),
+                                contentDescription = "rep Image",
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
-                                    .height(400.dp)
-                            ) {
-                                Image(
-                                    bitmap = videoFrame.asImageBitmap(),
-                                    contentDescription = "Video frame",
-                                    contentScale = ContentScale.FillBounds,
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .align(Alignment.Center)
-                                        .clickable(onClick = {
-                                            val intent = Intent(Intent.ACTION_VIEW)
-                                            intent.setDataAndType(
-                                                viewModel.videoUri.value,
-                                                "video/*"
-                                            )
+                                    .height(200.dp)
+//                                    .fillMaxHeight(0.4f)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = OneBGDarkGrey)
+                            )
+                        }
+                        Text(
+                            text = "분석할 영상을 추가해 주세요.",
+                            modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
+                            style = TextStyle(color = Color.Black), // Customize the text style
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    ) {
+                        imageBitmap.let {
+                            Image(
+                                bitmap = videoFrame.asImageBitmap(),
+                                contentDescription = "rep Image",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = MaterialTheme.colors.onSurface)
+                            )
+                        }
+                    }
+                }
+
+                FocusBlock(
+                    title = "영상정보",
+                    subtitle = "제목 : $videoTitle",
+                    infols = listOf("길이 : $videoLength ms", "용량 : $videoSize byte"),
+                    buttonTitle = "입력",
+                    isbuttonVisible = false,
+                    buttonOnclickEvent = {},
+                    modifier = Modifier,
+                )
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Column(
+                        modifier = Modifier.weight(0.5f)
+                    ) {
+                        VideoPicker(onVideoSelected = { address ->
+                            viewModel.videoUri.value = Uri.parse(address)
+                            videoFrame = bitmap
+                        })
+                    }
+
+                    Column(
+                        modifier = Modifier.weight(0.5f)
+                    ) {
+                        IntentButton(title = "카메라") {
+                            dispatchTakeVideoIntent(activity, viewModel)
+                        }
+                    }
+                }
+            }//Column
+
+
+
+//            if (!videoFrame.sameAs(bitmap)) {
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .border(BorderStroke(width = 4.dp, color = Color.Black))
+//                            .height(400.dp)
+//                    ) {
+//                        Image(
+//                            bitmap = videoFrame.asImageBitmap(),
+//                            contentDescription = "Video frame",
+//                            contentScale = ContentScale.FillBounds,
+//                            modifier = Modifier
+//                                .fillMaxHeight()
+//                                .align(Alignment.Center)
+//                                .clickable(onClick = {
+//                                    val intent = Intent(Intent.ACTION_VIEW)
+//                                    intent.setDataAndType(
+//                                        viewModel.videoUri.value,
+//                                        "video/*"
+//                                    )
 //                                        intent.putExtra("loop", true) // 비디오 반복재생 설정
 //                                        intent.putExtra("position", 5000) ms 단위로 비디오 시작점 지정
 //                                        intent.putExtra("control", false) // 재생여부등 기본긴으 컨트롤러 키기
 //                                        intent.putExtra("quality", "1080p") 화질 조정정                                        startActivity(context,intent,null)
-                                        })
-                                )
-                            }
-                            Text(text = "영상 제목 : $videoTitle")
-                            Text(text = "영상 길이 : $videoLength ms")
-                            Text(text = "영상 크기 : $videoSize byte")
-                        }
-                    }
+//                                })
+//                        )
+//                    }
+//                }
 
-                }
-            }
-        }//최외곽 컬럼 끝
-
+        }
     }
-
-}
+}//최외곽 컬럼 끝

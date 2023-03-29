@@ -1,9 +1,11 @@
 package com.kgh.signezprototype.ui.signage
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,25 +22,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
+import com.kgh.signezprototype.R
 import com.kgh.signezprototype.SignEzTopAppBar
-import com.kgh.signezprototype.data.entities.Cabinet
 import com.kgh.signezprototype.fields.CustomTextInput
 import com.kgh.signezprototype.fields.EditNumberField
 import com.kgh.signezprototype.pickers.ImagePicker
 import com.kgh.signezprototype.ui.components.BottomDoubleFlatButton
-import com.kgh.signezprototype.ui.components.BottomSingleFlatButton
+import com.kgh.signezprototype.ui.components.FocusBlock
 import com.kgh.signezprototype.ui.components.IntentButton
 import com.kgh.signezprototype.ui.components.WhiteButton
 import com.kgh.signezprototype.ui.inputs.dispatchTakePictureIntent
 import com.kgh.signezprototype.ui.navigation.NavigationDestination
 import com.kgh.signezprototype.ui.theme.OneBGDarkGrey
-import com.kgh.signezprototype.ui.theme.OneBGGrey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,7 +56,9 @@ object AddSignageDestination : NavigationDestination {
 @Composable
 fun AddSignageScreen(
     modifier: Modifier = Modifier, activity: Activity, viewModel: SignageViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
@@ -62,16 +67,28 @@ fun AddSignageScreen(
     val context = LocalContext.current
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
-
-    val sWidth = remember { mutableStateOf("") } // 사이니지
-    val sHeight = remember { mutableStateOf("") } // 사이니지
-    val sName = remember { mutableStateOf("") }
     val allFieldsNotEmpty = (
-            sName.value.isNotEmpty() &&
-                    sWidth.value.isNotEmpty() &&
-                    sHeight.value.isNotEmpty()
+            viewModel.sName.value.isNotEmpty() &&
+                    viewModel.sWidth.value.isNotEmpty() &&
+                    viewModel.sHeight.value.isNotEmpty()
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
+
+    val imageLoadingScope = CoroutineScope(Dispatchers.Main)
+    // Load the image asynchronously using coroutines
+    fun loadImageAsync(context: Context, contentUri: Uri) {
+        imageLoadingScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    // Load the image bitmap on a background thread
+                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+                } catch (e: Exception) {
+                    // Handle any errors that occur while loading the image
+                    Log.e("Error", "Error loading image", e)
+                }
+            }
+        }
+    }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
@@ -84,7 +101,8 @@ fun AddSignageScreen(
     }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
-        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
+        loadImageAsync(context, contentUri)
     }
 
     androidx.compose.material.Scaffold(
@@ -94,7 +112,8 @@ fun AddSignageScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "새 사이니지 추가",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         bottomBar = {
@@ -108,9 +127,6 @@ fun AddSignageScreen(
                     coroutineScope.launch {
                         try {
                             viewModel.saveItem(
-                                name = sName.value,
-                                width = sWidth.value.toDouble(),
-                                height = sHeight.value.toDouble(),
                                 bitmap = imageBitmap,
                                 modelId = viewModel.selectedCabinetId.value
                             )
@@ -134,7 +150,7 @@ fun AddSignageScreen(
             contentAlignment = Alignment.TopCenter
         ) {
             Column {
-                Spacer(modifier = modifier.padding(15.dp))
+                Spacer(modifier = modifier.padding(5.dp))
                 if (viewModel.imageUri.value == Uri.EMPTY) {
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
@@ -164,15 +180,6 @@ fun AddSignageScreen(
                     ) {
 
                         imageBitmap.let {
-//                        Image(
-//                            bitmap = it.asImageBitmap(),
-//                            contentDescription = "rep Image",
-//                            modifier = Modifier
-//                                .fillMaxWidth(0.9f)
-//                                .fillMaxHeight(0.3f)
-//                                .clip(RoundedCornerShape(15.dp))
-//                                .background(color = OneBGDarkGrey)
-//                        )
                             Image(
                                 bitmap = it.asImageBitmap(),
                                 contentDescription = "rep Image",
@@ -244,8 +251,8 @@ fun AddSignageScreen(
 
                         ) {
                             CustomTextInput(
-                                value = sName.value,
-                                onValueChange = { it -> sName.value = it },
+                                value = viewModel.sName.value,
+                                onValueChange = { it -> viewModel.sName.value = it },
                                 placeholder = "사이니지 이름"
                             )
                         }
@@ -262,8 +269,8 @@ fun AddSignageScreen(
                                 keyboardActions = KeyboardActions(
                                     onDone = { focusManager.clearFocus() }
                                 ),
-                                value = sWidth.value,
-                                onValueChange = { sWidth.value = it },
+                                value = viewModel.sWidth.value,
+                                onValueChange = { viewModel.sWidth.value = it },
                                 unit = "mm"
                             )
                         }
@@ -281,8 +288,8 @@ fun AddSignageScreen(
                                 keyboardActions = KeyboardActions(
                                     onDone = { focusManager.clearFocus() }
                                 ),
-                                value = sHeight.value,
-                                onValueChange = { sHeight.value = it },
+                                value = viewModel.sHeight.value,
+                                onValueChange = { viewModel.sHeight.value = it },
                                 unit = "mm"
                             )
                         }
@@ -290,12 +297,9 @@ fun AddSignageScreen(
                     }
                 }
 
-
-
-
                 if (viewModel.selectedCabinetId.value == -1L) {
                     WhiteButton(title = "캐비닛 스펙 추가하기", isUsable = true) {
-                        navController.navigate(CabinetListScreenDestination.route + "/edit")
+                        navController.navigate(CabinetListScreenDestination.route + "/add")
                     }
 //                    OutlinedButton(
 //                        onClick = {
@@ -313,33 +317,45 @@ fun AddSignageScreen(
 //                    }
                 } // 캐비닛 정보 선택 구간
                 else {
-                    Box {
-                        Column {
-                            OutlinedButton(
-                                onClick = {
-                                    navController.navigate(CabinetListScreenDestination.route)
-                                },
-                                shape = RoundedCornerShape(20.dp),
-                                border = BorderStroke(2.dp, Color.Blue),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    backgroundColor = Color.White,
-                                    contentColor = Color.Blue
-                                ),
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text("변경")
-                            }
-                            Text(text = "캐비닛 스펙")
-                            Text(text = cabinetState.cabinet.name)
-                            Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
-                            Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
-                            Text(text = "${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}")
-                        }
-                    }
-                } // 캐비닛 변경 버튼 else문
+                    FocusBlock(
+                        title = "캐비닛 스펙",
+                        subtitle = cabinetState.cabinet.name,
+                        infols = listOf(
+                            "너비 : ${cabinetState.cabinet.cabinetWidth} mm",
+                            "높이 : ${cabinetState.cabinet.cabinetHeight} mm",
+                            "모듈 : ${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}"
+                        ),
+                        buttonTitle = "변경",
+                        isbuttonVisible = true,
+                        buttonOnclickEvent = { navController.navigate(CabinetListScreenDestination.route + "/add") },
+                        modifier = Modifier,
+                    )
 
-
-            }// 화면 전체 컬럼 끝
-        }// 화면 전체 박스 끝
-    }
+                    //
+//                    Box {
+//                        Column {
+//                            OutlinedButton(
+//                                onClick = {
+//                                    navController.navigate(CabinetListScreenDestination.route+"/add")
+//                                },
+//                                shape = RoundedCornerShape(20.dp),
+//                                border = BorderStroke(2.dp, Color.Blue),
+//                                colors = ButtonDefaults.outlinedButtonColors(
+//                                    backgroundColor = Color.White,
+//                                    contentColor = Color.Blue
+//                                ),
+//                                modifier = Modifier.padding(16.dp)
+//                            ) {
+//                                Text("변경")
+//                            }
+//                            Text(text = "캐비닛 스펙")
+//                            Text(text = cabinetState.cabinet.name)
+//                            Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
+//                            Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
+//                            Text(text = "${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}")
+//                        }
+                }
+            } // 캐비닛 변경 버튼 else문
+        }// 화면 전체 컬럼 끝
+    }// 화면 전체 박스 끝
 }

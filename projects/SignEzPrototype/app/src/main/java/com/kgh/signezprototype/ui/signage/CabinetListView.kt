@@ -47,8 +47,10 @@ fun CabinetInformationScreen(
     navController: NavHostController,
     signageViewModel: SignageViewModel,
     detailViewModel: SignageDetailViewModel,
-    mode: String
-    ) {
+    mode: String,
+    navigateBack: () -> Unit,
+    onNavigateUp: () -> Unit,
+) {
 
     val focusManager = LocalFocusManager.current
     var selectedId: Long by remember { mutableStateOf(-1) }
@@ -59,7 +61,8 @@ fun CabinetInformationScreen(
         topBar = {
             SignEzTopAppBar(
                 title = "캐비닛 정보 입력",
-                canNavigateBack = true
+                canNavigateBack = true,
+                navigateUp = onNavigateUp
             )
         },
         floatingActionButton = {
@@ -69,9 +72,16 @@ fun CabinetInformationScreen(
         },
         bottomBar = {
             if (selectedId != -1L) {
-                BottomSingleFlatButton(title = "선택", isUsable = true) {
-                    signageViewModel.selectedCabinetId.value = selectedId
-                    navController.popBackStack()
+                if (mode == "edit") {
+                    BottomSingleFlatButton(title = "선택", isUsable = true) {
+                        detailViewModel.newCabinetId.value = selectedId
+                        navController.popBackStack()
+                    }
+                } else {
+                    BottomSingleFlatButton(title = "선택", isUsable = true) {
+                        signageViewModel.selectedCabinetId.value = selectedId
+                        navController.popBackStack()
+                    }
                 }
             }
         },
@@ -103,41 +113,42 @@ fun CabinetInformationScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.99F)
+                            .fillMaxHeight( if (selectedId != -1L) {0.89F} else {0.99F})
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        CabinetList(onItemClick = { cabinet ->
-                            run {
-                                if (selectedId == cabinet.id) {
-                                    selectedId = -1
-                                } else {
-                                    selectedId = cabinet.id
+                        CabinetList(
+                            onItemClick = { cabinet ->
+                                run {
+                                    if (selectedId == cabinet.id) {
+                                        selectedId = -1
+                                    } else {
+                                        selectedId = cabinet.id
+                                    }
                                 }
-                            }
-                        }, selectedId = selectedId,
-                            navController = navController)
+                            }, selectedId = selectedId,
+                            navController = navController
+                        )
                     }
                     // 이거 지우나요?
-                    if (selectedId != -1L) {
-                        if (mode == "edit") {
-                            Button(onClick = {
-                                detailViewModel.newCabinetId.value = selectedId
-                                navController.popBackStack()
-                            }) {
-                                Text(text = "선택")
-                            }
-                        } else {
-                            Button(onClick = {
-                                signageViewModel.selectedCabinetId.value = selectedId
-                                navController.popBackStack()
-                            }) {
-                                Text(text = "선택")
-                            }
-                        }
-
-                    }
+//                    if (selectedId != -1L) {
+//                        if (mode == "edit") {
+//                            Button(onClick = {
+//                                detailViewModel.newCabinetId.value = selectedId
+//                                navController.popBackStack()
+//                            }) {
+//                                Text(text = "선택")
+//                            }
+//                        } else {
+//                            Button(onClick = {
+//                                signageViewModel.selectedCabinetId.value = selectedId
+//                                navController.popBackStack()
+//                            }) {
+//                                Text(text = "선택")
+//                            }
+//                        }
+//                    }
                 }
             }
         }
@@ -150,7 +161,7 @@ fun CabinetList(
     modifier: Modifier = Modifier,
     viewModel: CabinetViewModel = viewModel(factory = AppViewModelProvider.Factory),
     selectedId: Long,
-    navController:NavController
+    navController: NavController
 ) {
     val cabinetListState by viewModel.cabinetListState.collectAsState()
     val itemList = cabinetListState.itemList
@@ -169,7 +180,8 @@ fun CabinetList(
                     cabinet = item,
                     onItemClick = onItemClick,
                     selectedId = selectedId,
-                    navController = navController)
+                    navController = navController
+                )
                 Divider(
                     modifier = Modifier
                         .height(1.dp)
@@ -189,14 +201,15 @@ private fun InventoryItem(
     selectedId: Long,
     navController: NavController
 ) {
-    Row(modifier = modifier
+    Row(
+        modifier = modifier
 //        .clickable {  }
-        .fillMaxWidth()
-        .conditional(selectedId == cabinet.id) {
-            background(
-                color = Color(0xFFE6E6E6)
-            )
-        },
+            .fillMaxWidth()
+            .conditional(selectedId == cabinet.id) {
+                background(
+                    color = Color(0xFFE6E6E6)
+                )
+            },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {

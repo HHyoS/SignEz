@@ -52,4 +52,6 @@ interface SignagesRepository {
     suspend fun updateSignage(signage: Signage)
 
     suspend fun getSignageById(signageId: Long) : Signage
+
+    suspend fun getSignageList(): List<Signage>
 }
