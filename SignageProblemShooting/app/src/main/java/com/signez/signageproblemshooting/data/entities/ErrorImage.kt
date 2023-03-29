@@ -2,10 +2,7 @@ package com.signez.signageproblemshooting.data.entities
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import androidx.room.TypeConverter
+import androidx.room.*
 import java.io.ByteArrayOutputStream
 
 @Entity(tableName = "error_images",
@@ -20,6 +17,7 @@ import java.io.ByteArrayOutputStream
     ])
 data class ErrorImage(
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     var id: Long = 0,
     var error_module_id: Long,
     var evidence_image: ByteArray? = null

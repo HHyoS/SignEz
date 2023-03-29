@@ -5,7 +5,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
@@ -14,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.signez.signageproblemshooting.ui.theme.NotoSansKR
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 @Composable
 fun LoadingSpinner(
@@ -65,7 +64,7 @@ fun LoadingSpinner(
 @Preview
 @Composable
 fun SpinnerPreview() {
-    SignEzPrototypeTheme(darkTheme = false) {
+    SignEzTheme(darkTheme = false) {
         var inprogressFrame =  remember { mutableStateOf(0) }
         var totalFrame = remember { mutableStateOf(1) }
         totalFrame.value = 300
