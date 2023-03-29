@@ -16,7 +16,7 @@ import com.bumptech.glide.Glide
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.MainViewModelFactory
-import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
+//import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
@@ -91,6 +91,9 @@ class ErrorDetectActivity : ComponentActivity() {
         }
     }
 
+    fun getModel() : Module {
+        return Module.load(assetFilePath(SignEzApplication.instance, signageDetectModuleFileName))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -133,7 +136,7 @@ class ErrorDetectActivity : ComponentActivity() {
 
         setContent {
             SignEzPrototypeTheme {
-                AnalysisProgress()
+           //     AnalysisProgress()
             }
         }
 
