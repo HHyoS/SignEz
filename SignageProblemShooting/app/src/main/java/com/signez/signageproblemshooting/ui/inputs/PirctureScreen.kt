@@ -76,7 +76,7 @@ fun PictureAnalysis(
     viewModel: PictureViewModel,
     analysisViewModel: AnalysisViewModel,
     modifier: Modifier = Modifier,
-    navController:NavController
+    navController: NavController
 ) {
     val context = LocalContext.current
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -86,13 +86,14 @@ fun PictureAnalysis(
     val coroutineScope = rememberCoroutineScope()
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
+    val REQUEST_DETECT_PHOTO: Int = 101
 
     //test start
     var mModule: Module? = null
-    var mWidth : Int = 1
-    var mHeight : Int = 2
-    var mmWidth : Int = 3
-    var mmHeight :Int = 5
+    var mWidth: Int = 1
+    var mHeight: Int = 2
+    var mmWidth: Int = 3
+    var mmHeight: Int = 5
     var mImgScaleX = 0f
     var mImgScaleY = 0f
     var mIvScaleX = 0f
@@ -151,10 +152,11 @@ fun PictureAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
+
                     // test
-                    if(contentUri == Uri.EMPTY)
-                        Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-                    else{
+                    if (contentUri == Uri.EMPTY)
+                        Toast.makeText(context, "사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    else {
                         mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
                         mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
                         mIvScaleX = (if (mmWidth > mmHeight) mWidth
@@ -172,24 +174,29 @@ fun PictureAnalysis(
                         }
                         val thread = object : Thread() {
                             override fun run() {
-                                Log.d("hyoyo","1")
+                                Log.d("hyoyo", "1")
                                 val resizedBitmap = Bitmap.createScaledBitmap(
-                                    (BitmapFactory.decodeStream(activity.contentResolver.openInputStream(contentUri)))!!,
+                                    (BitmapFactory.decodeStream(
+                                        activity.contentResolver.openInputStream(
+                                            contentUri
+                                        )
+                                    ))!!,
                                     PrePostProcessor.mInputWidth,
                                     PrePostProcessor.mInputHeight,
                                     true
                                 )
-                                Log.d("hyoyo","{")
+                                Log.d("hyoyo", "{")
                                 val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
                                     resizedBitmap,
                                     PrePostProcessor.NO_MEAN_RGB,
                                     PrePostProcessor.NO_STD_RGB
                                 )
-                                Log.d("hyoyo","3")
-                                val outputTuple = mModule!!.forward(IValue.from(inputTensor)).toTuple()
+                                Log.d("hyoyo", "3")
+                                val outputTuple =
+                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
                                 val outputTensor = outputTuple[0].toTensor()
                                 val outputs = outputTensor.dataAsFloatArray
-                                Log.d("hyoyo","4")
+                                Log.d("hyoyo", "4")
                                 val results = PrePostProcessor.outputsToNMSPredictions(
                                     outputs,
                                     mImgScaleX,
@@ -201,22 +208,34 @@ fun PictureAnalysis(
                                 )
 
                                 if (results != null) {
-                                    for(r in results!!) {
-                                        Log.d("test","${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
-                                                "${r.rect.bottom} @ ${r.score}")
+                                    Log.d("hyoyo", "5")
+                                    for (r in results!!) {
+                                        Log.d(
+                                            "test",
+                                            "${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
+                                                    "${r.rect.bottom} @ ${r.score}"
+                                        )
                                     }
+                                } else {
+                                    Log.d("hyoyo", "555555555555555555")
                                 }
                             }
                         }
                         thread.start()
                     }
                     //
-                /* 분석하기 이벤트를 넣으면 됨 */
+                    /* 분석하기 이벤트를 넣으면 됨 */
 //                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
-                    navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+
+//                    navController.popBackStack()
+//                    navController.navigate(ResultsHistoryDestination.route)
+//                    navController.navigate(ResultGridDestination.route)
+//                    openErrorDetectActivity(
+//                        context,
+//                        REQUEST_DETECT_PHOTO,
+//                        analysisViewModel.signageId.value,
+//                        analysisViewModel.imageContentUri.value
+//                    )
                 }
             )
         }
@@ -279,7 +298,11 @@ fun PictureAnalysis(
                             inJustDecodeBounds = true
                         }
                         // 사진 진짜크기
-                        BitmapFactory.decodeStream(activity.contentResolver.openInputStream(uri), null, options)
+                        BitmapFactory.decodeStream(
+                            activity.contentResolver.openInputStream(uri),
+                            null,
+                            options
+                        )
                         mmWidth = options.outWidth
                         mmHeight = options.outHeight
 
