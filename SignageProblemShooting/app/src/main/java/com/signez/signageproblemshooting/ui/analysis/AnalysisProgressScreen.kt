@@ -12,23 +12,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Signage
-import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
-import com.signez.signageproblemshooting.ui.signage.SignageViewModel
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
 
-object ResultGridDetailDestination : NavigationDestination {
-    override val route = "ResultGridDetailScreen"
-    override val titleRes = "ResultGridDetail"
-}
-
 @Composable
-fun ResultGridDetailView(
-    onItemClick: (Signage) -> Unit,
+fun AnalysisProgress(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: AnalysisViewModel,
-    navigateBack: () -> Unit,
-    onNavigateUp: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     androidx.compose.material.Scaffold(
@@ -38,8 +26,7 @@ fun ResultGridDetailView(
         topBar = {
             SignEzTopAppBar(
                 title = "분석 결과",
-                canNavigateBack = true,
-                navigateUp = onNavigateUp
+                canNavigateBack = false,
             )
         }
     ) { innerPadding ->
@@ -54,7 +41,7 @@ fun ResultGridDetailView(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Text(text="분석 도표 세부 페이지")
+                Text(text="분석중 페이지")
             }
         }
     }

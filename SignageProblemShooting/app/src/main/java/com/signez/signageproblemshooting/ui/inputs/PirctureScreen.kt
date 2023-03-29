@@ -29,12 +29,16 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.ImagePicker
 import com.signez.signageproblemshooting.pickers.loadImageMetadata
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
+import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
+import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.IntentButton
@@ -60,7 +64,8 @@ fun PictureAnalysis(
     onNavigateUp: () -> Unit,
     viewModel: PictureViewModel,
     analysisViewModel: AnalysisViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    navController:NavController
 ) {
     val context = LocalContext.current
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -118,9 +123,16 @@ fun PictureAnalysis(
                 leftTitle = "취소",
                 rightTitle = "분석하기",
                 isLeftUsable = true,
-                isRightUsable = false,
+                isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
-                rightOnClickEvent = {  /* 분석하기 이벤트를 넣으면 됨 */ }
+                rightOnClickEvent = {
+                /* 분석하기 이벤트를 넣으면 됨 */
+//                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
+                    navController.popBackStack()
+                    navController.navigate(ResultsHistoryDestination.route)
+                    navController.navigate(ResultGridDestination.route)
+                    openErrorDetectActivity(context)
+                }
             )
         }
     ) { innerPadding ->
