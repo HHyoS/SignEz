@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
@@ -100,6 +101,7 @@ fun PictureAnalysis(
     var mStartX = 0f
     var mStartY = 0f
     var imageUri by remember { mutableStateOf(contentUri) }
+    var rec : Rect? = null
     //test end
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
@@ -172,24 +174,25 @@ fun PictureAnalysis(
                         }
                         val thread = object : Thread() {
                             override fun run() {
-                                Log.d("hyoyo","1")
                                 val resizedBitmap = Bitmap.createScaledBitmap(
-                                    (BitmapFactory.decodeStream(activity.contentResolver.openInputStream(contentUri)))!!,
+                                    (BitmapFactory.decodeStream(
+                                        activity.contentResolver.openInputStream(
+                                            contentUri
+                                        )
+                                    ))!!,
                                     PrePostProcessor.mInputWidth,
                                     PrePostProcessor.mInputHeight,
                                     true
                                 )
-                                Log.d("hyoyo","{")
                                 val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
                                     resizedBitmap,
                                     PrePostProcessor.NO_MEAN_RGB,
                                     PrePostProcessor.NO_STD_RGB
                                 )
-                                Log.d("hyoyo","3")
-                                val outputTuple = mModule!!.forward(IValue.from(inputTensor)).toTuple()
+                                val outputTuple =
+                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
                                 val outputTensor = outputTuple[0].toTensor()
                                 val outputs = outputTensor.dataAsFloatArray
-                                Log.d("hyoyo","4")
                                 val results = PrePostProcessor.outputsToNMSPredictions(
                                     outputs,
                                     mImgScaleX,
@@ -199,24 +202,23 @@ fun PictureAnalysis(
                                     mStartX,
                                     mStartY
                                 )
-
-                                if (results != null) {
-                                    for(r in results!!) {
-                                        Log.d("test","${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
-                                                "${r.rect.bottom} @ ${r.score}")
-                                    }
-                                }
+                                if (results != null)
+                                    rec = results[0].rect
                             }
                         }
                         thread.start()
                     }
-                    //
+
                 /* 분석하기 이벤트를 넣으면 됨 */
 //                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
                     navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+
+                    if(rec != null){
+                        openErrorDetectActivity(context, rec!!)
+                    }
+
                 }
             )
         }
@@ -271,7 +273,7 @@ fun PictureAnalysis(
                                     Log.d("Image Size", "width: $width, height: $height")
                                 },
                         )
-
+                        rec = null
                         mWidth = LocalConfiguration.current.screenWidthDp
                         mHeight = LocalConfiguration.current.screenHeightDp
                         val uri = Uri.parse(contentUri.toString()) // 실제 Uri 주소를 사용하여 초기화합니다.

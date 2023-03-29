@@ -3,6 +3,7 @@ package com.signez.signageproblemshooting.ui.inputs
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.util.Log
@@ -69,7 +70,7 @@ fun VideoAnalysis(
     var videoLength by remember { mutableStateOf(0L) }
     var videoSize by remember { mutableStateOf(0L) }
     var videoFrame by remember { mutableStateOf(bitmap) }
-
+    var rec : Rect? = null
     val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, uri)
@@ -142,7 +143,7 @@ fun VideoAnalysis(
                     navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+                    openErrorDetectActivity(context,rec!!)
                 }
             )
         }

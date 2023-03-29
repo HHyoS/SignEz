@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
@@ -181,8 +182,9 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openErrorDetectActivity(context: Context) {
+fun openErrorDetectActivity(context: Context,rec : Rect) {
     val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
     val intent = Intent(context, ErrorDetectActivity::class.java)
+    intent.putExtra("Rect",rec)
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
 }

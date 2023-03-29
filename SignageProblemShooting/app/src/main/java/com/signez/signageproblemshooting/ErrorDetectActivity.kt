@@ -91,7 +91,7 @@ class ErrorDetectActivity : ComponentActivity() {
         }
     }
 
-    fun getModel() : Module {
+    fun getModel(): Module {
         return Module.load(assetFilePath(SignEzApplication.instance, signageDetectModuleFileName))
     }
 
@@ -136,7 +136,7 @@ class ErrorDetectActivity : ComponentActivity() {
 
         setContent {
             SignEzPrototypeTheme {
-           //     AnalysisProgress()
+                //     AnalysisProgress()
             }
         }
 
@@ -398,6 +398,12 @@ class ErrorDetectActivity : ComponentActivity() {
 
 
     private fun getCorners(originalMat: Mat): MutableList<Point> {
+        // hyosang
+
+
+
+
+
         var points = mutableListOf<Point>()
         //
         //
@@ -470,3 +476,4 @@ class ErrorDetectActivity : ComponentActivity() {
         super.onBackPressed()
     }
 }
+ 
