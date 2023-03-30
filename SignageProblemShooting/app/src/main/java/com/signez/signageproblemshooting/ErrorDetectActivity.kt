@@ -140,7 +140,7 @@ class ErrorDetectActivity : ComponentActivity() {
 
         setContent {
             SignEzTheme {
-                AnalysisProgress()
+                AnalysisProgress(analysisViewModel = analysisViewModel)
             }
         }
 
@@ -283,6 +283,8 @@ class ErrorDetectActivity : ComponentActivity() {
                     uri
                 )
             }
+            analysisViewModel.progressFloat.value = 0.1f
+
             if (originalImage != null) {
                 Log.d(
                     "Image Size",
@@ -304,13 +306,16 @@ class ErrorDetectActivity : ComponentActivity() {
 
                 val resultId = analysisViewModel.saveResult(signage.id)
                 Log.d("ImageProcess", "resultId = ${resultId.toString()}")
+                analysisViewModel.progressFloat.value = 0.2f
 
                 val originalMat: Mat = bitmapToMat(originalImage!!)
                 try {
                     val points: MutableList<Point> = getCorners(originalMat)
                     Log.d("ImageProcess", "points = ${points.toString()}")
+                    analysisViewModel.progressFloat.value = 0.3f
 
                     val warpedMat = getWarp(originalMat, points, width, height)
+                    analysisViewModel.progressFloat.value = 0.5f
 
                     val errorModuleList = getPredictions(
                         warpedMat,
@@ -321,6 +326,7 @@ class ErrorDetectActivity : ComponentActivity() {
                         moduleHeight,
                         resultId
                     )
+                    analysisViewModel.progressFloat.value = 0.8f
                     Log.d("ImageProcess", "errorModuleList = ${errorModuleList.toString()}")
                     for (errorModule in errorModuleList) {
                         val processedMat: Mat =
@@ -334,12 +340,14 @@ class ErrorDetectActivity : ComponentActivity() {
                         Utils.matToBitmap(processedMat, processedBitmap)
                         analysisViewModel.saveImage(processedBitmap, errorModule.id)
                     }
+                    analysisViewModel.progressFloat.value = 0.9f
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             } else {
                 Log.e("ImageProcess", "Image Load Fail!")
             }
+            analysisViewModel.progressFloat.value = 1.0f
 
         }
     }

@@ -44,7 +44,7 @@ fun LoadingSpinner(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = title+" (${kotlin.math.round(progress*100).toInt()}%)",
+                text = title + " (${kotlin.math.round(progress * 100).toInt()}%)",
                 style = TextStyle(
                     fontFamily = NotoSansKR,
                     fontWeight = FontWeight.Normal,
@@ -53,7 +53,7 @@ fun LoadingSpinner(
                 color = MaterialTheme.colors.onSurface,
                 modifier = Modifier.padding(10.dp),
             )
-//            LinearProgre4ssIndicator(
+//            LinearProgressIndicator(
 //                modifier = Modifier.width(80.dp),
 //                color = MaterialTheme.colors.primary,
 //                backgroundColor = MaterialTheme.colors.secondary
@@ -66,14 +66,14 @@ fun LoadingSpinner(
 @Composable
 fun SpinnerPreview() {
     SignEzTheme(darkTheme = false) {
-        var inprogressFrame =  remember { mutableStateOf(0) }
+        var inprogressFrame = remember { mutableStateOf(0) }
         var totalFrame = remember { mutableStateOf(1) }
         totalFrame.value = 300
-        var progressPercent = inprogressFrame.value/(totalFrame).value.toFloat()
+        var progressPercent = inprogressFrame.value / (totalFrame).value.toFloat()
 
         Column(modifier = Modifier.fillMaxSize()) {
             LoadingSpinner("분석 중", progressPercent)
-            Button(onClick = { inprogressFrame.value = inprogressFrame.value+1}){
+            Button(onClick = { inprogressFrame.value = inprogressFrame.value + 1 }) {
                 Text(text = inprogressFrame.value.toString())
             }
         }
