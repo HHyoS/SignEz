@@ -1,12 +1,9 @@
 package com.signez.signageproblemshooting.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -19,13 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.signez.signageproblemshooting.fields.CustomTextInput
-import com.signez.signageproblemshooting.fields.EditNumberField
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 /**
  *
@@ -427,10 +420,11 @@ fun BottomDoubleFlatButton(
 //    }
 //}
 
+
 @Preview
 @Composable
 fun ComponentPreview() {
-    SignEzPrototypeTheme(darkTheme = false) {
+    SignEzTheme(darkTheme = false) {
         Column() {
 //            FocusBlock(
 //                title = "사이니지 스펙",

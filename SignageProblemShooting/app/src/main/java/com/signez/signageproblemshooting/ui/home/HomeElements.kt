@@ -36,10 +36,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.signez.signageproblemshooting.MainActivity
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
@@ -47,8 +45,7 @@ import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.WhiteButton
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import com.signez.signageproblemshooting.ui.theme.OneRippleGrey
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 @Composable //지난 분석 결과 틀
 fun PastResult(
@@ -126,15 +123,17 @@ fun PastResult(
     }
 }
 
+
 //@Preview
 //@Composable
 //fun ComponentPreview() {
-//    SignEzPrototypeTheme(darkTheme = false) {
+//    SignEzTheme(darkTheme = false) {
 //        Column {
-//            PastResult(navController = navController)
+//            PastResult()
 //        }
 //    }
 //}
+
 
 @Composable // 사이니지 스펙 틀
 fun SignEzSpec(
