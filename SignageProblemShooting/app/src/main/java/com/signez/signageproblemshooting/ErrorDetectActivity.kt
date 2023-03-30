@@ -20,7 +20,8 @@ import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.inputs.MainViewModel
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 import kotlinx.coroutines.*
 import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.LoaderCallbackInterface
@@ -138,7 +139,7 @@ class ErrorDetectActivity : ComponentActivity() {
         val signageId: Long? = intents.extras?.getLong(REQUEST_SIGNAGE_ID)
 
         setContent {
-            SignEzPrototypeTheme {
+            SignEzTheme {
                 AnalysisProgress()
             }
         }
