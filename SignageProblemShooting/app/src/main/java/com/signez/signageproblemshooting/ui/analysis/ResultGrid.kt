@@ -166,29 +166,6 @@ fun ResultGridView(
                                     bottom = 8.dp
                                 )
                             )
-                        } else {
-                            LazyColumn(
-                                modifier = modifier.background(MaterialTheme.colors.surface),
-                                //            verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                items(items = modules, key = { it.id }) { item ->
-                                    Text(text = "${item.id}번 에러 모듈 좌표 : ${item.x} , ${item.y}"
-                                        ,modifier
-                                            .clickable(onClick = {
-                                                viewModel.selectedModuleX.value = item.x
-                                                viewModel.selectedModuleY.value = item.y
-                                                navController.navigate(ErrorImageDestination.route)
-                                            })
-                                            .height(50.dp)
-                                            .background(color= Color.Black)
-                                    )
-                                    Divider(
-                                        modifier = Modifier
-                                            .height(1.dp)
-                                            .fillMaxWidth(0.95f),
-                                        startIndent = 70.dp
-                                    )
-
 
                             Slider(
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp),
