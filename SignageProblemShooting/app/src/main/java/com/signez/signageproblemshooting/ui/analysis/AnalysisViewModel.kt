@@ -125,6 +125,14 @@ class AnalysisViewModel(
         return@runBlocking analysisResultRepository.insertResult(newResult)
     }
 
+    fun saveResult(signageId: Long) = runBlocking {
+        //
+        val newResult = AnalysisResult(
+            signageId = signageId
+        )
+        return@runBlocking analysisResultRepository.insertResult(newResult)
+    }
+
     suspend fun getRelatedImages(moduleId: Long): List<ErrorImage> {
         val images: List<ErrorImage> =
             errorImagesRepository.getImagesByModuleId(moduleId)

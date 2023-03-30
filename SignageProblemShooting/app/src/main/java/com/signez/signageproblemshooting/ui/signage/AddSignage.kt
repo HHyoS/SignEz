@@ -76,7 +76,8 @@ fun AddSignageScreen(
     val allFieldsNotEmpty = (
             viewModel.sName.value.isNotEmpty() &&
                     viewModel.sWidth.value.isNotEmpty() &&
-                    viewModel.sHeight.value.isNotEmpty()
+                    viewModel.sHeight.value.isNotEmpty() &&
+                    viewModel.selectedCabinetId.value > 0
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
 
@@ -147,6 +148,7 @@ fun AddSignageScreen(
                 rightOnClickEvent = {
                     coroutineScope.launch {
                         try {
+                            if(viewModel.selectedCabinetId.value < 1L) throw Exception("Cabinet Not Selected!")
                             viewModel.saveItem(
                                 bitmap = imageBitmap,
                                 modelId = viewModel.selectedCabinetId.value
