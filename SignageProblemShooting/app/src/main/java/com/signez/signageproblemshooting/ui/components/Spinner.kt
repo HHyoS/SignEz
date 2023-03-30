@@ -17,7 +17,8 @@ import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 @Composable
 fun LoadingSpinner(
-    progress: Float = 0F
+    title: String = "분석 중...",
+    progress: Float = 0F,
 ) {
     Box(
         contentAlignment = Alignment.Center
@@ -25,7 +26,7 @@ fun LoadingSpinner(
         CircularProgressIndicator(
             progress = 1f,
             modifier = Modifier
-                .size(200.dp)
+                .size(300.dp)
                 .padding(16.dp),
             strokeWidth = 10.dp,
             color = MaterialTheme.colors.secondary
@@ -33,7 +34,7 @@ fun LoadingSpinner(
         CircularProgressIndicator(
             progress = progress,
             modifier = Modifier
-                .size(200.dp)
+                .size(300.dp)
                 .padding(16.dp),
             strokeWidth = 10.dp,
             color = MaterialTheme.colors.primary
@@ -43,7 +44,7 @@ fun LoadingSpinner(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "분석 중... (${kotlin.math.round(progress*100).toInt()}%)",
+                text = title+" (${kotlin.math.round(progress*100).toInt()}%)",
                 style = TextStyle(
                     fontFamily = NotoSansKR,
                     fontWeight = FontWeight.Normal,
@@ -52,11 +53,11 @@ fun LoadingSpinner(
                 color = MaterialTheme.colors.onSurface,
                 modifier = Modifier.padding(10.dp),
             )
-            LinearProgressIndicator(
-                modifier = Modifier.width(80.dp),
-                color = MaterialTheme.colors.primary,
-                backgroundColor = MaterialTheme.colors.secondary
-            )
+//            LinearProgre4ssIndicator(
+//                modifier = Modifier.width(80.dp),
+//                color = MaterialTheme.colors.primary,
+//                backgroundColor = MaterialTheme.colors.secondary
+//            )
         }
     }
 }
@@ -71,7 +72,7 @@ fun SpinnerPreview() {
         var progressPercent = inprogressFrame.value/(totalFrame).value.toFloat()
 
         Column(modifier = Modifier.fillMaxSize()) {
-            LoadingSpinner(progressPercent)
+            LoadingSpinner("분석 중", progressPercent)
             Button(onClick = { inprogressFrame.value = inprogressFrame.value+1}){
                 Text(text = inprogressFrame.value.toString())
             }
