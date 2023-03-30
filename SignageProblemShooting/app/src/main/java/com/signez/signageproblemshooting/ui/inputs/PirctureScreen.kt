@@ -202,11 +202,19 @@ fun PictureAnalysis(
                                     mStartX,
                                     mStartY
                                 )
-                                if (results != null)
+                                if (results.size != 0) {
                                     rec = results[0].rect
+                                    Log.d("result[0]","${results[0].rect}")
+                                    Log.d("rec","${rec}")
+
+                                }
+                                else{
+                                    Log.d("what","????")
+                                }
                             }
                         }
                         thread.start()
+                        thread.interrupt()
                     }
 
                 /* 분석하기 이벤트를 넣으면 됨 */
@@ -215,8 +223,14 @@ fun PictureAnalysis(
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route)
 
-                    if(rec != null){
-                        openErrorDetectActivity(context, rec!!)
+                    if(rec == null){
+                        Log.d("start","is Null")
+                        openImageCropActivity(context, Rect(-999,-1,-1,-1),contentUri)
+                    }
+                    else{
+                        Log.d("null","not Null")
+                        openImageCropActivity(context, rec!!,contentUri)
+                        rec = null
                     }
 
                 }
@@ -271,7 +285,7 @@ fun PictureAnalysis(
                                     val width = ImageSize.width
                                     val height = ImageSize.height
                                     Log.d("Image Size", "width: $width, height: $height")
-                                },
+                                }
                         )
                         rec = null
                         mWidth = LocalConfiguration.current.screenWidthDp
@@ -284,7 +298,7 @@ fun PictureAnalysis(
                         BitmapFactory.decodeStream(activity.contentResolver.openInputStream(uri), null, options)
                         mmWidth = options.outWidth
                         mmHeight = options.outHeight
-
+                        Log.d("here","error")
 
 //                        imageBitmap?.let {
 //                            Image(

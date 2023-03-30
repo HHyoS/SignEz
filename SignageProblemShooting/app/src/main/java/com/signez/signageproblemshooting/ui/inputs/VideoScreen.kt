@@ -143,7 +143,7 @@ fun VideoAnalysis(
                     navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context,rec!!)
+                   // openErrorDetectActivity(context,rec!!,contentUri)
                 }
             )
         }

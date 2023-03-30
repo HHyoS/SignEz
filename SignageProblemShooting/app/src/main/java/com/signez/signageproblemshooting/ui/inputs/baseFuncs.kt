@@ -19,6 +19,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.signez.signageproblemshooting.ErrorDetectActivity
+import com.signez.signageproblemshooting.ImageCropActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -182,9 +183,25 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openErrorDetectActivity(context: Context,rec : Rect) {
+fun openImageCropActivity(context: Context,rec : Rect,uri : Uri) {
+    val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+    val intent = Intent(context, ImageCropActivity::class.java)
+    intent.putExtra("left",rec.left)
+    intent.putExtra("right",rec.right)
+    intent.putExtra("top",rec.top)
+    intent.putExtra("bottom",rec.bottom)
+    intent.putExtra("uri",uri.toString())
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
+}
+fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
     val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
     val intent = Intent(context, ErrorDetectActivity::class.java)
-    intent.putExtra("Rect",rec)
+    intent.putExtra("left",rec.left)
+    intent.putExtra("right",rec.right)
+    intent.putExtra("top",rec.top)
+    intent.putExtra("bottom",rec.bottom)
+    intent.putExtra("uri",uri.toString())
+    Log.d("start","start ${uri}")
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+    Log.d("end","end")
 }
