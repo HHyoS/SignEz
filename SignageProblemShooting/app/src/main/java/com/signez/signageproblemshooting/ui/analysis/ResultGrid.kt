@@ -3,6 +3,7 @@ package com.signez.signageproblemshooting.ui.analysis
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -165,6 +166,28 @@ fun ResultGridView(
                                     bottom = 8.dp
                                 )
                             )
+                        } else {
+                            LazyColumn(
+                                modifier = modifier.background(MaterialTheme.colors.surface),
+                                //            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(items = modules, key = { it.id }) { item ->
+                                    Text(text = "${item.id}번 에러 모듈 좌표 : ${item.x} , ${item.y}"
+                                        ,modifier
+                                            .clickable(onClick = {
+                                                viewModel.selectedModuleX.value = item.x
+                                                viewModel.selectedModuleY.value = item.y
+                                                navController.navigate(ErrorImageDestination.route)
+                                            })
+                                            .height(50.dp)
+                                            .background(color= Color.Black)
+                                    )
+                                    Divider(
+                                        modifier = Modifier
+                                            .height(1.dp)
+                                            .fillMaxWidth(0.95f),
+                                        startIndent = 70.dp
+                                    )
 
 
                             Slider(

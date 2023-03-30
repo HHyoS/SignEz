@@ -17,6 +17,7 @@ import com.signez.signageproblemshooting.ui.analysis.SignageState
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 
 class SignageDetailViewModel(private val signageRepository: SignagesRepository, private val cabinetRepository: CabinetsRepository) : ViewModel(),
@@ -45,6 +46,11 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         newCabinetId.value = -1L
     }
 
+    fun getCabinetById(modelId: Long) =
+        runBlocking {
+            return@runBlocking cabinetRepository.getNewCabinet(modelId)
+        }
+
     fun updateRecord(bitmap:Bitmap?,signage:Signage) = viewModelScope.launch {
         if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()
@@ -55,7 +61,6 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         signage.name = sName.value
         signage.width = sWidth.value.toDouble()
         signage.height = sHeight.value.toDouble()
-
         // 모듈 개수 계산식 반영 필요
         signage.modelId = if (newCabinetId.value > -1 ) {
             newCabinetId.value
@@ -63,6 +68,10 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         else {
             signage.modelId
         }
+        val this_cabinet = getCabinetById(signage.modelId)
+        signage.heightCabinetNumber = (signage.height/this_cabinet.cabinetHeight).toInt()
+        signage.widthCabinetNumber = (signage.width/this_cabinet.cabinetWidth).toInt()
+
         signageRepository.updateSignage(signage)
     }
 
