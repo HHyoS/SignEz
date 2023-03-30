@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -160,6 +161,7 @@ class ErrorDetectActivity : ComponentActivity() {
         val intents: Intent = intent
         val nullableType = intents.extras?.getInt(REQUEST_TYPE)
         val signageId: Long? = intents.extras?.getLong(REQUEST_SIGNAGE_ID)
+        analysisViewModel.progressMessage.value = "모델 읽는 중"
         if (intents.data == null || signageId == null || nullableType == null) {
             finish()
         }
@@ -192,78 +194,76 @@ class ErrorDetectActivity : ComponentActivity() {
             val moduleHeight: Float =
                 height.toFloat() / (signage.heightCabinetNumber * cabinet.moduleColCount)
 
-            val videoPath = getPathFromUri(applicationContext, uri)
-            if (videoPath == null) {
-                Log.e("VideoProcess", "Failed to get file path from URI")
-            }
-
-
             try {
+                analysisViewModel.progressMessage.value = "영상 읽는 중"
                 Log.d("VideoProcess", "1")
                 val resultId = analysisViewModel.saveResult(signage.id)
                 Log.d("VideoProcess", "2")
                 Log.d("VideoProcess", "3")
-                val videoCapture = VideoCapture()
-                Log.d("VideoProcess", "4")
-                var boo = videoCapture.open(videoPath, Videoio.CAP_ANDROID)
-                Log.d("VideoProcess", boo.toString())
+                val mediaMetadataRetriever = MediaMetadataRetriever()
+                mediaMetadataRetriever.setDataSource(applicationContext, uri)
 
-                val frameCount = videoCapture.get(Videoio.CAP_PROP_FRAME_COUNT).toInt()
+
+                Log.d("VideoProcess", "4")
+
+
+                val frameCount: Int =
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)!!
+                        .toInt()
+
                 Log.d("VideoProcess", "${frameCount.toString()}")
 
-                val frameCount2 = videoCapture.get(Videoio.CAP_PROP_POS_FRAMES).toInt()
-                Log.d("VideoProcess", "${frameCount2.toString()}")
+                val frameSize = Size(
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!
+                        .toDouble(),
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!
+                        .toDouble()
+                )
+                Log.d("VideoProcess", "${frameSize.toString()}")
+                var frame = Mat(frameSize, CvType.CV_8UC3)
+                var points: MutableList<Point>? = null
+                analysisViewModel.progressMessage.value = "영상 분석 중"
 
-                if (videoCapture.isOpened) {
-                    val frameSize = Size(
-                        videoCapture.get(Videoio.CAP_PROP_FRAME_WIDTH),
-                        videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT)
-                    )
-                    Log.d("VideoProcess", "${frameSize.toString()}")
-                    val frame = Mat(frameSize, CvType.CV_8UC3)
-                    var points: MutableList<Point>? = null
+                for (i in 0 until frameCount) {
+                    analysisViewModel.progressFloat.value = i.toFloat() / frameCount
+                    Log.d("VideoProcess", "${i.toString()}")
+                    val bitmapFrame: Bitmap? = mediaMetadataRetriever.getFrameAtIndex(i)
+                    Utils.bitmapToMat(bitmapFrame, frame)
 
-                    for (i in 0 until frameCount) {
-                        Log.d("VideoProcess", "${i.toString()}")
-
-                        if (videoCapture.read(frame)) {
-                            if (i == 0) {
-                                points = getCorners(frame)
-                            }
-                            if (points != null && points.size == 4) {
-                                val warpedMat = getWarp(frame, points, width, height)
-                                val errorModuleList = getPredictions(
-                                    warpedMat,
-                                    errorDetectModule,
-                                    width,
-                                    height,
-                                    moduleWidth,
-                                    moduleHeight,
-                                    resultId
-                                )
-                                for (errorModule in errorModuleList) {
-                                    val processedMat: Mat = postProcess(
-                                        warpedMat,
-                                        errorModule,
-                                        moduleWidth,
-                                        moduleHeight
-                                    )
-                                    val processedBitmap =
-                                        Bitmap.createBitmap(
-                                            processedMat.cols(),
-                                            processedMat.rows(),
-                                            Bitmap.Config.ARGB_8888
-                                        )
-                                    Utils.matToBitmap(processedMat, processedBitmap)
-                                    analysisViewModel.saveImage(processedBitmap, errorModule.id)
-                                }
-                            }
-                            setProgresses(frameCount, i)
+                    if (bitmapFrame != null) {
+                        if (i == 0) {
+                            points = getCorners(frame)
                         }
+                        val warpedMat = getWarp(frame, points!!, width, height)
+                        val errorModuleList = getPredictions(
+                            warpedMat,
+                            errorDetectModule,
+                            width,
+                            height,
+                            moduleWidth,
+                            moduleHeight,
+                            resultId
+                        )
+                        for (errorModule in errorModuleList) {
+                            val processedMat: Mat = postProcess(
+                                warpedMat,
+                                errorModule,
+                                moduleWidth,
+                                moduleHeight
+                            )
+                            val processedBitmap =
+                                Bitmap.createBitmap(
+                                    processedMat.cols(),
+                                    processedMat.rows(),
+                                    Bitmap.Config.ARGB_8888
+                                )
+                            Utils.matToBitmap(processedMat, processedBitmap)
+                            analysisViewModel.saveImage(processedBitmap, errorModule.id)
+                        }
+
                     }
-                } else {
-                    Log.e("VideoProcessing", "Failed to open video file.")
                 }
+
 
             } catch (e: Exception) {
                 Log.e("VideoProcessing", "Error processing video file: ${e.localizedMessage}", e)
@@ -276,6 +276,7 @@ class ErrorDetectActivity : ComponentActivity() {
 
     private suspend fun detectPhoto() = coroutineScope {
         launch {
+            analysisViewModel.progressMessage.value = "사진 읽는 중"
             Log.i("ImageProcess", uri.toString())
             val originalImage: Bitmap? = withContext(Dispatchers.IO) {
                 loadBitmapFromUriWithGlide(
@@ -307,6 +308,7 @@ class ErrorDetectActivity : ComponentActivity() {
                 val resultId = analysisViewModel.saveResult(signage.id)
                 Log.d("ImageProcess", "resultId = ${resultId.toString()}")
                 analysisViewModel.progressFloat.value = 0.2f
+                analysisViewModel.progressMessage.value = "사진 분석 중"
 
                 val originalMat: Mat = bitmapToMat(originalImage!!)
                 try {

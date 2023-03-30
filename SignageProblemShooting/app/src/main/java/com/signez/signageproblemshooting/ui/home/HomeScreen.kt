@@ -92,48 +92,48 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            if (!mainViewModel.permissionsGranted.value) {
+//            if (!mainViewModel.permissionsGranted.value) {
+//                Column(
+//                    modifier = Modifier
+//                        .align(alignment = Alignment.TopCenter),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    PermissionInfo()
+//                    Button(onClick = { openAppSettings(context, appSettingsResultLauncher) }) {
+//                        Text(text = "권한 설정")
+//                    }
+//                }
+//
+//            } else {
+            Column(
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+            ) {
+
+                Spacer(modifier = Modifier.padding(5.dp))
+                PastResult(modifier = Modifier, navController = navController)
+                Spacer(modifier = Modifier.padding(8.dp))
                 Column(
                     modifier = Modifier
-                        .align(alignment = Alignment.TopCenter),
+                        .padding(start = 16.dp, end = 16.dp)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    PermissionInfo()
-                    Button(onClick = { openAppSettings(context, appSettingsResultLauncher) }) {
-                        Text(text = "권한 설정")
+                )
+                {
+                    if (viewModel.signageId.value > -1) {
+                        SignEzSpec(
+                            modifier = Modifier,
+                            navigateToSignageList,
+                            signageState.signage
+                        )
+                        CabinetSpec(modifier = Modifier, cabinetState.cabinet)
+                    } else {
+                        SignEzSpec(modifier = Modifier, navigateToSignageList, null)
+                        CabinetSpec(modifier = Modifier, null)
                     }
                 }
-
-            } else {
-                Column(
-                    modifier = Modifier
-                        .align(alignment = Alignment.TopCenter)
-                ) {
-
-                    Spacer(modifier = Modifier.padding(5.dp))
-                    PastResult(modifier = Modifier, navController = navController)
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp)
-                            .fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    )
-                    {
-                        if (viewModel.signageId.value > -1) {
-                            SignEzSpec(
-                                modifier = Modifier,
-                                navigateToSignageList,
-                                signageState.signage
-                            )
-                            CabinetSpec(modifier = Modifier, cabinetState.cabinet)
-                        } else {
-                            SignEzSpec(modifier = Modifier, navigateToSignageList, null)
-                            CabinetSpec(modifier = Modifier, null)
-                        }
-                    }
-                }
+//                }
             }
         }
     }
