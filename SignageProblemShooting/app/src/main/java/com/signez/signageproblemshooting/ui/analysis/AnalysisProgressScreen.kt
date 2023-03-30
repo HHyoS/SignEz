@@ -18,6 +18,7 @@ import com.signez.signageproblemshooting.ui.signage.noRippleClickable
 @Composable
 fun AnalysisProgress(
     modifier: Modifier = Modifier,
+    analysisViewModel: AnalysisViewModel
 ) {
     val focusManager = LocalFocusManager.current
     androidx.compose.material.Scaffold(
@@ -42,7 +43,7 @@ fun AnalysisProgress(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                LoadingSpinner("분석 중...", 0.0f)
+                LoadingSpinner(analysisViewModel.progressMessage.value, analysisViewModel.progressFloat.value)
             }
         }
     }
