@@ -34,6 +34,10 @@ import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
 import com.signez.signageproblemshooting.ui.components.SignEzFloatingButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 import java.util.*
 
@@ -87,6 +91,7 @@ fun SignageInformationScreen(
             if (selectedId > -1) {
                 BottomSingleFlatButton(title = "선택", isUsable = true) {
                     viewModel.signageId.value = selectedId
+
                     navController.popBackStack()
                 }
             }
@@ -104,7 +109,11 @@ fun SignageInformationScreen(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    SearchBar(placeholder = "사이트 명 검색", onValueChange = { it -> searchQuery = it }, searchQuery = searchQuery)
+                    SearchBar(
+                        placeholder = "사이트 명 검색",
+                        onValueChange = { it -> searchQuery = it },
+                        searchQuery = searchQuery
+                    )
                     Spacer(modifier.padding(10.dp))
                     Text(
                         text = "전체 사이트",
@@ -118,7 +127,13 @@ fun SignageInformationScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight( if (selectedId > -1) {0.89F} else {0.99F})
+                            .fillMaxHeight(
+                                if (selectedId > -1) {
+                                    0.89F
+                                } else {
+                                    0.99F
+                                }
+                            )
                             .clip(RoundedCornerShape(16.dp))
                             .background(MaterialTheme.colors.surface),
                         contentAlignment = Alignment.TopCenter
@@ -265,13 +280,13 @@ private fun InventoryItem(
         ) {
             Column(modifier = Modifier.padding(start = 10.dp)) {
                 signage.repImg?.let { byteArray ->
-                        GlideImage(
-                            model = byteArray,
-                            contentDescription = "글라이드",
-                            modifier = Modifier
-                                .size(45.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                        )
+                    GlideImage(
+                        model = byteArray,
+                        contentDescription = "글라이드",
+                        modifier = Modifier
+                            .size(45.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                    )
                 }
             } // 대표 이미지
 
@@ -310,7 +325,7 @@ fun SearchBar(
     onValueChange: (String) -> Unit,
     placeholder: String = "설치 장소 검색",
     onSearch: (String) -> Unit = {},
-    searchQuery:String
+    searchQuery: String
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     OutlinedTextField(
@@ -344,7 +359,7 @@ fun SearchBar(
 //@Preview
 //@Composable
 //fun ComponentPreview() {
-//    SignEzPrototypeTheme(darkTheme = false) {
+//    SignEzTheme(darkTheme = false) {
 //        Column {
 //            SearchBar()
 //        }

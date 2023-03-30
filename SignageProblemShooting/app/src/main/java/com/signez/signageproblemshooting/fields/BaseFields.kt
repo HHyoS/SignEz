@@ -174,7 +174,7 @@ fun String.getCommaNumber(): String {
 //@Preview
 //@Composable
 //fun TextFieldsPreview() {
-//    SignEzPrototypeTheme(darkTheme = false) {
+//    SignEzTheme(darkTheme = false) {
 //        Column() {
 //
 //        }

@@ -26,12 +26,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.navigation.NavController
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.VideoPicker
 import com.signez.signageproblemshooting.pickers.getVideoTitle
 import com.signez.signageproblemshooting.pickers.loadVideoMetadata
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
+import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
+import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.IntentButton
@@ -56,6 +59,7 @@ fun VideoAnalysis(
     viewModel: VideoViewModel,
     analysisViewModel: AnalysisViewModel,
     modifier: Modifier = Modifier,
+    navController: NavController
 ) {
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
@@ -65,6 +69,7 @@ fun VideoAnalysis(
     var videoLength by remember { mutableStateOf(0L) }
     var videoSize by remember { mutableStateOf(0L) }
     var videoFrame by remember { mutableStateOf(bitmap) }
+    val REQUEST_DETECT_VIDEO: Int = 100
 
     val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
         val retriever = MediaMetadataRetriever()
@@ -130,9 +135,22 @@ fun VideoAnalysis(
                 leftTitle = "취소",
                 rightTitle = "분석하기",
                 isLeftUsable = true,
-                isRightUsable = false,
+                isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
-                rightOnClickEvent = {  /* 분석하기 이벤트를 넣으면 됨 */ }
+                rightOnClickEvent = {
+                    /* 분석하기 이벤트를 넣으면 됨 */
+                    // .currentDestination?.let { navController.popBackStack(it.id , true) }
+
+                    navController.popBackStack()
+                    navController.navigate(ResultsHistoryDestination.route)
+                    navController.navigate(ResultGridDestination.route)
+                    openErrorDetectActivity(
+                        context,
+                        REQUEST_DETECT_VIDEO,
+                        analysisViewModel.signageId.value,
+                        analysisViewModel.videoContentUri.value
+                    )
+                }
             )
         }
     ) { innerPadding ->
@@ -216,7 +234,6 @@ fun VideoAnalysis(
                     }
                 }
             }//Column
-
 
 
 //            if (!videoFrame.sameAs(bitmap)) {
