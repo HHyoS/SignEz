@@ -13,12 +13,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.model.GlideUrl
 import com.signez.signageproblemshooting.data.Converters
 import com.signez.signageproblemshooting.data.entities.Cabinet
+import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.data.repository.CabinetsRepository
 import com.signez.signageproblemshooting.data.repository.SignagesRepository
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 
 class SignageViewModel(
@@ -189,19 +191,25 @@ class SignageViewModel(
         )
         signageRepository.insertSignage(testAnalysisResult10)
     }
+    fun getCabinetById(modelId: Long) =
+        runBlocking {
+            return@runBlocking cabinetRepository.getNewCabinet(modelId)
+        }
 
     fun saveItem(bitmap: Bitmap, modelId: Long = 0) = viewModelScope.launch {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
-
+        val this_cabinet = getCabinetById(modelId)
+        val height = sHeight.value.toDouble()
+        val width = sWidth.value.toDouble()
         val newSignage = Signage(
-            name = sName.value,
-            height = sHeight.value.toDouble(),
-            width = sWidth.value.toDouble(),
-            heightCabinetNumber = 1,
-            widthCabinetNumber = 1,
+            name=sName.value,
+            height = height,
+            width= width,
+            heightCabinetNumber = (height/this_cabinet.cabinetHeight).toInt(),
+            widthCabinetNumber = (width/this_cabinet.cabinetWidth).toInt(),
             modelId = modelId,
             repImg = byteArray
         )

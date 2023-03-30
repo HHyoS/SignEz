@@ -127,7 +127,6 @@ fun ResultList(
                     selectedId = selectedId,
                     viewModel=viewModel
                 )
-                Text(text = itemList[item].id.toString())
             }
         }
     }
@@ -224,7 +223,7 @@ fun ShowContextMenu(
         DropdownMenuItem(onClick = onDelete) {
             Text("Delete")
         }
-        DropdownMenuItem(onClick = {}) {
+        DropdownMenuItem(onClick = closeMenu) {
             Text("닫기")
         }
     }
