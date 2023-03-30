@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.ErrorModule
@@ -217,35 +218,27 @@ fun ResultGridView(
                     }
 
 
-//                    Text(text="분석 도표 페이지")
-//
-//                    if (modules != null) {
-//                        if (modules.isEmpty()) {
-//                            Text(
-//                                text = "텅 비었어요.",
-//                                style = MaterialTheme.typography.subtitle2
-//                            )
-//                        } else {
-//                            LazyColumn(
-//                                modifier = modifier.background(MaterialTheme.colors.surface),
-//                                //            verticalArrangement = Arrangement.spacedBy(8.dp)
-//                            ) {
-//                                items(items = modules, key = { it.id }) { item ->
-//                                    Text(text = "${item.id}번 에러 모듈 좌표 : ${item.x} , ${item.y}")
-//                                    Divider(
-//                                        modifier = Modifier
-//                                            .height(1.dp)
-//                                            .fillMaxWidth(0.95f),
-//                                        startIndent = 70.dp
-//                                    )
-//
-//                                }
-//                            }
-//                        }
-//                    } // 모듈 눌체크
+
                 }// 컬럼 끝
 
             } // 박스 끝
         }
     }
+}
+
+/*
+x, y 좌표 고르면 해당 위치에 발생된
+모든 에러 모듈 이미지 슬라이드로 navigate됨.
+해당 페이지에서 사진을 보고 해당 모듈 삭제 가능.
+-> 모듈에 달아 주세요~
+ */
+fun moduleClickEvent(
+    x:Int,
+    y:Int,
+    viewModel : AnalysisViewModel,
+    navController:NavController
+) {
+    viewModel.selectedModuleX.value = x
+    viewModel.selectedModuleY.value = y
+    navController.navigate(ErrorImageDestination.route)
 }
