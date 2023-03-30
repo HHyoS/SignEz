@@ -1,6 +1,6 @@
 package com.signez.signageproblemshooting
 
-//SignEzPrototypeTheme
+//SignEzTheme
 
 
 //
@@ -9,7 +9,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -29,12 +28,13 @@ import com.signez.signageproblemshooting.ui.signage.CabinetDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetViewModel
 import com.signez.signageproblemshooting.ui.signage.SignageDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.SignageViewModel
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 import java.io.*
 import java.util.*
 import android.Manifest
 import android.net.Uri
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         viewModel5.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
-            SignEzPrototypeTheme {
+            SignEzTheme {
 
                 SignEzApp(
                     activity = this,

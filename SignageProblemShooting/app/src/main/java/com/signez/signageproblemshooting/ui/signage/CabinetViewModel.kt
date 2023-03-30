@@ -20,7 +20,7 @@ class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : View
     MediaViewModel {
     // Initialize this according to your app's architecture
     val cabinetListState: StateFlow<CabinetListState> =
-        cabinetRepository.getAllCabinetsStream().map{ CabinetListState(it) }
+        cabinetRepository.getAllCabinetsStream().map { CabinetListState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -54,25 +54,44 @@ class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : View
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
 
-        val testAnalysisResult = Cabinet(id = 1L,
-            name="TEST",
-            cabinetHeight = 5.4,
-            cabinetWidth = 5.2,
-            moduleColCount = 5,
-            moduleRowCount = 7,
+        val testAnalysisResult = Cabinet(
+            id = 1L,
+            name = "XRP",
+            cabinetHeight = 1000.0,
+            cabinetWidth = 1000.0,
+            moduleColCount = 4,
+            moduleRowCount = 4,
             repImg = byteArray
         )
         cabinetRepository.insertCabinet(testAnalysisResult)
+
+        val testAnalysisResult2 = Cabinet(
+            id = 2L,
+            name = "XHB",
+            cabinetHeight = 1050.0,
+            cabinetWidth = 700.0,
+            moduleColCount = 3,
+            moduleRowCount = 2,
+            repImg = byteArray
+        )
+        cabinetRepository.insertCabinet(testAnalysisResult2)
     }
 
-    fun saveItem(name:String, width:Double, height:Double, bitmap: Bitmap, colCount:Int, rowCount:Int) = viewModelScope.launch {
+    fun saveItem(
+        name: String,
+        width: Double,
+        height: Double,
+        bitmap: Bitmap,
+        colCount: Int,
+        rowCount: Int
+    ) = viewModelScope.launch {
         // Save image as a Blob
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
         val byteArray = outputStream.toByteArray()
 
         val newCabinet = Cabinet(
-            name=name,
+            name = name,
             cabinetHeight = height,
             cabinetWidth = width,
             moduleColCount = colCount,

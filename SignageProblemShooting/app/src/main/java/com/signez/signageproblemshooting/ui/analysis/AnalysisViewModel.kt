@@ -41,6 +41,8 @@ class AnalysisViewModel(
     var selectedResultId = mutableStateOf(-1L)
     var selectedModuleX = mutableStateOf(-1)
     var selectedModuleY = mutableStateOf(-1)
+    var progressMessage = mutableStateOf("분석 중")
+    var progressFloat = mutableStateOf(0.0F)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
