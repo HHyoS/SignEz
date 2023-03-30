@@ -16,14 +16,12 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
-import androidx.compose.ui.unit.min
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
-import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap2
+import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap
 import com.signez.signageproblemshooting.ui.components.InFocusBlockButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
@@ -159,7 +157,7 @@ fun ResultGridView(
                                 "moduleSize",
                                 "ResultGridView: ${moduleSize}}"
                             )
-                            ErrorModuleHeatMap2(
+                            ErrorModuleHeatMap(
                                 widthCabinetNumber = widthCabinetNumber,
                                 heightCabinetNumber = heightCabinetNumber,
                                 moduleRowCount = 4,
