@@ -5,17 +5,13 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.signez.signageproblemshooting.data.entities.*
 import com.signez.signageproblemshooting.data.repository.*
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetState
-import com.signez.signageproblemshooting.ui.signage.SignageListState
-import com.signez.signageproblemshooting.ui.signage.SignageViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -67,9 +63,7 @@ class AnalysisViewModel(
     }
 
     suspend fun getSignageById(signageId: Long): Signage {
-        val signage: Signage =
-            signageRepository.getSignageById(signageId)
-        return signage
+        return signageRepository.getSignageById(signageId)
     }
 
     fun getSignage(): StateFlow<SignageState> {
@@ -138,45 +132,44 @@ class AnalysisViewModel(
     }
 
     suspend fun getRelatedImages(moduleId: Long): List<ErrorImage> {
-        val images: List<ErrorImage> =
-            errorImagesRepository.getImagesByModuleId(moduleId)
-        return images
+        return errorImagesRepository.getImagesByModuleId(moduleId)
+    }
+
+    private suspend fun getMostRecentResultId() = runBlocking {
+        return@runBlocking analysisResultRepository.getMostRecentResult().id
     }
 
     suspend fun getRelatedModule(resultId: Long): List<ErrorModule> {
-        val modules: List<ErrorModule> =
-            errorModulesRepository.getModulesByResultId(resultId)
-        return modules
+        return if (resultId == -1L) {
+            val modules: List<ErrorModule> =
+                errorModulesRepository.getModulesByResultId(resultId)
+            modules
+        } else { // resultId가 -1 == 안 골라 졌다면 가장 최근 생성된 결과 아이디 가져옴.
+            val modules: List<ErrorModule> =
+                errorModulesRepository.getModulesByResultId(getMostRecentResultId())
+            modules
+        }
+
     }
 
     suspend fun getRelatedResults(signageId: Long): List<AnalysisResult> {
-        val results: List<AnalysisResult> =
-            analysisResultRepository.getResultsBySignageId(signageId)
-        return results
+        return analysisResultRepository.getResultsBySignageId(signageId)
     }
 
     suspend fun getImageById(imageId: Long): ErrorImage {
-        val image: ErrorImage =
-            errorImagesRepository.getImageById(imageId)
-        return image
+        return errorImagesRepository.getImageById(imageId)
     }
 
     suspend fun getModuleById(moduleId: Long): ErrorModule {
-        val module: ErrorModule =
-            errorModulesRepository.getModuleById(moduleId)
-        return module
+        return errorModulesRepository.getModuleById(moduleId)
     }
 
     suspend fun getResultById(resultId: Long): AnalysisResult {
-        val result: AnalysisResult =
-            analysisResultRepository.getResultById(resultId)
-        return result
+        return analysisResultRepository.getResultById(resultId)
     }
 
     suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long): List<ErrorModuleWithImage> {
-        val listOfMAI: List<ErrorModuleWithImage> =
-            errorModulesRepository.getModulesByXYResultId(x, y, resultId)
-        return listOfMAI
+        return errorModulesRepository.getModulesByXYResultId(x, y, resultId)
     }
 
     suspend fun deleteResult(resultId: Long) {
@@ -187,7 +180,7 @@ class AnalysisViewModel(
         errorModulesRepository.deleteErrorModule(module)
     }
 
-    fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
+    private fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(color)
