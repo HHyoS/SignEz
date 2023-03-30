@@ -39,6 +39,8 @@ class AnalysisViewModel(
     var imageContentUri = mutableStateOf(Uri.EMPTY)
     var signageId = mutableStateOf(-1L)
     var selectedResultId = mutableStateOf(-1L)
+    var progressMessage = mutableStateOf("분석 중")
+    var progressFloat = mutableStateOf(0.0F)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
