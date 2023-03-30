@@ -154,88 +154,93 @@ fun PictureAnalysis(
                 rightOnClickEvent = {
 
                     // test
-                    if (contentUri == Uri.EMPTY)
-                        Toast.makeText(context, "사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-                    else {
-                        mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
-                        mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
-                        mIvScaleX = (if (mmWidth > mmHeight) mWidth
-                            .toFloat() / mmWidth else mHeight
-                            .toFloat() / mmHeight)
-                        mIvScaleY = (if (mmHeight > mmWidth) mHeight
-                            .toFloat() / mmHeight else mWidth
-                            .toFloat() / mmWidth)
-                        mStartX = (mWidth - mIvScaleX * mmWidth) / 2
-                        mStartY = (mHeight - mIvScaleY * mmHeight) / 2
-
-                        if (mModule == null) {
-                            val temp = ErrorDetectActivity()
-                            mModule = temp.getModel()
-                        }
-                        val thread = object : Thread() {
-                            override fun run() {
-                                Log.d("hyoyo", "1")
-                                val resizedBitmap = Bitmap.createScaledBitmap(
-                                    (BitmapFactory.decodeStream(
-                                        activity.contentResolver.openInputStream(
-                                            contentUri
-                                        )
-                                    ))!!,
-                                    PrePostProcessor.mInputWidth,
-                                    PrePostProcessor.mInputHeight,
-                                    true
-                                )
-                                Log.d("hyoyo", "{")
-                                val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
-                                    resizedBitmap,
-                                    PrePostProcessor.NO_MEAN_RGB,
-                                    PrePostProcessor.NO_STD_RGB
-                                )
-                                Log.d("hyoyo", "3")
-                                val outputTuple =
-                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
-                                val outputTensor = outputTuple[0].toTensor()
-                                val outputs = outputTensor.dataAsFloatArray
-                                Log.d("hyoyo", "4")
-                                val results = PrePostProcessor.outputsToNMSPredictions(
-                                    outputs,
-                                    mImgScaleX,
-                                    mImgScaleY,
-                                    mIvScaleX,
-                                    mIvScaleY,
-                                    mStartX,
-                                    mStartY
-                                )
-
-                                if (results != null) {
-                                    Log.d("hyoyo", "5")
-                                    for (r in results!!) {
-                                        Log.d(
-                                            "test",
-                                            "${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
-                                                    "${r.rect.bottom} @ ${r.score}"
-                                        )
-                                    }
-                                } else {
-                                    Log.d("hyoyo", "555555555555555555")
-                                }
-                            }
-                        }
-                        thread.start()
-                    }
+//                    if (contentUri == Uri.EMPTY)
+//                        Toast.makeText(context, "사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+//                    else {
+//                        mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
+//                        mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
+//                        mIvScaleX = (if (mmWidth > mmHeight) mWidth
+//                            .toFloat() / mmWidth else mHeight
+//                            .toFloat() / mmHeight)
+//                        mIvScaleY = (if (mmHeight > mmWidth) mHeight
+//                            .toFloat() / mmHeight else mWidth
+//                            .toFloat() / mmWidth)
+//                        mStartX = (mWidth - mIvScaleX * mmWidth) / 2
+//                        mStartY = (mHeight - mIvScaleY * mmHeight) / 2
+//
+//                        if (mModule == null) {
+//                            val temp = ErrorDetectActivity()
+//                            mModule = temp.getModel()
+//                        }
+//                        val thread = object : Thread() {
+//                            override fun run() {
+//                                Log.d("hyoyo", "1")
+//                                val resizedBitmap = Bitmap.createScaledBitmap(
+//                                    (BitmapFactory.decodeStream(
+//                                        activity.contentResolver.openInputStream(
+//                                            contentUri
+//                                        )
+//                                    ))!!,
+//                                    PrePostProcessor.mInputWidth,
+//                                    PrePostProcessor.mInputHeight,
+//                                    true
+//                                )
+//                                Log.d("hyoyo", "{")
+//                                val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
+//                                    resizedBitmap,
+//                                    PrePostProcessor.NO_MEAN_RGB,
+//                                    PrePostProcessor.NO_STD_RGB
+//                                )
+//                                Log.d("hyoyo", "3")
+//                                val outputTuple =
+//                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
+//                                val outputTensor = outputTuple[0].toTensor()
+//                                val outputs = outputTensor.dataAsFloatArray
+//                                Log.d("hyoyo", "4")
+//                                val results = PrePostProcessor.outputsToNMSPredictions(
+//                                    outputs,
+//                                    mImgScaleX,
+//                                    mImgScaleY,
+//                                    mIvScaleX,
+//                                    mIvScaleY,
+//                                    mStartX,
+//                                    mStartY
+//                                )
+//
+//                                if (results != null) {
+//                                    Log.d("hyoyo", "5")
+//                                    for (r in results!!) {
+//                                        Log.d(
+//                                            "test",
+//                                            "${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
+//                                                    "${r.rect.bottom} @ ${r.score}"
+//                                        )
+//                                    }
+//                                } else {
+//                                    Log.d("hyoyo", "555555555555555555")
+//                                }
+//                            }
+//                        }
+//                        thread.start()
+//                    }
                     //
                     /* 분석하기 이벤트를 넣으면 됨 */
-//                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
+                    navController.currentDestination?.let {
+                        navController.popBackStack(
+                            it.id,
+                            true
+                        )
+                    }
 
-//                    navController.popBackStack()
-//                    navController.navigate(ResultsHistoryDestination.route)
-//                    navController.navigate(ResultGridDestination.route)
-//                    openErrorDetectActivity(
-//                        context,
-//                        REQUEST_DETECT_PHOTO,
-//                        analysisViewModel.signageId.value,
-//                        analysisViewModel.imageContentUri.value
-//                    )
+                    navController.popBackStack()
+                    navController.navigate(ResultsHistoryDestination.route)
+                    navController.navigate(ResultGridDestination.route)
+                    openErrorDetectActivity(
+                        context,
+                        REQUEST_DETECT_PHOTO,
+                        analysisViewModel.signageId.value,
+                        analysisViewModel.imageContentUri.value
+                    )
                 }
             )
         }
