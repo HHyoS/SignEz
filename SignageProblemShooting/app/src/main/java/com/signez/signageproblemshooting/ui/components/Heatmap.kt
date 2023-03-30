@@ -114,8 +114,8 @@ fun ErrorModuleHeatMap(
                                     Canvas(
                                         modifier = Modifier
                                             .padding(horizontal = 1.dp)
-                                            .width(5.dp)
-                                            .height(5.dp)
+                                            .width(8.dp)
+                                            .height(8.dp)
 //                                            .clip(RoundedCornerShape(15))
                                             .clickable(
                                                 enabled = errorCount >= 1
@@ -223,7 +223,7 @@ fun HeatMapPreview() {
 //        threshold = 70
         Column() {
             errorModuleFilteredList = listOf(
-                ErrorModule(resultId = 1, score = 75.1, x = 13, y = 14),
+                ErrorModule(resultId = 1, score = 75.1, x = 4, y = 1),
                 ErrorModule(resultId = 2, score = 45.0, x = 1, y = 1),
                 ErrorModule(resultId = 3, score = 89.0, x = 4, y = 4),
                 ErrorModule(resultId = 4, score = 25.0, x = 9, y = 9),
@@ -237,6 +237,7 @@ fun HeatMapPreview() {
                 ErrorModule(resultId = 12, score = 70.0, x = 9, y = 9),
                 ErrorModule(resultId = 13, score = 75.0, x = 9, y = 9),
                 ErrorModule(resultId = 14, score = 80.0, x = 9, y = 9),
+//                ErrorModule(resultId = 15, score = 73.0, x = 30, y = 31),
             ).filter {
                 it.score >= threshold
             }
