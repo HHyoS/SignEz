@@ -1,5 +1,6 @@
 package com.signez.signageproblemshooting
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -7,19 +8,21 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorModule
+import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.MainViewModelFactory
+import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
+import kotlinx.coroutines.*
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
@@ -41,10 +44,11 @@ class ErrorDetectActivity : ComponentActivity() {
     // constants
     private val REQUEST_DETECT_VIDEO: Int = 100
     private val REQUEST_DETECT_PHOTO: Int = 101
+    private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
 
-
-    // viewModels
-    private lateinit var analysisViewModel: AnalysisViewModel
+    private val REQUEST_TYPE: String = "REQUEST_TYPE"
+    private val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
+    private val REQUEST_URI: String = "REQUEST_URI"
 
     // Torch Modules
     private lateinit var signageDetectModule: Module
@@ -63,9 +67,12 @@ class ErrorDetectActivity : ComponentActivity() {
 
     private val rectThreshold = 5.0f
 
-    private val mainViewModel: MainViewModel by viewModels {
-        MainViewModelFactory((application as SignEzApplication).container)
-    }
+    private lateinit var analysisViewModel: AnalysisViewModel
+
+    private lateinit var signage: Signage
+    private lateinit var cabinet: Cabinet
+    private lateinit var uri: Uri
+
 
     @Throws(IOException::class)
     private fun assetFilePath(context: Context, assetName: String): String {
@@ -86,16 +93,27 @@ class ErrorDetectActivity : ComponentActivity() {
         }
     }
 
+    fun getModel(): Module {
+        return Module.load(assetFilePath(SignEzApplication.instance, signageDetectModuleFileName))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        analysisViewModel = ViewModelProvider(
+
+        analysisViewModel = ViewModelProvider( // 분석 종합
             this,
             factory = AppViewModelProvider.Factory
-        )[AnalysisViewModel::class.java]
+        ).get(AnalysisViewModel::class.java)
 
         val intents: Intent = intent
-        val type = intents.extras?.getInt("REQUEST_TYPE")
+        val type = intents.extras?.getInt(REQUEST_TYPE)
+        val signageId: Long? = intents.extras?.getLong(REQUEST_SIGNAGE_ID)
+
+        setContent {
+            SignEzTheme {
+                AnalysisProgress()
+            }
+        }
 
         try {
             signageDetectModule =
@@ -109,30 +127,35 @@ class ErrorDetectActivity : ComponentActivity() {
         }
 
         lifecycleScope.launch {
+            if (intents.data == null || signageId == null) {
+                finish()
+            }
+            uri = intents.data!!
+            signage = analysisViewModel.getSignageById(signageId!!)
+            cabinet = analysisViewModel.getCabinet(signageId)
             when (type) {
-                REQUEST_DETECT_VIDEO -> detectVideo()
-                REQUEST_DETECT_PHOTO -> detectPhoto()
+//                REQUEST_DETECT_VIDEO -> detectVideo()
+//                REQUEST_DETECT_PHOTO -> detectPhoto()
                 else -> {
+                    Log.i("-------------State-----------", uri.toString())
+                    Log.i("-------------State-----------", signage.toString())
+                    Log.i("-------------State-----------", cabinet.toString())
+
+
+                    delay(5000)
                     Log.e("ErrorDetectActivity", "Wrong Access to Activity!")
-                    //
-                    //
-                    //
-                    //
-                    //
-                    //
-                    //
+
                     //
                 }
-            }
-        }
-
+            } // when end
+            setResult(REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+            finish()
+        } // coroutine end
 
     }
 
     private suspend fun detectVideo() = coroutineScope {
         launch {
-            val signage = analysisViewModel.getSignage().value.signage
-            val cabinet = analysisViewModel.getCabinet().value.cabinet
 
             val width = signage.width.toInt() * 100
             val height = signage.height.toInt() * 100
@@ -145,7 +168,7 @@ class ErrorDetectActivity : ComponentActivity() {
                 File.createTempFile("video", ".temp")
             }
             val inputStream: InputStream? = applicationContext.contentResolver
-                .openInputStream(analysisViewModel.videoContentUri.value)
+                .openInputStream(uri)
             val outputStream = withContext(Dispatchers.IO) {
                 FileOutputStream(tempFile)
             }
@@ -214,6 +237,8 @@ class ErrorDetectActivity : ComponentActivity() {
                     inputStream?.close()
                 }
                 tempFile.delete()
+
+
             }
 
 
@@ -224,10 +249,8 @@ class ErrorDetectActivity : ComponentActivity() {
         launch {
             val originalImage: Bitmap? = loadBitmapFromUriWithGlide(
                 applicationContext,
-                analysisViewModel.imageContentUri.value
+                uri
             )
-            val signage = analysisViewModel.getSignage().value.signage
-            val cabinet = analysisViewModel.getCabinet().value.cabinet
 
             val width = signage.width.toInt() * 100
             val height = signage.height.toInt() * 100
@@ -451,4 +474,8 @@ class ErrorDetectActivity : ComponentActivity() {
         return mat
     }
 
+    override fun onBackPressed() {
+        setResult(Activity.RESULT_OK)
+        super.onBackPressed()
+    }
 }
