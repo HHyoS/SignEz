@@ -93,8 +93,8 @@ fun ResultGridView(
             )
         },
         bottomBar = {
-            BottomSingleFlatButton(title = "사진 보기", isUsable = true) {
-
+            BottomSingleFlatButton(title = "사진보기", isUsable = true) {
+                navController.navigate(ErrorImageDestination.route)
             }
         }
     ) { innerPadding ->

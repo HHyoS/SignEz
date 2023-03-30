@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.text.SimpleDateFormat
+import java.util.*
 
 @Entity(tableName = "results",
     foreignKeys = [
@@ -21,5 +23,13 @@ data class AnalysisResult(
     var id: Long = 0,
     var signageId: Long = 0,
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    var resultDate: String = ""
+    var resultDate: String = getCurrentDateTime()
 )
+{
+    companion object {
+        private fun getCurrentDateTime(): String {
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            return sdf.format(Date())
+        }
+    }
+}
