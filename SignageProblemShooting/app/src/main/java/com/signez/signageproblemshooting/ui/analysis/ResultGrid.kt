@@ -1,32 +1,32 @@
 package com.signez.signageproblemshooting.ui.analysis
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
+import androidx.compose.material.Text
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.min
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
-import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
-import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap
+import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap2
 import com.signez.signageproblemshooting.ui.components.InFocusBlockButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 object ResultGridDestination : NavigationDestination {
     override val route = "ResultGridScreen"
@@ -47,6 +47,10 @@ fun ResultGridView(
         value = viewModel.getRelatedModule(viewModel.selectedResultId.value)
     })
     val modules = modulesState.value
+    val signageState = produceState(initialValue = null as Signage?, producer = {
+        value = viewModel.getSignageById(viewModel.selectedResultId.value)
+    })
+    val signage = signageState.value
 
     var threshold by remember { mutableStateOf(70) }
     var errorModuleFilteredList by remember {
@@ -61,6 +65,11 @@ fun ResultGridView(
             )
         )
     }
+
+//    Log.d("넘어오냐", "ResultGridView: ${signage}")
+    
+    var widthCabinetNumber = 11
+    var heightCabinetNumber = 19
 
     errorModuleFilteredList = listOf(
         ErrorModule(resultId = 1, score = 75.1, x = 13, y = 14),
@@ -112,18 +121,60 @@ fun ResultGridView(
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column {
-                    ErrorModuleHeatMap(
-                        widthCabinetNumber = 11,
-                        heightCabinetNumber = 19,
-                        moduleRowCount = 2,
-                        moduleColCount = 2,
-                        errorModuleList = errorModuleFilteredList
-                    )
+                    var parentWidth by remember { mutableStateOf(0) }
+                    var parentHeight by remember { mutableStateOf(0) }
 
                     androidx.compose.material3.Card(
                         modifier = Modifier
                             .padding(top = 8.dp, bottom = 8.dp)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .weight(0.7f)
+                            .onSizeChanged {
+                                parentWidth = it.width
+                                parentHeight = it.height
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colors.surface
+                        )
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Log.d(
+                                "Width",
+                                "ResultGridView: ${with(LocalDensity.current) { parentWidth.toDp() }}"
+                            )
+                            Log.d(
+                                "Height",
+                                "ResultGridView: ${with(LocalDensity.current) { parentHeight.toDp() }}"
+                            )
+                            var pxsixteen = with(LocalDensity.current) { 16.dp.toPx() }
+                            var moduleSize = with(LocalDensity.current) { kotlin.math.min(
+                                (parentWidth / (widthCabinetNumber+2)),
+                                (parentHeight / (heightCabinetNumber+2))
+                            ).toDp() }
+                            Log.d(
+                                "moduleSize",
+                                "ResultGridView: ${moduleSize}}"
+                            )
+                            ErrorModuleHeatMap2(
+                                widthCabinetNumber = widthCabinetNumber,
+                                heightCabinetNumber = heightCabinetNumber,
+                                moduleRowCount = 4,
+                                moduleColCount = 4,
+                                errorModuleList = errorModuleFilteredList,
+                                moduleSize = moduleSize
+                            )
+                        }
+                    }
+
+                    androidx.compose.material3.Card(
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
+                            .weight(0.3f),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colors.surface
                         )
@@ -131,9 +182,9 @@ fun ResultGridView(
                         Column(
                             Modifier
                         ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Text(
                                     text = "Threshold 조정",
                                     style = MaterialTheme.typography.h3,
@@ -190,7 +241,7 @@ fun ResultGridView(
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
-                            ){
+                            ) {
                                 Text(
                                     text = "20%",
                                     style = MaterialTheme.typography.h4,
