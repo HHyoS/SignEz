@@ -1,6 +1,7 @@
 package com.signez.signageproblemshooting.ui.analysis
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -84,7 +86,16 @@ fun ResultGridView(
                                 //            verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(items = modules, key = { it.id }) { item ->
-                                    Text(text = "${item.id}번 에러 모듈 좌표 : ${item.x} , ${item.y}")
+                                    Text(text = "${item.id}번 에러 모듈 좌표 : ${item.x} , ${item.y}"
+                                        ,modifier
+                                            .clickable(onClick = {
+                                                viewModel.selectedModuleX.value = item.x
+                                                viewModel.selectedModuleY.value = item.y
+                                                navController.navigate(ErrorImageDestination.route)
+                                            })
+                                            .height(50.dp)
+                                            .background(color= Color.Black)
+                                    )
                                     Divider(
                                         modifier = Modifier
                                             .height(1.dp)

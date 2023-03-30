@@ -39,6 +39,8 @@ class AnalysisViewModel(
     var imageContentUri = mutableStateOf(Uri.EMPTY)
     var signageId = mutableStateOf(-1L)
     var selectedResultId = mutableStateOf(-1L)
+    var selectedModuleX = mutableStateOf(-1)
+    var selectedModuleY = mutableStateOf(-1)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -169,8 +171,18 @@ class AnalysisViewModel(
         return result
     }
 
+    suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long): List<ErrorModuleWithImage> {
+        val listOfMAI: List<ErrorModuleWithImage> =
+            errorModulesRepository.getModulesByXYResultId(x, y, resultId)
+        return listOfMAI
+    }
+
     suspend fun deleteResult(resultId: Long) {
         analysisResultRepository.deleteById(resultId)
+    }
+
+    suspend fun deleteErrorModule(module:ErrorModule) {
+        errorModulesRepository.deleteErrorModule(module)
     }
 
     fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
@@ -182,22 +194,53 @@ class AnalysisViewModel(
 
     fun insertTestRecord() = viewModelScope.launch {
         // Save image as a Blob
-        val bitmap = createSimpleBitmap(100, 100, Color.BLUE)
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
-        val byteArray = outputStream.toByteArray()
+        val bitmap1 = createSimpleBitmap(100, 100, Color.BLUE)
+        val outputStream1 = ByteArrayOutputStream()
+        bitmap1.compress(Bitmap.CompressFormat.JPEG, 20, outputStream1)
+        val byteArray1 = outputStream1.toByteArray()
+
+        val bitmap2 = createSimpleBitmap(100, 100, Color.RED)
+        val outputStream2 = ByteArrayOutputStream()
+        bitmap2.compress(Bitmap.CompressFormat.JPEG, 20, outputStream2)
+        val byteArray2 = outputStream2.toByteArray()
+
+        val bitmap3 = createSimpleBitmap(100, 100, Color.GREEN)
+        val outputStream3 = ByteArrayOutputStream()
+        bitmap3.compress(Bitmap.CompressFormat.JPEG, 20, outputStream3)
+        val byteArray3 = outputStream3.toByteArray()
 
         val testAnalysisResult = AnalysisResult(signageId = 1L)
         val resultId = analysisResultRepository.insertResult(testAnalysisResult)
-        val testErrorModule = ErrorModule(
+        val testErrorModule1 = ErrorModule(
             resultId = resultId,
             score = 90.1,
             x = 1,
             y = 1
         )
-        val moduleId = errorModulesRepository.insertErrorModule(testErrorModule)
-        val testErrorImage = ErrorImage(error_module_id = moduleId, evidence_image = byteArray)
+        val testErrorModule2 = ErrorModule(
+            resultId = resultId,
+            score = 45.1,
+            x = 1,
+            y = 1
+        )
+        val testErrorModule3 = ErrorModule(
+            resultId = resultId,
+            score = 75.1,
+            x = 1,
+            y = 1
+        )
+        val moduleId1 = errorModulesRepository.insertErrorModule(testErrorModule1)
+        val moduleId2 = errorModulesRepository.insertErrorModule(testErrorModule2)
+        val moduleId3 = errorModulesRepository.insertErrorModule(testErrorModule3)
+
+        val testErrorImage1 = ErrorImage(error_module_id = moduleId1, evidence_image = byteArray1)
+        errorImagesRepository.insertImage(testErrorImage1)
+        val testErrorImage2 = ErrorImage(error_module_id = moduleId2, evidence_image = byteArray2)
+        errorImagesRepository.insertImage(testErrorImage2)
+        val testErrorImage3 = ErrorImage(error_module_id = moduleId3, evidence_image = byteArray3)
+        errorImagesRepository.insertImage(testErrorImage3)
     }
+
 
 }
 

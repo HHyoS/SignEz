@@ -40,4 +40,6 @@ class OfflineErrorModulesRepository(private val moduleDao: ErrorModuleDao) : Err
     override suspend fun getModulesByResultId(resultId: Long) = moduleDao.getModulesByResultId(resultId)
 
     override suspend fun getModuleById(resultId: Long) = moduleDao.getModuleById(resultId)
+
+    override suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long) = moduleDao.getModulesByXYResultId(x,y,resultId)
 }
