@@ -1,6 +1,7 @@
 package com.signez.signageproblemshooting
 
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -21,7 +22,6 @@ import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 import kotlinx.coroutines.*
 import org.opencv.android.BaseLoaderCallback
@@ -30,8 +30,6 @@ import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
-import org.opencv.videoio.VideoCapture
-import org.opencv.videoio.Videoio
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
@@ -70,6 +68,7 @@ class ErrorDetectActivity : ComponentActivity() {
         private const val scoreThreshold = 0.20f // score above which a detection is generated
 
         private const val rectThreshold = 5.0f
+
 
     }
 
@@ -149,6 +148,7 @@ class ErrorDetectActivity : ComponentActivity() {
             }
         }
 
+
         try {
             signageDetectModule =
                 Module.load(assetFilePath(applicationContext, signageDetectModuleFileName))
@@ -158,13 +158,6 @@ class ErrorDetectActivity : ComponentActivity() {
             Log.e("TorchScriptModule", "Failed to open module files.")
             finish()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val intents: Intent = intent
-        val nullableType = intents.extras?.getInt(REQUEST_TYPE)
-        val signageId: Long? = intents.extras?.getLong(REQUEST_SIGNAGE_ID)
         analysisViewModel.progressMessage.value = "모델 읽는 중"
         if (intents.data == null || signageId == null || nullableType == null) {
             finish()
@@ -187,6 +180,7 @@ class ErrorDetectActivity : ComponentActivity() {
             }
         }
     }
+
 
     private suspend fun detectVideo() = coroutineScope {
         launch {
