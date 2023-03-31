@@ -182,13 +182,14 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openImageCropActivity(context: Context, mWidth:Int, mHeight:Int, mmWidth:Int, mmHeight:Int, uri: Uri) {
+fun openImageCropActivity(context: Context, mWidth:Int, mHeight:Int, mmWidth:Int, mmHeight:Int, REQUEST_TYPE:Int, uri: Uri) {
     val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
     val intent = Intent(context, ImageCropActivity::class.java)
     intent.putExtra("mWidth",mWidth)
     intent.putExtra("mHeight",mHeight)
     intent.putExtra("mmWidth",mmWidth)
     intent.putExtra("mmHeight",mmHeight)
+    intent.putExtra("REQUEST_TYPE", REQUEST_TYPE)
     intent.putExtra("uri",uri.toString())
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
 }

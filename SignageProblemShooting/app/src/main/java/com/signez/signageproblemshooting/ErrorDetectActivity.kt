@@ -147,8 +147,6 @@ class ErrorDetectActivity : ComponentActivity() {
         val TopRight = intents.getIntExtra("PointTopRight", 0)
         val BottomLeft = intents.getIntExtra("PointBottomLeft", 0)
         val BottomRight = intents.getIntExtra("PointBottomRight", 0)
-        val pointBottomRight = intents.getIntExtra("pointBottomRight", 0)
-        Log.d("test","${TopLeft},${TopRight},${BottomLeft},${BottomRight}")
         Log.d("test","${TopLeft},${TopRight},${BottomLeft},${BottomRight}")
 
         try {

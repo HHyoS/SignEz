@@ -38,6 +38,8 @@ class ImageCropActivity : AppCompatActivity() {
     var pointBottomRight = Point(300, 300)
 
     var mModule: Module? = null
+    // m : viewFrame
+    // mm : 이미지 실제 크기
     var mWidth : Int = 1
     var mHeight : Int = 2
     var mmWidth : Int = 3
@@ -57,6 +59,9 @@ class ImageCropActivity : AppCompatActivity() {
     var viewHeight : Float  = 0f
     var imageWidth : Float  = 0f
     var imageHeight  : Float  = 0f
+    var scaleX: Float = 0f
+    var scaleY : Float = 0f
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -199,8 +204,8 @@ class ImageCropActivity : AppCompatActivity() {
 //            val imageWidth = imageView.drawable.intrinsicWidth
 //            val imageHeight = imageView.drawable.intrinsicHeight
 
-            val scaleX = imageWidth.toFloat() / viewWidth.toFloat()
-            val scaleY = imageHeight.toFloat() / viewHeight.toFloat()
+            scaleX = imageWidth / viewWidth
+            scaleY = imageHeight / viewHeight
 //            val scaleX = viewWidth.toFloat() / imageWidth.toFloat()
 //            val scaleY = viewHeight.toFloat() / imageHeight.toFloat()
             val scaledTouchX = event.x * scaleX
@@ -266,9 +271,9 @@ class ImageCropActivity : AppCompatActivity() {
                 putExtra("PointTopRight", pointTopRight)
                 putExtra("PointBottomLeft", pointBottomLeft)
                 putExtra("PointBottomRight", pointBottomRight)
-                putExtra("blx", pointBottomLeft.x)
-                putExtra("bly", pointBottomLeft.y)
-                putExtra("pointBottomRight", pointBottomRight)
+                putExtra("scaleX", scaleX)
+                putExtra("scaleY", scaleY)
+                putExtra("REQUEST_CODE", intent.getIntExtra("REQUEST_CODE", 0))
             }
             startActivity(intent)
             finish()
