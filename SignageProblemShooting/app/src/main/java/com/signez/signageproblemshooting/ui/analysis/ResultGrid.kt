@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
+import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
@@ -52,6 +53,10 @@ fun ResultGridView(
         value = viewModel.getSignageByResultId(viewModel.selectedResultId.value)
     })
     val signage = signageState.value
+    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
+        value = viewModel.getCabinetByResultId(viewModel.selectedResultId.value)
+    })
+    val cabinet = cabinetState.value
 
     var threshold by remember { mutableStateOf(70) }
     var errorModuleFilteredList by remember {
@@ -72,6 +77,8 @@ fun ResultGridView(
 
     var widthCabinetNumber = signage?.widthCabinetNumber ?: 2
     var heightCabinetNumber = signage?.heightCabinetNumber ?: 2
+    var widthModuleNumber = cabinet?.moduleColCount ?: 2
+    var heightModuleNumber = cabinet?.moduleRowCount ?: 2
 
 
     errorModuleFilteredList = modules ?: listOf(
@@ -143,22 +150,25 @@ fun ResultGridView(
                             var pxsixteen = with(LocalDensity.current) { 16.dp.toPx() }
                             var moduleSize = with(LocalDensity.current) {
                                 kotlin.math.min(
-                                    (parentWidth / (widthCabinetNumber + 2)),
-                                    (parentHeight / (heightCabinetNumber + 2))
+                                    (parentWidth / ((widthCabinetNumber*widthModuleNumber) + 2)),
+                                    (parentHeight / ((heightCabinetNumber*heightModuleNumber) + 2))
                                 ).toDp()
                             }
+
                             Log.d(
                                 "moduleSize",
                                 "ResultGridView: ${moduleSize}}"
                             )
-                            if (signage != null) {
+                            if (signage != null && cabinet != null) {
                                 ErrorModuleHeatMap(
                                     widthCabinetNumber = widthCabinetNumber,
                                     heightCabinetNumber = heightCabinetNumber,
-                                    moduleRowCount = 4,
-                                    moduleColCount = 4,
+                                    moduleRowCount = cabinet.moduleRowCount,
+                                    moduleColCount = cabinet.moduleColCount,
                                     errorModuleList = errorModuleFilteredList,
-                                    moduleSize = moduleSize
+                                    moduleSize = moduleSize,
+                                    cabinetHeigth = (moduleSize*heightModuleNumber),
+                                    cabinetWidth = (moduleSize*widthModuleNumber)
                                 )
                             }
                         }
