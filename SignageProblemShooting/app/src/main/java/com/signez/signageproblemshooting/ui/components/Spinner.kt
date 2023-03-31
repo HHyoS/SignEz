@@ -53,11 +53,11 @@ fun LoadingSpinner(
                 color = MaterialTheme.colors.onSurface,
                 modifier = Modifier.padding(10.dp),
             )
-//            LinearProgressIndicator(
-//                modifier = Modifier.width(80.dp),
-//                color = MaterialTheme.colors.primary,
-//                backgroundColor = MaterialTheme.colors.secondary
-//            )
+            LinearProgressIndicator(
+                modifier = Modifier.width(80.dp),
+                color = MaterialTheme.colors.primary,
+                backgroundColor = MaterialTheme.colors.secondary
+            )
         }
     }
 }
