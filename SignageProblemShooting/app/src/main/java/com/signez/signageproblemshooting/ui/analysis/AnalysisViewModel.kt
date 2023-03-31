@@ -5,17 +5,13 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.signez.signageproblemshooting.data.entities.*
 import com.signez.signageproblemshooting.data.repository.*
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetState
-import com.signez.signageproblemshooting.ui.signage.SignageListState
-import com.signez.signageproblemshooting.ui.signage.SignageViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -39,6 +35,10 @@ class AnalysisViewModel(
     var imageContentUri = mutableStateOf(Uri.EMPTY)
     var signageId = mutableStateOf(-1L)
     var selectedResultId = mutableStateOf(-1L)
+    var selectedModuleX = mutableStateOf(-1)
+    var selectedModuleY = mutableStateOf(-1)
+    var progressMessage = mutableStateOf("분석 중")
+    var progressFloat = mutableStateOf(0.0F)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
@@ -63,9 +63,7 @@ class AnalysisViewModel(
     }
 
     suspend fun getSignageById(signageId: Long): Signage {
-        val signage: Signage =
-            signageRepository.getSignageById(signageId)
-        return signage
+        return signageRepository.getSignageById(signageId)
     }
 
     fun getSignage(): StateFlow<SignageState> {
@@ -134,46 +132,64 @@ class AnalysisViewModel(
     }
 
     suspend fun getRelatedImages(moduleId: Long): List<ErrorImage> {
-        val images: List<ErrorImage> =
-            errorImagesRepository.getImagesByModuleId(moduleId)
-        return images
+        return errorImagesRepository.getImagesByModuleId(moduleId)
+    }
+
+    private suspend fun getMostRecentResultId() = runBlocking {
+        return@runBlocking analysisResultRepository.getMostRecentResult().id
     }
 
     suspend fun getRelatedModule(resultId: Long): List<ErrorModule> {
-        val modules: List<ErrorModule> =
-            errorModulesRepository.getModulesByResultId(resultId)
-        return modules
+        return if (resultId == -1L) {
+            val modules: List<ErrorModule> =
+                errorModulesRepository.getModulesByResultId(resultId)
+            modules
+        } else { // resultId가 -1 == 안 골라 졌다면 가장 최근 생성된 결과 아이디 가져옴.
+            val modules: List<ErrorModule> =
+                errorModulesRepository.getModulesByResultId(getMostRecentResultId())
+            modules
+        }
+
     }
 
     suspend fun getRelatedResults(signageId: Long): List<AnalysisResult> {
-        val results: List<AnalysisResult> =
-            analysisResultRepository.getResultsBySignageId(signageId)
-        return results
+        return analysisResultRepository.getResultsBySignageId(signageId)
     }
 
     suspend fun getImageById(imageId: Long): ErrorImage {
-        val image: ErrorImage =
-            errorImagesRepository.getImageById(imageId)
-        return image
+        return errorImagesRepository.getImageById(imageId)
     }
 
     suspend fun getModuleById(moduleId: Long): ErrorModule {
-        val module: ErrorModule =
-            errorModulesRepository.getModuleById(moduleId)
-        return module
+        return errorModulesRepository.getModuleById(moduleId)
     }
 
     suspend fun getResultById(resultId: Long): AnalysisResult {
-        val result: AnalysisResult =
-            analysisResultRepository.getResultById(resultId)
-        return result
+        return analysisResultRepository.getResultById(resultId)
+    }
+
+    suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long): List<ErrorModuleWithImage> {
+        return errorModulesRepository.getModulesByXYResultId(x, y, resultId)
     }
 
     suspend fun deleteResult(resultId: Long) {
         analysisResultRepository.deleteById(resultId)
     }
 
-    fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
+    suspend fun deleteErrorModule(module: ErrorModule) {
+        errorModulesRepository.deleteErrorModule(module)
+    }
+
+    suspend fun getSignageByResultId(resultId: Long): Signage? {
+        val resultById = getResultById(resultId = resultId)
+        if (resultById == null) {
+            return null
+        } else {
+            return getSignageById(resultById.signageId)
+        }
+    }
+
+    private fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         canvas.drawColor(color)
@@ -182,22 +198,53 @@ class AnalysisViewModel(
 
     fun insertTestRecord() = viewModelScope.launch {
         // Save image as a Blob
-        val bitmap = createSimpleBitmap(100, 100, Color.BLUE)
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outputStream)
-        val byteArray = outputStream.toByteArray()
-
-        val testAnalysisResult = AnalysisResult(signageId = 1L)
-        val resultId = analysisResultRepository.insertResult(testAnalysisResult)
-        val testErrorModule = ErrorModule(
-            resultId = resultId,
-            score = 90.1,
-            x = 1,
-            y = 1
-        )
-        val moduleId = errorModulesRepository.insertErrorModule(testErrorModule)
-        val testErrorImage = ErrorImage(error_module_id = moduleId, evidence_image = byteArray)
+//        val bitmap1 = createSimpleBitmap(100, 100, Color.BLUE)
+//        val outputStream1 = ByteArrayOutputStream()
+//        bitmap1.compress(Bitmap.CompressFormat.JPEG, 20, outputStream1)
+//        val byteArray1 = outputStream1.toByteArray()
+//
+//        val bitmap2 = createSimpleBitmap(100, 100, Color.RED)
+//        val outputStream2 = ByteArrayOutputStream()
+//        bitmap2.compress(Bitmap.CompressFormat.JPEG, 20, outputStream2)
+//        val byteArray2 = outputStream2.toByteArray()
+//
+//        val bitmap3 = createSimpleBitmap(100, 100, Color.GREEN)
+//        val outputStream3 = ByteArrayOutputStream()
+//        bitmap3.compress(Bitmap.CompressFormat.JPEG, 20, outputStream3)
+//        val byteArray3 = outputStream3.toByteArray()
+//
+//        val testAnalysisResult = AnalysisResult(signageId = 1L)
+//        val resultId = analysisResultRepository.insertResult(testAnalysisResult)
+//        val testErrorModule1 = ErrorModule(
+//            resultId = resultId,
+//            score = 90.1,
+//            x = 1,
+//            y = 1
+//        )
+//        val testErrorModule2 = ErrorModule(
+//            resultId = resultId,
+//            score = 45.1,
+//            x = 1,
+//            y = 1
+//        )
+//        val testErrorModule3 = ErrorModule(
+//            resultId = resultId,
+//            score = 75.1,
+//            x = 1,
+//            y = 1
+//        )
+//        val moduleId1 = errorModulesRepository.insertErrorModule(testErrorModule1)
+//        val moduleId2 = errorModulesRepository.insertErrorModule(testErrorModule2)
+//        val moduleId3 = errorModulesRepository.insertErrorModule(testErrorModule3)
+//
+//        val testErrorImage1 = ErrorImage(error_module_id = moduleId1, evidence_image = byteArray1)
+//        errorImagesRepository.insertImage(testErrorImage1)
+//        val testErrorImage2 = ErrorImage(error_module_id = moduleId2, evidence_image = byteArray2)
+//        errorImagesRepository.insertImage(testErrorImage2)
+//        val testErrorImage3 = ErrorImage(error_module_id = moduleId3, evidence_image = byteArray3)
+//        errorImagesRepository.insertImage(testErrorImage3)
     }
+
 
 }
 
