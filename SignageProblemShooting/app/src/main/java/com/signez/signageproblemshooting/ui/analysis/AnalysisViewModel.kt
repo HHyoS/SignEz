@@ -189,6 +189,20 @@ class AnalysisViewModel(
         }
     }
 
+    suspend fun getCabinetByResultId(resultId: Long): Cabinet? {
+        val resultById = getResultById(resultId = resultId)
+        if (resultById == null) {
+            return null
+        } else {
+            val cabinetById = getCabinet(signageId = resultById.signageId)
+            if(cabinetById == null){
+                return null
+            } else {
+                return cabinetById
+            }
+        }
+    }
+
     private fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
