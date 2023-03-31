@@ -10,6 +10,7 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
@@ -34,6 +35,8 @@ fun ErrorModuleHeatMap(
     moduleColCount: Int,
     errorModuleList: List<ErrorModule>,
     moduleSize: Dp,
+    cabinetWidth: Dp,
+    cabinetHeigth: Dp,
 ) {
     // set up all transformation states
     var scale by remember { mutableStateOf(1f) }
@@ -55,13 +58,14 @@ fun ErrorModuleHeatMap(
             IntArray(cabinetColCount + 1)
         }
 
-//    Array<ErrorModule>
-    for (errormoudle in errorModuleList) {
-        val crow = (errormoudle.x / moduleRowCount) + 1
-        val ccol = (errormoudle.y / moduleColCount) + 1
 
-        cabinetMatrix[crow][ccol] += 1
-    }
+//    Array<ErrorModule>
+//    for (errormoudle in errorModuleList) {
+//        val crow = (errormoudle.x / moduleRowCount) + 1
+//        val ccol = (errormoudle.y / moduleColCount) + 1
+//    }
+
+    cabinetMatrix[1][1] = 1
 
     Box(
         modifier = Modifier
@@ -76,49 +80,126 @@ fun ErrorModuleHeatMap(
 //         add transformable to listen to multitouch transformation events
 //         after offset
             .transformable(state = state)
-            .border(width = moduleSize/2, color = Color.Black)
+            .border(width = moduleSize / 2, color = Color.Black)
     ) {
         Column(
-            modifier = Modifier.padding(all = moduleSize/2)
+            modifier = Modifier.padding(all = moduleSize / 2)
         ) {
             for (cabinetR in 1..cabinetRowCount) {
                 Row() {
                     for (cabinetC in 1..cabinetColCount) {
-                        Column(
-                            Modifier
+                        Box(
+                            modifier = Modifier
+                                .border(width = moduleSize / 8, color = Color(0xFF555657))
+                        ) {
+                            Column(
+                                Modifier
+                                    .width(cabinetWidth + (moduleSize / 4))
+                                    .height(cabinetHeigth + (moduleSize / 4))
+                                    .padding(all = moduleSize / 8),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
 //                            .border(width = 0.5.dp, color = MaterialTheme.colors.onSurface)
 //                            .padding(0.5.dp)
-                        ) {
+                            ) {
                             val errorCount = errorModuleList.count { errorModule ->
                                 errorModule.x / moduleRowCount + 1 == cabinetR &&
                                         errorModule.y / moduleColCount + 1 == cabinetC
                             }
-                            Canvas(
-                                modifier = Modifier
-                                    .width(moduleSize)
-                                    .height(moduleSize)
-                                    .clip(RoundedCornerShape(15))
-                                    .clickable(
-                                        enabled = errorCount >= 1
-                                    ) {
 
+//                                val errorCount = 1
+                                var isModuleRevealed by remember {
+                                    mutableStateOf(false)
+                                }
+                                if (!isModuleRevealed) {
+                                    Canvas(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+//                                        .width(moduleSize)
+//                                        .height(moduleSize)
+//                                        .clip(RoundedCornerShape(15))
+                                            .clickable(
+                                                enabled = errorCount >= 1
+                                            ) {
+                                                isModuleRevealed = true
+                                            }
+//                                        .border(width = 0.2.dp, color = Color(0xFF0D3EF1))
+                                    ) {
+                                        //draw shapes here
+                                        drawRoundRect(
+                                            color =
+                                            when (errorCount) {
+                                                0 -> Color(0xFFECECEC)
+                                                1, 2, 3, 4 -> Color(0xFFFFB5B5)
+                                                5, 6, 7, 8 -> Color(0xFFFF6767)
+                                                else -> Color(0xFFFF1414)
+                                            },
+//                                        cornerRadius = CornerRadius(5f, 5f)
+                                        )
                                     }
-                                    .border(width = 0.2.dp, color = Color(0xFFFFFFFF))
-                            ) {
-                                //draw shapes here
-                                drawRoundRect(
-                                    color =
-                                    when (errorCount) {
-                                        0 -> Color(0xFFE3E3E3)
-                                        1, 2, 3, 4 -> Color(0xFFFFB5B5)
-                                        5, 6, 7, 8, 9 -> Color(0xFFFF6767)
-                                        else -> Color(0xFFFF1414)
-                                    },
-                                    cornerRadius = CornerRadius(5f, 5f)
-                                )
-                            }
-                        } // Col
-                    } // for cabinet C
+                                } else {
+                                    var signageMatrix =
+                                        Array(moduleRowCount + 1) { IntArray(moduleColCount + 1) }
+                                    //
+                                    for (moduleR in 1..moduleRowCount) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+//                                        modifier = Modifier.padding(vertical = 1.dp)
+                                        ) {
+                                            for (moduleC in 1..moduleColCount) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(5))
+                                                ) {
+                                                    Column(
+                                                        Modifier
+                                                            .size(moduleSize)
+                                                    ) {
+                                            val errorCount = errorModuleList.count { errorModule ->
+                                                errorModule.x / moduleRowCount + 1 == cabinetR &&
+                                                        errorModule.y / moduleColCount + 1 == cabinetC &&
+                                                        errorModule.x % moduleRowCount + 1 == moduleR &&
+                                                        errorModule.y % moduleColCount + 1 == moduleC
+                                            }
+//                                                        val errorCount = 5
+                                                        Canvas(
+                                                            modifier = Modifier
+                                                                .fillMaxSize()
+//                                                                .size(moduleSize)
+//                                                                .clip(RoundedCornerShape(5))
+                                                                .clickable(
+                                                                    enabled = errorCount >= 1
+                                                                ) {
+                                                                    isModuleRevealed = false
+                                                                }
+//                                                    .border(
+////                                                        width = 0.05.dp,
+////                                                        color = Color(0xFFFFFFFF)
+//                                                    )
+                                                        ) {
+                                                            //draw shapes here
+                                                            drawRoundRect(
+                                                                color =
+                                                                when (errorCount) {
+                                                                    0 -> Color(0xFFE3E3E3)
+                                                                    1, 2, 3, 4 -> Color(0xFFFFB5B5)
+                                                                    5, 6, 7, 8 -> Color(0xFFFF6767)
+                                                                    else -> Color(0xFFFF1414)
+                                                                },
+//                                                    cornerRadius = CornerRadius(5f, 5f)
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    //
+                                }
+                            } // Col
+                        } // for cabinet C
+                    }
                 } // Row
             } // for cabinet R
         } // Col
@@ -184,7 +265,9 @@ fun HeatMapPreview() {
                     moduleRowCount = 4,
                     moduleColCount = 4,
                     errorModuleList = errorModuleFilteredList,
-                    moduleSize = 20.dp
+                    moduleSize = 20.dp,
+                    cabinetHeigth = 10.dp,
+                    cabinetWidth = 10.dp
                 )
             }
 
