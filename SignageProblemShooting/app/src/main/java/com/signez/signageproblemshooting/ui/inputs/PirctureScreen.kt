@@ -90,7 +90,7 @@ fun PictureAnalysis(
 
     //test start
     var mModule: Module? = null
-    var mWidth: Int = 1
+    var mWidth: Int = 2
     var mHeight: Int = 2
     var mmWidth: Int = 3
     var mmHeight: Int = 5
