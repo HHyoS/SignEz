@@ -65,4 +65,7 @@ interface AnalysisResultDao {
 
     @Query("DELETE FROM results WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT * FROM results ORDER BY resultDate DESC LIMIT 1")
+    suspend fun getMostRecentResult(): AnalysisResult
 }

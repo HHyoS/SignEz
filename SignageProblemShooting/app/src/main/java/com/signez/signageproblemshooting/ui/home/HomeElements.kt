@@ -10,9 +10,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -23,8 +21,7 @@ import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,30 +34,45 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.R
+import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
+import com.signez.signageproblemshooting.ui.AppViewModelProvider
+import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
+import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
+import com.signez.signageproblemshooting.ui.analysis.ShowContextMenu
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.WhiteButton
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
+import com.signez.signageproblemshooting.ui.signage.conditional
 import com.signez.signageproblemshooting.ui.theme.SignEzTheme
+import kotlinx.coroutines.launch
 
 @Composable //지난 분석 결과 틀
 fun PastResult(
     modifier: Modifier = Modifier,
-    navController: NavController
+    navController: NavController,
+    viewModel: AnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val itemList = listOf<Painter>(
-        painterResource(id = R.drawable.bluesign),
-        painterResource(id = R.drawable.bluesign),
-        painterResource(id = R.drawable.bluesign),
-        painterResource(id = R.drawable.bluesign),
-        painterResource(id = R.drawable.bluesign),
-        painterResource(id = R.drawable.bluesign),
-        painterResource(id = R.drawable.bluesign)
-    )
+    val resultListState by viewModel.resultListState.collectAsState()
+    val itemList = resultListState.itemList
+//    val itemList = listOf<Painter>(
+//        painterResource(id = R.drawable.bluesign),
+//        painterResource(id = R.drawable.bluesign),
+//        painterResource(id = R.drawable.bluesign),
+//        painterResource(id = R.drawable.bluesign),
+//        painterResource(id = R.drawable.bluesign),
+//        painterResource(id = R.drawable.bluesign),
+//        painterResource(id = R.drawable.bluesign)
+//    )
     Surface(
         modifier = modifier
             .background(androidx.compose.material.MaterialTheme.colors.surface)
@@ -105,16 +117,20 @@ fun PastResult(
             ) {
                 items(items = itemList) { item ->
                     CompositionLocalProvider(LocalRippleTheme provides RippleCustomTheme) {
-                        Image(
-                            painter = item,
-                            contentDescription = "아이템",
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(100.dp)
-//                                .padding(5.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .clickable { /* 해당 분석 결과로 가는 이벤트 */ }
-                        )
+                        HomeHistoryElement(
+                            result=item,
+                            viewModel=viewModel,
+                            navController=navController
+                            )
+//                        Image(
+//                            painter = item,
+//                            contentDescription = "아이템",
+//                            modifier = Modifier
+//                                .width(100.dp)
+//                                .height(100.dp)
+//                                .clip(RoundedCornerShape(10.dp))
+//                                .clickable { /* 해당 분석 결과로 가는 이벤트 */ }
+//                        )
                     }
                 }
             }
@@ -123,7 +139,34 @@ fun PastResult(
     }
 }
 
-
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+private fun HomeHistoryElement(
+    result: AnalysisResult,
+    viewModel: AnalysisViewModel,
+    navController: NavController
+) {
+    val signageState = produceState(initialValue = null as Signage?, producer = {
+        value = viewModel.getSignageById(result.signageId)
+    })
+    val signage = signageState.value
+    if (signage != null) {
+        signage.repImg?.let { byteArray ->
+            GlideImage(
+                model = byteArray,
+                contentDescription = "글라이드",
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(100.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        viewModel.selectedResultId.value = result.id
+                        navController.navigate(ResultGridDestination.route)
+                    }
+            )
+        }
+    } // if 끝
+}
 //@Preview
 //@Composable
 //fun ComponentPreview() {
