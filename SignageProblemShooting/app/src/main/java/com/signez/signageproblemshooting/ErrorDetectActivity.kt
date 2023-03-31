@@ -51,6 +51,7 @@ class ErrorDetectActivity : ComponentActivity() {
         private const val REQUEST_DETECT_VIDEO: Int = 100
         private const val REQUEST_DETECT_PHOTO: Int = 101
         private const val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+        private const val REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY = 998
 
         private val REQUEST_TYPE: String = "REQUEST_TYPE"
         private val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
@@ -89,22 +90,25 @@ class ErrorDetectActivity : ComponentActivity() {
         return Module.load(assetFilePath(SignEzApplication.instance, signageDetectModuleFileName))
     }
 
-    private fun detect() {
+    private fun detect(defaultDispatcher: CoroutineDispatcher = Dispatchers.Default) {
         lifecycleScope.launch {
-            when (type) {
-                REQUEST_DETECT_VIDEO -> detectVideo()
-                REQUEST_DETECT_PHOTO -> detectPhoto()
-                else -> {
-                    Log.i("-------------State-----------", uri.toString())
-                    Log.i("-------------State-----------", signage.toString())
-                    Log.i("-------------State-----------", cabinet.toString())
+            withContext(defaultDispatcher) {
+                when (type) {
+                    REQUEST_DETECT_VIDEO -> detectVideo()
+                    REQUEST_DETECT_PHOTO -> detectPhoto()
+                    else -> {
+                        Log.i("-------------State-----------", uri.toString())
+                        Log.i("-------------State-----------", signage.toString())
+                        Log.i("-------------State-----------", cabinet.toString())
 
-                    delay(5000)
-                    Log.e("ErrorDetectActivity", "Wrong Access to Activity!")
-
-                    //
-                }
-            } // when end
+                        delay(5000)
+                        Log.e("ErrorDetectActivity", "Wrong Access to Activity!")
+                        setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
+                        finish()
+                        //
+                    }
+                } // when end
+            }
             setResult(REQUEST_CODE_ERROR_DETECT_ACTIVITY)
             finish()
         }
