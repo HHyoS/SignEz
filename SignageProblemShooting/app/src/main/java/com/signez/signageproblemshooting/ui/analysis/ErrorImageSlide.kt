@@ -45,6 +45,9 @@ fun ErrorImageView(
     viewModel: AnalysisViewModel,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
+    x:Int,
+    y:Int,
+    resultId:Long,
 ) {
     val focusManager = LocalFocusManager.current
     val coroutineScope = rememberCoroutineScope()

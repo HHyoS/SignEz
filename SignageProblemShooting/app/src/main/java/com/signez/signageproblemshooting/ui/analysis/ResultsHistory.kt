@@ -156,7 +156,7 @@ private fun ResultItem(
             .combinedClickable(
                 onClick = {
                     viewModel.selectedResultId.value = result.id
-                    navController.navigate(ResultGridDestination.route)
+                    navController.navigate(ResultGridDestination.route+"/${result.id}")
                 },
                 onLongClick = {
                     showContextMenu = true

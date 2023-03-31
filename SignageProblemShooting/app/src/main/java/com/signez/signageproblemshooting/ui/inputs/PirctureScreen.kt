@@ -225,16 +225,7 @@ fun PictureAnalysis(
 //                    }
                     //
                     /* 분석하기 이벤트를 넣으면 됨 */
-                    navController.currentDestination?.let {
-                        navController.popBackStack(
-                            it.id,
-                            true
-                        )
-                    }
-
                     navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
                     openErrorDetectActivity(
                         context,
                         REQUEST_DETECT_PHOTO,

@@ -150,28 +150,39 @@ fun SignEzNavHost(
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel5
             )
+
         }
 
-        composable(route = ResultGridDestination.route) {
-            ResultGridView(
-                onItemClick = {},
-                modifier = Modifier,
-                navController = navController,
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel5
-            )
+        composable(route = ResultGridDestination.route+"/{resultId}") {
+            backStackEntry ->
+            backStackEntry.arguments?.getString("resultId")?.let {
+                ResultGridView(
+                    onItemClick = {},
+                    modifier = Modifier,
+                    navController = navController,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
+                    viewModel = viewModel5,
+                    resultId = it.toLong()
+                )
+            }
         }
 
-        composable(route = ErrorImageDestination.route) {
-            ErrorImageView(
-                onItemClick = {},
-                modifier = Modifier,
-                navController = navController,
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel5
-            )
+        composable(route = ErrorImageDestination.route+"/{x}/{y}/{resultId}") {
+            backStackEntry ->
+            backStackEntry.arguments?.let {
+                ErrorImageView(
+                    onItemClick = {},
+                    modifier = Modifier,
+                    navController = navController,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
+                    viewModel = viewModel5,
+                    x = it.getInt("x"),
+                    y = it.getInt("y"),
+                    resultId = it.getLong("resultId")
+                )
+            }
         }
 
     }
