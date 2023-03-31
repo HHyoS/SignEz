@@ -176,8 +176,17 @@ class AnalysisViewModel(
         analysisResultRepository.deleteById(resultId)
     }
 
-    suspend fun deleteErrorModule(module:ErrorModule) {
+    suspend fun deleteErrorModule(module: ErrorModule) {
         errorModulesRepository.deleteErrorModule(module)
+    }
+
+    suspend fun getSignageByResultId(resultId: Long): Signage? {
+        val resultById = getResultById(resultId = resultId)
+        if (resultById == null) {
+            return null
+        } else {
+            return getSignageById(resultById.signageId)
+        }
     }
 
     private fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
@@ -189,51 +198,51 @@ class AnalysisViewModel(
 
     fun insertTestRecord() = viewModelScope.launch {
         // Save image as a Blob
-        val bitmap1 = createSimpleBitmap(100, 100, Color.BLUE)
-        val outputStream1 = ByteArrayOutputStream()
-        bitmap1.compress(Bitmap.CompressFormat.JPEG, 20, outputStream1)
-        val byteArray1 = outputStream1.toByteArray()
-
-        val bitmap2 = createSimpleBitmap(100, 100, Color.RED)
-        val outputStream2 = ByteArrayOutputStream()
-        bitmap2.compress(Bitmap.CompressFormat.JPEG, 20, outputStream2)
-        val byteArray2 = outputStream2.toByteArray()
-
-        val bitmap3 = createSimpleBitmap(100, 100, Color.GREEN)
-        val outputStream3 = ByteArrayOutputStream()
-        bitmap3.compress(Bitmap.CompressFormat.JPEG, 20, outputStream3)
-        val byteArray3 = outputStream3.toByteArray()
-
-        val testAnalysisResult = AnalysisResult(signageId = 1L)
-        val resultId = analysisResultRepository.insertResult(testAnalysisResult)
-        val testErrorModule1 = ErrorModule(
-            resultId = resultId,
-            score = 90.1,
-            x = 1,
-            y = 1
-        )
-        val testErrorModule2 = ErrorModule(
-            resultId = resultId,
-            score = 45.1,
-            x = 1,
-            y = 1
-        )
-        val testErrorModule3 = ErrorModule(
-            resultId = resultId,
-            score = 75.1,
-            x = 1,
-            y = 1
-        )
-        val moduleId1 = errorModulesRepository.insertErrorModule(testErrorModule1)
-        val moduleId2 = errorModulesRepository.insertErrorModule(testErrorModule2)
-        val moduleId3 = errorModulesRepository.insertErrorModule(testErrorModule3)
-
-        val testErrorImage1 = ErrorImage(error_module_id = moduleId1, evidence_image = byteArray1)
-        errorImagesRepository.insertImage(testErrorImage1)
-        val testErrorImage2 = ErrorImage(error_module_id = moduleId2, evidence_image = byteArray2)
-        errorImagesRepository.insertImage(testErrorImage2)
-        val testErrorImage3 = ErrorImage(error_module_id = moduleId3, evidence_image = byteArray3)
-        errorImagesRepository.insertImage(testErrorImage3)
+//        val bitmap1 = createSimpleBitmap(100, 100, Color.BLUE)
+//        val outputStream1 = ByteArrayOutputStream()
+//        bitmap1.compress(Bitmap.CompressFormat.JPEG, 20, outputStream1)
+//        val byteArray1 = outputStream1.toByteArray()
+//
+//        val bitmap2 = createSimpleBitmap(100, 100, Color.RED)
+//        val outputStream2 = ByteArrayOutputStream()
+//        bitmap2.compress(Bitmap.CompressFormat.JPEG, 20, outputStream2)
+//        val byteArray2 = outputStream2.toByteArray()
+//
+//        val bitmap3 = createSimpleBitmap(100, 100, Color.GREEN)
+//        val outputStream3 = ByteArrayOutputStream()
+//        bitmap3.compress(Bitmap.CompressFormat.JPEG, 20, outputStream3)
+//        val byteArray3 = outputStream3.toByteArray()
+//
+//        val testAnalysisResult = AnalysisResult(signageId = 1L)
+//        val resultId = analysisResultRepository.insertResult(testAnalysisResult)
+//        val testErrorModule1 = ErrorModule(
+//            resultId = resultId,
+//            score = 90.1,
+//            x = 1,
+//            y = 1
+//        )
+//        val testErrorModule2 = ErrorModule(
+//            resultId = resultId,
+//            score = 45.1,
+//            x = 1,
+//            y = 1
+//        )
+//        val testErrorModule3 = ErrorModule(
+//            resultId = resultId,
+//            score = 75.1,
+//            x = 1,
+//            y = 1
+//        )
+//        val moduleId1 = errorModulesRepository.insertErrorModule(testErrorModule1)
+//        val moduleId2 = errorModulesRepository.insertErrorModule(testErrorModule2)
+//        val moduleId3 = errorModulesRepository.insertErrorModule(testErrorModule3)
+//
+//        val testErrorImage1 = ErrorImage(error_module_id = moduleId1, evidence_image = byteArray1)
+//        errorImagesRepository.insertImage(testErrorImage1)
+//        val testErrorImage2 = ErrorImage(error_module_id = moduleId2, evidence_image = byteArray2)
+//        errorImagesRepository.insertImage(testErrorImage2)
+//        val testErrorImage3 = ErrorImage(error_module_id = moduleId3, evidence_image = byteArray3)
+//        errorImagesRepository.insertImage(testErrorImage3)
     }
 
 
