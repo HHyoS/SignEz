@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.ErrorModule
@@ -27,15 +28,12 @@ import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 @Composable
 fun ErrorModuleHeatMap(
-//    signageWidth: Double,
-//    signageHeight: Double,
-//    cabinetWidth: Double,
-//    cabinetHeight: Double,
+    heightCabinetNumber: Int = 10,
+    widthCabinetNumber: Int = 10,
     moduleRowCount: Int,
     moduleColCount: Int,
-    heightCabinetNumber: Int,
-    widthCabinetNumber: Int,
-    errorModuleList: List<ErrorModule>
+    errorModuleList: List<ErrorModule>,
+    moduleSize: Dp,
 ) {
     // set up all transformation states
     var scale by remember { mutableStateOf(1f) }
@@ -49,36 +47,23 @@ fun ErrorModuleHeatMap(
         offset += offsetChange
     }
 
-
-//    val cabinetRowCount = (signageHeight / cabinetHeight).toInt()
-//    val cabinetColCount = (signageWidth / cabinetWidth).toInt()
     val cabinetRowCount = heightCabinetNumber
     val cabinetColCount = widthCabinetNumber
 
-    val signageMatrix =
+    val cabinetMatrix =
         Array(cabinetRowCount + 1) {
-            Array(cabinetColCount + 1) {
-                Array(moduleRowCount + 1) { IntArray(moduleColCount + 1) }
-            }
+            IntArray(cabinetColCount + 1)
         }
 
 //    Array<ErrorModule>
     for (errormoudle in errorModuleList) {
         val crow = (errormoudle.x / moduleRowCount) + 1
         val ccol = (errormoudle.y / moduleColCount) + 1
-        var mrow = (errormoudle.x % moduleRowCount)
-        var mcol = (errormoudle.y % moduleColCount)
-        if (mrow == 0) {
-            mrow = moduleRowCount
-        }
-        if (mcol == 0) {
-            mcol = moduleColCount
-        }
-        signageMatrix[crow][ccol][mrow][mcol] += 1
+
+        cabinetMatrix[crow][ccol] += 1
     }
 
-
-    Column(
+    Box(
         modifier = Modifier
             // apply other transformations like rotation and zoom
             .graphicsLayer(
@@ -90,110 +75,55 @@ fun ErrorModuleHeatMap(
             )
 //         add transformable to listen to multitouch transformation events
 //         after offset
-            .transformable(state = state),
+            .transformable(state = state)
+            .border(width = moduleSize/2, color = Color.Black)
     ) {
-        for (cabinetR in 1..cabinetRowCount) {
-            Row() {
-                for (cabinetC in 1..cabinetColCount) {
-                    Column(
-                        Modifier
-                            .border(width = 0.5.dp, color = MaterialTheme.colors.onSurface)
-                            .padding(0.5.dp)
-                    ) {
-                        for (moduleR in 1..moduleRowCount) {
-                            Row(
-                                modifier = Modifier.padding(vertical = 1.dp)
-                            ) {
-                                for (moduleC in 1..moduleColCount) {
-                                    val errorCount = errorModuleList.count { errorModule ->
-                                        errorModule.x / moduleRowCount + 1 == cabinetR &&
-                                                errorModule.y / moduleColCount + 1 == cabinetC &&
-                                                errorModule.x % moduleRowCount + 1 == moduleR &&
-                                                errorModule.y % moduleColCount + 1 == moduleC
-                                    }
-                                    Canvas(
-                                        modifier = Modifier
-                                            .padding(horizontal = 1.dp)
-                                            .width(8.dp)
-                                            .height(8.dp)
-//                                            .clip(RoundedCornerShape(15))
-                                            .clickable(
-                                                enabled = errorCount >= 1
-                                            ) {
-
-                                            }
+        Column(
+            modifier = Modifier.padding(all = moduleSize/2)
+        ) {
+            for (cabinetR in 1..cabinetRowCount) {
+                Row() {
+                    for (cabinetC in 1..cabinetColCount) {
+                        Column(
+                            Modifier
+//                            .border(width = 0.5.dp, color = MaterialTheme.colors.onSurface)
+//                            .padding(0.5.dp)
+                        ) {
+                            val errorCount = errorModuleList.count { errorModule ->
+                                errorModule.x / moduleRowCount + 1 == cabinetR &&
+                                        errorModule.y / moduleColCount + 1 == cabinetC
+                            }
+                            Canvas(
+                                modifier = Modifier
+                                    .width(moduleSize)
+                                    .height(moduleSize)
+                                    .clip(RoundedCornerShape(15))
+                                    .clickable(
+                                        enabled = errorCount >= 1
                                     ) {
-                                        //draw shapes here
-                                        drawRoundRect(
-                                            color =
-                                            when (errorCount) {
-                                                0 -> Color(0xFFE3E3E3)
-                                                1, 2, 3, 4 -> Color(0xFFFFB5B5)
-                                                5, 6, 7, 8, 9 -> Color(0xFFFF6767)
-                                                else -> Color(0xFFFF1414)
-                                            },
-                                            cornerRadius = CornerRadius(5f, 5f)
-                                        )
-                                    }
-//                                    Box(
-//                                        modifier = Modifier
-//                                            .padding(horizontal = 1.dp)
-//                                            .width(15.dp)
-//                                            .height(15.dp)
-//                                            .clip(RoundedCornerShape(15))
-//                                            .clickable(
-//                                                enabled = errorCount >= 1
-//                                            ) {
-//
-//                                            }
-//                                            .background(
-//                                                color =
-//                                                when (errorCount) {
-//                                                    0 -> MaterialTheme.colors.secondary
-//                                                    1,2,3,4 -> Color(0xFFFFB5B5)
-//                                                    5,6,7,8,9-> Color(0xFFFF6767)
-//                                                    else -> Color(0xFFFF1414)
-//                                                }
-//
-////                                                if (errorCount >= 1)
-////                                                    MaterialTheme.colors.primary
-////                                                else
-////                                                    MaterialTheme.colors.secondary
-//                                            )
-//                                    )
-                                }
-//                                for (moduleC in 1..moduleColCount) {
-//                                    Column(
-//                                        modifier = Modifier.padding(horizontal = 1.dp)
-//                                    ) {
-//
-//                                        Box(
-//                                            modifier = Modifier
-//                                                .width(5.dp)
-//                                                .height(5.dp)
-//                                                .clip(RoundedCornerShape(15))
-//                                                .clickable { }
-//                                                .background(
-//                                                    color =
-//                                                    if (signageMatrix[cabinetR][cabinetC][moduleR][moduleC] >= 1)
-//                                                        MaterialTheme.colors.primary
-//                                                    else
-//                                                        MaterialTheme.colors.secondary
-//                                                )
-//                                        )
-//                                        {
-//                                        }
-////                                        Text(text = signageMatrix[cabinetR][cabinetC][moduleR][moduleC].toString())
-//                                    } // Col
-//                                } // for module C
-                            } // Row
-                        } // for module R
-                    } // Col
-                } // for cabinet C
-            } // Row
-        } // for cabinet R
-    } // Col
 
+                                    }
+                                    .border(width = 0.2.dp, color = Color(0xFFFFFFFF))
+                            ) {
+                                //draw shapes here
+                                drawRoundRect(
+                                    color =
+                                    when (errorCount) {
+                                        0 -> Color(0xFFE3E3E3)
+                                        1, 2, 3, 4 -> Color(0xFFFFB5B5)
+                                        5, 6, 7, 8, 9 -> Color(0xFFFF6767)
+                                        else -> Color(0xFFFF1414)
+                                    },
+                                    cornerRadius = CornerRadius(5f, 5f)
+                                )
+                            }
+                        } // Col
+                    } // for cabinet C
+                } // Row
+            } // for cabinet R
+        } // Col
+
+    }
 
 //    signageMatrix[0][0][0][0] = 3
 //    val ints = signageMatrix[0][0][0][0]
@@ -222,33 +152,41 @@ fun HeatMapPreview() {
         // 히트맵에 보내주는 에러모듈 리스트를 스레스홀드 기준으로
 //        threshold = 70
         Column() {
-            errorModuleFilteredList = listOf(
-                ErrorModule(resultId = 1, score = 75.1, x = 4, y = 1),
-                ErrorModule(resultId = 2, score = 45.0, x = 1, y = 1),
-                ErrorModule(resultId = 3, score = 89.0, x = 4, y = 4),
-                ErrorModule(resultId = 4, score = 25.0, x = 9, y = 9),
-                ErrorModule(resultId = 5, score = 30.0, x = 9, y = 9),
-                ErrorModule(resultId = 6, score = 35.0, x = 9, y = 9),
-                ErrorModule(resultId = 7, score = 40.0, x = 9, y = 9),
-                ErrorModule(resultId = 8, score = 45.0, x = 9, y = 9),
-                ErrorModule(resultId = 9, score = 50.0, x = 9, y = 9),
-                ErrorModule(resultId = 10, score = 55.0, x = 9, y = 9),
-                ErrorModule(resultId = 11, score = 60.0, x = 9, y = 9),
-                ErrorModule(resultId = 12, score = 70.0, x = 9, y = 9),
-                ErrorModule(resultId = 13, score = 75.0, x = 9, y = 9),
-                ErrorModule(resultId = 14, score = 80.0, x = 9, y = 9),
-//                ErrorModule(resultId = 15, score = 73.0, x = 30, y = 31),
-            ).filter {
-                it.score >= threshold
-            }
 
-            ErrorModuleHeatMap(
-                widthCabinetNumber = 11,
-                heightCabinetNumber = 19,
-                moduleRowCount = 4,
-                moduleColCount = 4,
-                errorModuleList = errorModuleFilteredList
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.9f)
+            ) {
+                errorModuleFilteredList = listOf(
+                    ErrorModule(resultId = 1, score = 75.1, x = 4, y = 1),
+                    ErrorModule(resultId = 2, score = 45.0, x = 1, y = 1),
+                    ErrorModule(resultId = 3, score = 89.0, x = 4, y = 4),
+                    ErrorModule(resultId = 4, score = 25.0, x = 9, y = 9),
+                    ErrorModule(resultId = 5, score = 30.0, x = 9, y = 9),
+                    ErrorModule(resultId = 6, score = 35.0, x = 9, y = 9),
+                    ErrorModule(resultId = 7, score = 40.0, x = 9, y = 9),
+                    ErrorModule(resultId = 8, score = 45.0, x = 9, y = 9),
+                    ErrorModule(resultId = 9, score = 50.0, x = 9, y = 9),
+                    ErrorModule(resultId = 10, score = 55.0, x = 9, y = 9),
+                    ErrorModule(resultId = 11, score = 60.0, x = 9, y = 9),
+                    ErrorModule(resultId = 12, score = 70.0, x = 9, y = 9),
+                    ErrorModule(resultId = 13, score = 75.0, x = 9, y = 9),
+                    ErrorModule(resultId = 14, score = 80.0, x = 9, y = 9),
+//                ErrorModule(resultId = 15, score = 73.0, x = 30, y = 31),
+                ).filter {
+                    it.score >= threshold
+                }
+
+                ErrorModuleHeatMap(
+                    widthCabinetNumber = 11,
+                    heightCabinetNumber = 19,
+                    moduleRowCount = 4,
+                    moduleColCount = 4,
+                    errorModuleList = errorModuleFilteredList,
+                    moduleSize = 20.dp
+                )
+            }
 
             Text(text = threshold.toString())
             Slider(
