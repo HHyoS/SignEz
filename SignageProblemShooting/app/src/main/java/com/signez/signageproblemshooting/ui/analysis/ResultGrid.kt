@@ -43,18 +43,19 @@ fun ResultGridView(
     viewModel: AnalysisViewModel,
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
+    resultId: Long,
 ) {
     val focusManager = LocalFocusManager.current
     val modulesState = produceState(initialValue = null as List<ErrorModule>?, producer = {
-        value = viewModel.getRelatedModule(viewModel.selectedResultId.value)
+        value = viewModel.getRelatedModule(resultId)
     })
     val modules = modulesState.value
     val signageState = produceState(initialValue = null as Signage?, producer = {
-        value = viewModel.getSignageByResultId(viewModel.selectedResultId.value)
+        value = viewModel.getSignageByResultId(resultId)
     })
     val signage = signageState.value
     val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-        value = viewModel.getCabinetByResultId(viewModel.selectedResultId.value)
+        value = viewModel.getCabinetByResultId(resultId)
     })
     val cabinet = cabinetState.value
 
@@ -100,7 +101,8 @@ fun ResultGridView(
         },
         bottomBar = {
             BottomSingleFlatButton(title = "사진보기", isUsable = true) {
-                navController.navigate(ErrorImageDestination.route)
+//                navController.navigate(ErrorImageDestination.route)
+                // moduleClickEvent 활용해주세요~
             }
         }
     ) { innerPadding ->
@@ -287,10 +289,11 @@ x, y 좌표 고르면 해당 위치에 발생된
 fun moduleClickEvent(
     x: Int,
     y: Int,
+    resultId: Long,
     viewModel: AnalysisViewModel,
     navController: NavController
 ) {
     viewModel.selectedModuleX.value = x
     viewModel.selectedModuleY.value = y
-    navController.navigate(ErrorImageDestination.route)
+    navController.navigate(ErrorImageDestination.route+"/${x}/${y}/${resultId}")
 }

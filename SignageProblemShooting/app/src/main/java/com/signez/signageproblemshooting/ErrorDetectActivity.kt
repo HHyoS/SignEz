@@ -108,7 +108,7 @@ class ErrorDetectActivity : ComponentActivity() {
                     }
                 } // when end
             }
-            setResult(REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+            setResult(Activity.RESULT_OK)
             finish()
         }
     }
@@ -124,7 +124,8 @@ class ErrorDetectActivity : ComponentActivity() {
                 else -> {
                     super.onManagerConnected(status)
                     Log.e("OpenCV", "OpenCV load failed!")
-                    finishActivity(998)
+                    setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
+                    finish()
                 }
             }
         }
@@ -156,10 +157,12 @@ class ErrorDetectActivity : ComponentActivity() {
                 Module.load(assetFilePath(applicationContext, errorDetectModuleFileName))
         } catch (e: Exception) {
             Log.e("TorchScriptModule", "Failed to open module files.")
+            setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
             finish()
         }
         analysisViewModel.progressMessage.value = "모델 읽는 중"
         if (intents.data == null || signageId == null || nullableType == null) {
+            setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
             finish()
         }
         lifecycleScope.launch {
@@ -265,9 +268,9 @@ class ErrorDetectActivity : ComponentActivity() {
 
             } catch (e: Exception) {
                 Log.e("VideoProcessing", "Error processing video file: ${e.localizedMessage}", e)
+                setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
                 finish()
             }
-
 
         }
     }

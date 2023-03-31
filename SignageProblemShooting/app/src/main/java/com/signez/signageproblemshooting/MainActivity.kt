@@ -40,6 +40,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
+import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
+import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 
 class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private lateinit var viewModel1: PictureViewModel
@@ -68,6 +70,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
+    lateinit var navController: NavHostController
     companion object {
         private const val REQUEST_CODE_PERMISSIONS = 1000
         private const val REQUEST_CODE_APP_SETTINGS = 2000
@@ -105,8 +108,11 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                 REQUEST_CODE_PERMISSIONS-> {
                     mainViewModel.permissionsGranted.value = checkAndRequestPermissions()
                 }
-                REQUEST_CODE_ERROR_DETECT_ACTIVITY -> {
-                    Log.d("godetect","clear")
+                REQUEST_CODE_ERROR_DETECT_ACTIVITY-> {
+                    finishActivity(REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+                    navController.navigate(ResultsHistoryDestination.route)
+                    navController.navigate(ResultGridDestination.route+"/-1")
+                    Log.d("godetect","clear ${requestCode}")
                 }
             }
         }
@@ -115,7 +121,6 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
@@ -150,10 +155,11 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         viewModel5.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
+            navController = rememberNavController()
             SignEzTheme {
-
                 SignEzApp(
                     activity = this,
+                    navController = navController,
                     viewModel1 = viewModel1,
                     viewModel2 = viewModel2,
                     viewModel3 = viewModel3,

@@ -3,7 +3,6 @@ package com.signez.signageproblemshooting.ui.analysis
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -140,7 +139,7 @@ class AnalysisViewModel(
     }
 
     suspend fun getRelatedModule(resultId: Long): List<ErrorModule> {
-        return if (resultId == -1L) {
+        return if (resultId != -1L) {
             val modules: List<ErrorModule> =
                 errorModulesRepository.getModulesByResultId(resultId)
             modules
@@ -181,25 +180,22 @@ class AnalysisViewModel(
     }
 
     suspend fun getSignageByResultId(resultId: Long): Signage? {
-        val resultById = getResultById(resultId = resultId)
-        if (resultById == null) {
-            return null
-        } else {
-            return getSignageById(resultById.signageId)
+        return if (resultId != -1L) {
+            val resultById = getResultById(resultId = resultId)
+            getSignageById(resultById.signageId)
+        } else { // 분석 마치고 왔을 때
+            val resultById = getResultById(resultId = resultId)
+            getSignageById(getMostRecentResultId())
         }
     }
 
     suspend fun getCabinetByResultId(resultId: Long): Cabinet? {
-        val resultById = getResultById(resultId = resultId)
-        if (resultById == null) {
-            return null
+        return if (resultId != -1L) {
+            val resultById = getResultById(resultId = resultId)
+            getCabinet(signageId = resultById.signageId)
         } else {
-            val cabinetById = getCabinet(signageId = resultById.signageId)
-            if(cabinetById == null){
-                return null
-            } else {
-                return cabinetById
-            }
+            val resultById = getResultById(resultId = getMostRecentResultId())
+            getCabinet(signageId = resultById.signageId)
         }
     }
 
