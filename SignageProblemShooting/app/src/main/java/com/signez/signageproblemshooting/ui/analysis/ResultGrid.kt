@@ -81,11 +81,11 @@ fun ResultGridView(
     var heightModuleNumber = cabinet?.moduleRowCount ?: 2
 
 
-    errorModuleFilteredList = modules ?: listOf(
-        ErrorModule(resultId = 0, score = 20.0, x = 1, y = 1),
-    ).filter {
+    errorModuleFilteredList = modules?.filter {
         (it.score * 100) >= threshold
-    }
+    } ?: listOf(
+        ErrorModule(resultId = 0, score = 20.0, x = 1, y = 1),
+    )
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
@@ -147,11 +147,11 @@ fun ResultGridView(
                                 "Height",
                                 "ResultGridView: ${with(LocalDensity.current) { parentHeight.toDp() }}"
                             )
-                            var pxsixteen = with(LocalDensity.current) { 16.dp.toPx() }
+
                             var moduleSize = with(LocalDensity.current) {
                                 kotlin.math.min(
-                                    (parentWidth / ((widthCabinetNumber*widthModuleNumber) + 2)),
-                                    (parentHeight / ((heightCabinetNumber*heightModuleNumber) + 2))
+                                    (parentWidth / ((widthCabinetNumber*widthModuleNumber) + (2*widthModuleNumber))),
+                                    (parentHeight / ((heightCabinetNumber*heightModuleNumber) + (2*heightModuleNumber)))
                                 ).toDp()
                             }
 
