@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
+import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
@@ -48,7 +49,7 @@ fun ResultGridView(
     })
     val modules = modulesState.value
     val signageState = produceState(initialValue = null as Signage?, producer = {
-        value = viewModel.getSignageById(viewModel.selectedResultId.value)
+        value = viewModel.getSignageByResultId(viewModel.selectedResultId.value)
     })
     val signage = signageState.value
 
@@ -66,28 +67,17 @@ fun ResultGridView(
         )
     }
 
-//    Log.d("넘어오냐", "ResultGridView: ${signage}")
-    
-    var widthCabinetNumber = 11
-    var heightCabinetNumber = 19
+    Log.d("사이니지 넘어오냐", "ResultGridView: ${signage}")
+    Log.d("모듈 넘어오냐", "ResultGridView: ${modules}")
 
-    errorModuleFilteredList = listOf(
-        ErrorModule(resultId = 1, score = 75.1, x = 13, y = 14),
-        ErrorModule(resultId = 2, score = 45.0, x = 1, y = 1),
-        ErrorModule(resultId = 3, score = 89.0, x = 4, y = 4),
-        ErrorModule(resultId = 4, score = 25.0, x = 9, y = 9),
-        ErrorModule(resultId = 5, score = 30.0, x = 9, y = 9),
-        ErrorModule(resultId = 6, score = 35.0, x = 9, y = 9),
-        ErrorModule(resultId = 7, score = 40.0, x = 9, y = 9),
-        ErrorModule(resultId = 8, score = 45.0, x = 9, y = 9),
-        ErrorModule(resultId = 9, score = 50.0, x = 9, y = 9),
-        ErrorModule(resultId = 10, score = 55.0, x = 9, y = 9),
-        ErrorModule(resultId = 11, score = 60.0, x = 9, y = 9),
-        ErrorModule(resultId = 12, score = 70.0, x = 9, y = 9),
-        ErrorModule(resultId = 13, score = 75.0, x = 9, y = 9),
-        ErrorModule(resultId = 14, score = 80.0, x = 9, y = 9),
+    var widthCabinetNumber = signage?.widthCabinetNumber ?: 2
+    var heightCabinetNumber = signage?.heightCabinetNumber ?: 2
+
+
+    errorModuleFilteredList = modules ?: listOf(
+        ErrorModule(resultId = 0, score = 20.0, x = 1, y = 1),
     ).filter {
-        it.score >= threshold
+        (it.score * 100) >= threshold
     }
 
     androidx.compose.material.Scaffold(
@@ -151,22 +141,26 @@ fun ResultGridView(
                                 "ResultGridView: ${with(LocalDensity.current) { parentHeight.toDp() }}"
                             )
                             var pxsixteen = with(LocalDensity.current) { 16.dp.toPx() }
-                            var moduleSize = with(LocalDensity.current) { kotlin.math.min(
-                                (parentWidth / (widthCabinetNumber+2)),
-                                (parentHeight / (heightCabinetNumber+2))
-                            ).toDp() }
+                            var moduleSize = with(LocalDensity.current) {
+                                kotlin.math.min(
+                                    (parentWidth / (widthCabinetNumber + 2)),
+                                    (parentHeight / (heightCabinetNumber + 2))
+                                ).toDp()
+                            }
                             Log.d(
                                 "moduleSize",
                                 "ResultGridView: ${moduleSize}}"
                             )
-                            ErrorModuleHeatMap(
-                                widthCabinetNumber = widthCabinetNumber,
-                                heightCabinetNumber = heightCabinetNumber,
-                                moduleRowCount = 4,
-                                moduleColCount = 4,
-                                errorModuleList = errorModuleFilteredList,
-                                moduleSize = moduleSize
-                            )
+                            if (signage != null) {
+                                ErrorModuleHeatMap(
+                                    widthCabinetNumber = widthCabinetNumber,
+                                    heightCabinetNumber = heightCabinetNumber,
+                                    moduleRowCount = 4,
+                                    moduleColCount = 4,
+                                    errorModuleList = errorModuleFilteredList,
+                                    moduleSize = moduleSize
+                                )
+                            }
                         }
                     }
 
@@ -267,7 +261,6 @@ fun ResultGridView(
                     }
 
 
-
                 }// 컬럼 끝
 
             } // 박스 끝
@@ -282,10 +275,10 @@ x, y 좌표 고르면 해당 위치에 발생된
 -> 모듈에 달아 주세요~
  */
 fun moduleClickEvent(
-    x:Int,
-    y:Int,
-    viewModel : AnalysisViewModel,
-    navController:NavController
+    x: Int,
+    y: Int,
+    viewModel: AnalysisViewModel,
+    navController: NavController
 ) {
     viewModel.selectedModuleX.value = x
     viewModel.selectedModuleY.value = y
