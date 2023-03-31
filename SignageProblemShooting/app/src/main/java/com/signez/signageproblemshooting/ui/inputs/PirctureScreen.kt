@@ -1,7 +1,6 @@
 package com.signez.signageproblemshooting.ui.inputs
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Rect
@@ -9,8 +8,6 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,33 +18,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.signature.ObjectKey
-import com.signez.signageproblemshooting.ErrorDetectActivity
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.ImagePicker
 import com.signez.signageproblemshooting.pickers.loadImageMetadata
-import com.signez.signageproblemshooting.service.PrePostProcessor
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
-import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.IntentButton
@@ -56,11 +39,8 @@ import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.pytorch.IValue
 import org.pytorch.Module
-import org.pytorch.torchvision.TensorImageUtils
 import java.io.File
-import kotlin.reflect.KFunction1
 
 object PictureScreenDestination : NavigationDestination {
     override val route = "PictureScreen"
@@ -156,82 +136,86 @@ fun PictureAnalysis(
                     // test
                     if(contentUri == Uri.EMPTY)
                         Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-                    else{
-                        mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
-                        mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
-                        mIvScaleX = (if (mmWidth > mmHeight) mWidth
-                            .toFloat() / mmWidth else mHeight
-                            .toFloat() / mmHeight)
-                        mIvScaleY = (if (mmHeight > mmWidth) mHeight
-                            .toFloat() / mmHeight else mWidth
-                            .toFloat() / mmWidth)
-                        mStartX = (mWidth - mIvScaleX * mmWidth) / 2
-                        mStartY = (mHeight - mIvScaleY * mmHeight) / 2
-
-                        if (mModule == null) {
-                            val temp = ErrorDetectActivity()
-                            mModule = temp.getModel()
-                        }
-                        val thread = object : Thread() {
-                            override fun run() {
-                                val resizedBitmap = Bitmap.createScaledBitmap(
-                                    (BitmapFactory.decodeStream(
-                                        activity.contentResolver.openInputStream(
-                                            contentUri
-                                        )
-                                    ))!!,
-                                    PrePostProcessor.mInputWidth,
-                                    PrePostProcessor.mInputHeight,
-                                    true
-                                )
-                                val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
-                                    resizedBitmap,
-                                    PrePostProcessor.NO_MEAN_RGB,
-                                    PrePostProcessor.NO_STD_RGB
-                                )
-                                val outputTuple =
-                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
-                                val outputTensor = outputTuple[0].toTensor()
-                                val outputs = outputTensor.dataAsFloatArray
-                                val results = PrePostProcessor.outputsToNMSPredictions(
-                                    outputs,
-                                    mImgScaleX,
-                                    mImgScaleY,
-                                    mIvScaleX,
-                                    mIvScaleY,
-                                    mStartX,
-                                    mStartY
-                                )
-                                if (results.size != 0) {
-                                    rec = results[0].rect
-                                    Log.d("result[0]","${results[0].rect}")
-                                    Log.d("rec","${rec}")
-
-                                }
-                                else{
-                                    Log.d("what","????")
-                                }
-                            }
-                        }
-                        thread.start()
-                        thread.interrupt()
+                    else {
+                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, contentUri)
                     }
+//                    else{
+//
+//                        mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
+//                        mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
+//                        mIvScaleX = (if (mmWidth > mmHeight) mWidth
+//                            .toFloat() / mmWidth else mHeight
+//                            .toFloat() / mmHeight)
+//                        mIvScaleY = (if (mmHeight > mmWidth) mHeight
+//                            .toFloat() / mmHeight else mWidth
+//                            .toFloat() / mmWidth)
+//                        mStartX = (mWidth - mIvScaleX * mmWidth) / 2
+//                        mStartY = (mHeight - mIvScaleY * mmHeight) / 2
+//
+//                        if (mModule == null) {
+//                            val temp = ErrorDetectActivity()
+//                            mModule = temp.getModel()
+//                        }
+//                        val thread = object : Thread() {
+//                            override fun run() {
+//                                val resizedBitmap = Bitmap.createScaledBitmap(
+//                                    (BitmapFactory.decodeStream(
+//                                        activity.contentResolver.openInputStream(
+//                                            contentUri
+//                                        )
+//                                    ))!!,
+//                                    PrePostProcessor.mInputWidth,
+//                                    PrePostProcessor.mInputHeight,
+//                                    true
+//                                )
+//                                val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
+//                                    resizedBitmap,
+//                                    PrePostProcessor.NO_MEAN_RGB,
+//                                    PrePostProcessor.NO_STD_RGB
+//                                )
+//                                val outputTuple =
+//                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
+//                                val outputTensor = outputTuple[0].toTensor()
+//                                val outputs = outputTensor.dataAsFloatArray
+//                                val results = PrePostProcessor.outputsToNMSPredictions(
+//                                    outputs,
+//                                    mImgScaleX,
+//                                    mImgScaleY,
+//                                    mIvScaleX,
+//                                    mIvScaleY,
+//                                    mStartX,
+//                                    mStartY
+//                                )
+//                                if (results.size != 0) {
+//                                    rec = results[0].rect
+//                                    Log.d("result[0]","${results[0].rect}")
+//                                    Log.d("rec","${rec}")
+//
+//                                }
+//                                else{
+//                                    Log.d("what","????")
+//                                }
+//                            }
+//                        }
+//                        thread.start()
+//                        thread.interrupt()
+//                    }
 
                 /* 분석하기 이벤트를 넣으면 됨 */
 //                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
-                    navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
-
-                    if(rec == null){
-                        Log.d("start","is Null")
-                        openImageCropActivity(context, Rect(-999,-1,-1,-1),contentUri)
-                    }
-                    else{
-                        Log.d("null","not Null")
-                        openImageCropActivity(context, rec!!,contentUri)
-                        rec = null
-                    }
+//                    navController.popBackStack()
+//                    navController.navigate(ResultsHistoryDestination.route)
+//                    navController.navigate(ResultGridDestination.route)
+//
+//                    if(rec == null){
+//                        Log.d("start","is Null")
+//                        openImageCropActivity(context, Rect(-999,-1,-1,-1),contentUri)
+//                    }
+//                    else{
+//                        Log.d("null","not Null")
+//                        openImageCropActivity(context, rec!!,contentUri)
+//                        rec = null
+//                    }
 
                 }
             )

@@ -13,7 +13,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
 import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -183,13 +182,13 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openImageCropActivity(context: Context,rec : Rect,uri : Uri) {
+fun openImageCropActivity(context: Context, mWidth:Int, mHeight:Int, mmWidth:Int, mmHeight:Int, uri: Uri) {
     val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
     val intent = Intent(context, ImageCropActivity::class.java)
-    intent.putExtra("left",rec.left)
-    intent.putExtra("right",rec.right)
-    intent.putExtra("top",rec.top)
-    intent.putExtra("bottom",rec.bottom)
+    intent.putExtra("mWidth",mWidth)
+    intent.putExtra("mHeight",mHeight)
+    intent.putExtra("mmWidth",mmWidth)
+    intent.putExtra("mmHeight",mmHeight)
     intent.putExtra("uri",uri.toString())
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
 }
