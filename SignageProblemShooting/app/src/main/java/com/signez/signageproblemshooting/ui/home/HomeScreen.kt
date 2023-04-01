@@ -111,7 +111,7 @@ fun HomeScreen(
             ) {
 
                 Spacer(modifier = Modifier.padding(5.dp))
-                PastResult(modifier = Modifier, navController = navController)
+                PastResult(modifier = Modifier, navController = navController, viewModel=viewModel)
                 Spacer(modifier = Modifier.padding(8.dp))
                 Column(
                     modifier = Modifier
