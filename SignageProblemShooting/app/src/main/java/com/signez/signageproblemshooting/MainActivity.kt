@@ -64,6 +64,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private val REQUEST_CODE_IMAGE_CAPTURE_5 = 22222
     private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
     private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+    private val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
 
     val permissions = arrayOf(
         Manifest.permission.CAMERA,
@@ -82,6 +83,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d("MainActivityOnActivityResult", "${requestCode.toString()}, ${resultCode.toString()}")
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 REQUEST_CODE_IMAGE_CAPTURE -> {
@@ -108,8 +110,9 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                 REQUEST_CODE_PERMISSIONS-> {
                     mainViewModel.permissionsGranted.value = checkAndRequestPermissions()
                 }
-                REQUEST_CODE_ERROR_DETECT_ACTIVITY-> {
-                    finishActivity(REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+                REQUEST_CODE_IMAGE_CROP_ACTIVITY-> {
+                    finishActivity(REQUEST_CODE_IMAGE_CROP_ACTIVITY)
+                    navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route+"/-1")
                     Log.d("godetect","clear ${requestCode}")

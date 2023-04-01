@@ -161,6 +161,7 @@ private fun HomeHistoryElement(
                     .clip(RoundedCornerShape(10.dp))
                     .clickable {
                         viewModel.selectedResultId.value = result.id
+                        Log.d("HomeResult", "/${result.id}")
                         navController.navigate(ResultGridDestination.route+"/${result.id}")
                     }
             )
