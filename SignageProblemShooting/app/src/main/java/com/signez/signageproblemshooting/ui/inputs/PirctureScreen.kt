@@ -90,7 +90,7 @@ fun PictureAnalysis(
 
     //test start
     var mModule: Module? = null
-    var mWidth: Int = 1
+    var mWidth: Int = 2
     var mHeight: Int = 2
     var mmWidth: Int = 3
     var mmHeight: Int = 5
@@ -225,16 +225,7 @@ fun PictureAnalysis(
 //                    }
                     //
                     /* 분석하기 이벤트를 넣으면 됨 */
-                    navController.currentDestination?.let {
-                        navController.popBackStack(
-                            it.id,
-                            true
-                        )
-                    }
-
                     navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
                     openErrorDetectActivity(
                         context,
                         REQUEST_DETECT_PHOTO,

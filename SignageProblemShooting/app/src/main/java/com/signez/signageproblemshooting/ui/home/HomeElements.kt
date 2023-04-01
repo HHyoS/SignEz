@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 fun PastResult(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: AnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: AnalysisViewModel
 ) {
     val resultListState by viewModel.resultListState.collectAsState()
     val itemList = resultListState.itemList
@@ -161,7 +161,7 @@ private fun HomeHistoryElement(
                     .clip(RoundedCornerShape(10.dp))
                     .clickable {
                         viewModel.selectedResultId.value = result.id
-                        navController.navigate(ResultGridDestination.route)
+                        navController.navigate(ResultGridDestination.route+"/${result.id}")
                     }
             )
         }
