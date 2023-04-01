@@ -152,8 +152,8 @@ fun ResultGridView(
 
                             var moduleSize = with(LocalDensity.current) {
                                 kotlin.math.min(
-                                    (parentWidth / ((widthCabinetNumber*widthModuleNumber) + (2*widthModuleNumber))),
-                                    (parentHeight / ((heightCabinetNumber*heightModuleNumber) + (2*heightModuleNumber)))
+                                    (parentWidth / ((widthCabinetNumber * widthModuleNumber) + (2 * widthModuleNumber))),
+                                    (parentHeight / ((heightCabinetNumber * heightModuleNumber) + (2 * heightModuleNumber)))
                                 ).toDp()
                             }
 
@@ -169,8 +169,10 @@ fun ResultGridView(
                                     moduleColCount = cabinet.moduleColCount,
                                     errorModuleList = errorModuleFilteredList,
                                     moduleSize = moduleSize,
-                                    cabinetHeigth = (moduleSize*heightModuleNumber),
-                                    cabinetWidth = (moduleSize*widthModuleNumber)
+                                    cabinetHeigth = (moduleSize * heightModuleNumber),
+                                    cabinetWidth = (moduleSize * widthModuleNumber),
+                                    viewModel = viewModel,
+                                    navController = navController,
                                 )
                             }
                         }
@@ -295,5 +297,5 @@ fun moduleClickEvent(
 ) {
     viewModel.selectedModuleX.value = x
     viewModel.selectedModuleY.value = y
-    navController.navigate(ErrorImageDestination.route+"/${x}/${y}/${resultId}")
+    navController.navigate(ErrorImageDestination.route + "/${x}/${y}/${resultId}")
 }
