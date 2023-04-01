@@ -194,19 +194,23 @@ fun playVideoFromUri(context: Context, uri: Uri) {
 }
 
 
-fun openImageCropActivity(context: Context, mWidth:Int, mHeight:Int, mmWidth:Int, mmHeight:Int, REQUEST_TYPE:Int, uri: Uri) {
+fun openImageCropActivity(context: Context, mWidth:Int, mHeight:Int, mmWidth:Int, mmHeight:Int, type:Int, signageId: Long, uri: Uri) {
     val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+    val REQUEST_TYPE: String = "REQUEST_TYPE"
+    val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
     val intent = Intent(context, ImageCropActivity::class.java)
     intent.putExtra("mWidth",mWidth)
     intent.putExtra("mHeight",mHeight)
     intent.putExtra("mmWidth",mmWidth)
     intent.putExtra("mmHeight",mmHeight)
-    intent.putExtra("REQUEST_TYPE", REQUEST_TYPE)
+    intent.putExtra(REQUEST_TYPE, type)
+    intent.putExtra(REQUEST_SIGNAGE_ID, signageId)
     intent.putExtra("uri",uri.toString())
+    intent.setData(uri)
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
 }
 fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
-    val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+    val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
     val REQUEST_TYPE: String = "REQUEST_TYPE"
     val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
 
@@ -217,7 +221,8 @@ fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
     intent.putExtra("top",rec.top)
     intent.putExtra("bottom",rec.bottom)
     intent.putExtra("uri",uri.toString())
+    intent.data = uri
     Log.d("start","start ${uri}")
-    (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
     Log.d("end","end")
 }

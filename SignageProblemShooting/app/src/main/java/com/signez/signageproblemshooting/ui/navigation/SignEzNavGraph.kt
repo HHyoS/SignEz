@@ -178,9 +178,9 @@ fun SignEzNavHost(
                     navigateBack = { navController.popBackStack() },
                     onNavigateUp = { navController.navigateUp() },
                     viewModel = viewModel5,
-                    x = it.getInt("x"),
-                    y = it.getInt("y"),
-                    resultId = it.getLong("resultId")
+                    x = it.getString("x")!!.toInt(),
+                    y = it.getString("y")!!.toInt(),
+                    resultId = it.getString("resultId")!!.toLong()
                 )
             }
         }

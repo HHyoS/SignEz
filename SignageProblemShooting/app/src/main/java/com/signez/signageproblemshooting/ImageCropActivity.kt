@@ -1,10 +1,12 @@
 package com.signez.signageproblemshooting
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
@@ -61,6 +63,9 @@ class ImageCropActivity : AppCompatActivity() {
     var imageHeight  : Float  = 0f
     var scaleX: Float = 0f
     var scaleY : Float = 0f
+
+    private val REQUEST_TYPE: String = "REQUEST_TYPE"
+    private val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -196,6 +201,15 @@ class ImageCropActivity : AppCompatActivity() {
         })
 
 
+        Log.d("ImageScaleType", imageView.scaleType.toString())
+//        val imageMatrix = imageView.imageMatrix
+//        val matrixValues = FloatArray(9)
+//        imageMatrix.getValues(matrixValues)
+
+//        scaleX = matrixValues[Matrix.MSCALE_X]
+//        scaleY = matrixValues[Matrix.MSCALE_Y]
+//        val translateX = matrixValues[Matrix.MTRANS_X]
+//        val translateY = matrixValues[Matrix.MTRANS_Y]
 
         // ImageView에 대한 OnTouchListener 설정
         imageView.setOnTouchListener { v, event ->
@@ -206,15 +220,18 @@ class ImageCropActivity : AppCompatActivity() {
 
             scaleX = imageWidth / viewWidth
             scaleY = imageHeight / viewHeight
+
 //            val scaleX = viewWidth.toFloat() / imageWidth.toFloat()
 //            val scaleY = viewHeight.toFloat() / imageHeight.toFloat()
-            val scaledTouchX = event.x * scaleX
-            val scaledTouchY = event.y * scaleY
+//            val scaledTouchX = event.x * scaleX
+//            val scaledTouchY = event.y * scaleY
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     // 터치 다운 이벤트 처리
                     // 가장 가까운 점을 찾아 이동
-                    val touchPoint = Point(scaledTouchX.toInt(), scaledTouchY.toInt())
+//                    val touchPoint = Point(scaledTouchX.toInt(), scaledTouchY.toInt())
+                    val touchPointF = imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
+                    val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
                     Log.d("touchPoint","${touchPoint}")
                     Log.d("bottomright", "${pointBottomRight}")
 
@@ -240,7 +257,9 @@ class ImageCropActivity : AppCompatActivity() {
                     // 터치 이동 이벤트 처리
                     // 이동된 점 다시 그리기
 
-                    val touchPoint = Point(scaledTouchX.toInt(), scaledTouchY.toInt())
+//                    val touchPoint = Point(scaledTouchX.toInt(), scaledTouchY.toInt())
+                    val touchPointF = imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
+                    val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
                     val closestPoint = findClosestPoint(
                         touchPoint,
                         pointTopLeft,
@@ -266,22 +285,36 @@ class ImageCropActivity : AppCompatActivity() {
         }
         val btn: Button = findViewById(R.id.exit_btn)
         btn.setOnClickListener {
+            val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
             val intent = Intent(this, ErrorDetectActivity::class.java).apply {
-                putExtra("PointTopLeft", pointTopLeft)
-                putExtra("PointTopRight", pointTopRight)
-                putExtra("PointBottomLeft", pointBottomLeft)
-                putExtra("PointBottomRight", pointBottomRight)
+                putExtra("PointTopLeftX", pointTopLeft.x)
+                putExtra("PointTopLeftY", pointTopLeft.y)
+                putExtra("PointTopRightX", pointTopRight.x)
+                putExtra("PointTopRightY", pointTopRight.y)
+                putExtra("PointBottomLeftX", pointBottomLeft.x)
+                putExtra("PointBottomLeftY", pointBottomLeft.y)
+                putExtra("PointBottomRightX", pointBottomRight.x)
+                putExtra("PointBottomRightY", pointBottomRight.y)
                 putExtra("scaleX", scaleX)
                 putExtra("scaleY", scaleY)
                 putExtra("REQUEST_CODE", intent.getIntExtra("REQUEST_CODE", 0))
+                putExtra("uri", intent.data.toString())
+                putExtra(REQUEST_TYPE, intent.getIntExtra(REQUEST_TYPE, -1))
+                putExtra(REQUEST_SIGNAGE_ID, intent.getLongExtra(REQUEST_SIGNAGE_ID, -1L))
+                setData(intent.data)
             }
+            setResult(Activity.RESULT_OK)
             startActivity(intent)
-            finish()
         }
         // ImageView 다시 그리기
 //        imageView.viewTreeObserver.addOnDrawListener {
 //            onDraw(imageView, imageUri)
 //        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        finish()
     }
 
     private fun onDraw(imageView: ImageView, uri : Uri) {
@@ -389,5 +422,45 @@ class ImageCropActivity : AppCompatActivity() {
         val dy = (y - other.y).toDouble()
 
         return sqrt((dx * dx + dy * dy)).toFloat()
+    }
+
+    fun imageViewToImageCoordinatesFitCenter(imageView: ImageView, x: Float, y: Float): PointF {
+        val drawable: Drawable = imageView.drawable ?: return PointF(x, y)
+        val imageWidth = drawable.intrinsicWidth
+        val imageHeight = drawable.intrinsicHeight
+        val imageViewWidth = imageView.width
+        val imageViewHeight = imageView.height
+
+        // 이미지와 이미지 뷰의 가로세로비를 계산합니다.
+        val imageRatio = imageWidth.toFloat() / imageHeight.toFloat()
+        val imageViewRatio = imageViewWidth.toFloat() / imageViewHeight.toFloat()
+
+        // 이미지의 스케일과 평행 이동 값을 계산합니다.
+        val scaleX: Float
+        val scaleY: Float
+        val translateX: Float
+        val translateY: Float
+
+        if (imageRatio > imageViewRatio) {
+            // 이미지가 이미지 뷰보다 더 넓은 경우
+            scaleX = imageViewWidth.toFloat() / imageWidth.toFloat()
+            scaleY = scaleX
+            translateX = 0f
+            translateY = (imageViewHeight - (imageHeight * scaleY)) / 2f
+        } else {
+            // 이미지가 이미지 뷰보다 더 높은 경우
+            scaleY = imageViewHeight.toFloat() / imageHeight.toFloat()
+            scaleX = scaleY
+            translateX = (imageViewWidth - (imageWidth * scaleX)) / 2f
+            translateY = 0f
+        }
+
+        // 이미지 뷰에서 실제 이미지의 크기와 위치를 고려하여 좌표를 변환합니다.
+        val imageX = (x - translateX) / scaleX
+        val imageY = (y - translateY) / scaleY
+
+        Log.d("ScaledPoint", "${imageX}, ${imageY}")
+
+        return PointF(imageX, imageY)
     }
 }

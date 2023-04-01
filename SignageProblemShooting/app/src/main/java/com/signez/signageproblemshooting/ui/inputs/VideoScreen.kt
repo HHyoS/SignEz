@@ -150,7 +150,7 @@ fun VideoAnalysis(
                         val mHeight = configuration.screenHeightDp
                         val mmWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toInt() ?: 0
                         val mmHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
-                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_CODE_VIDEO_CAPTURE, contentUri)
+                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_DETECT_VIDEO, analysisViewModel.signageId.value, contentUri)
                     }
                     // .currentDestination?.let { navController.popBackStack(it.id , true) }
 //                    navController.popBackStack()

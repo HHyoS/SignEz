@@ -84,7 +84,6 @@ fun PictureAnalysis(
     var mStartY = 0f
     var imageUri by remember { mutableStateOf(contentUri) }
     var rec : Rect? = null
-    val REQUEST_DETECT_PHOTO: Int = 101
 
     //test end
     if (viewModel.imageUri.value != Uri.EMPTY) {
@@ -143,7 +142,7 @@ fun PictureAnalysis(
                     if(contentUri == Uri.EMPTY)
                         Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
                     else {
-                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_CODE_IMAGE_CAPTURE, contentUri)
+                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_DETECT_PHOTO, analysisViewModel.signageId.value, contentUri)
                     }
 
 

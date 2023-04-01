@@ -45,6 +45,7 @@ fun ResultGridView(
     onNavigateUp: () -> Unit,
     resultId: Long,
 ) {
+    Log.d("ResultGrid", "resultId : ${resultId.toString()}")
     val focusManager = LocalFocusManager.current
     val modulesState = produceState(initialValue = null as List<ErrorModule>?, producer = {
         value = viewModel.getRelatedModule(resultId)
@@ -58,6 +59,7 @@ fun ResultGridView(
         value = viewModel.getCabinetByResultId(resultId)
     })
     val cabinet = cabinetState.value
+
 
     var threshold by remember { mutableStateOf(70) }
     var errorModuleFilteredList by remember {
@@ -295,6 +297,7 @@ fun moduleClickEvent(
     viewModel: AnalysisViewModel,
     navController: NavController
 ) {
+    Log.d("moduleClickEvent", "${x}, ${y}, ${resultId}")
     viewModel.selectedModuleX.value = x
     viewModel.selectedModuleY.value = y
     navController.navigate(ErrorImageDestination.route + "/${x}/${y}/${resultId}")
