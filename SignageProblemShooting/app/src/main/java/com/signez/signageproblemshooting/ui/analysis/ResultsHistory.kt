@@ -35,6 +35,7 @@ import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
+import com.signez.signageproblemshooting.ui.components.ResultHistoryBlock
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.*
 import kotlinx.coroutines.coroutineScope
@@ -75,7 +76,7 @@ fun ResultsHistoryView(
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
@@ -117,15 +118,20 @@ fun ResultList(
             style = MaterialTheme.typography.subtitle2
         )
     } else {
-        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-            items(count=itemList.size) { item ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxHeight()
+        ) {
+            items(count = itemList.size) { item ->
                 // Item content here
                 ResultItem(
                     result = itemList[item],
-                    onItemClick={},
+                    onItemClick = {},
                     navController = navController,
                     selectedId = selectedId,
-                    viewModel=viewModel
+                    viewModel = viewModel
                 )
             }
         }
@@ -156,7 +162,7 @@ private fun ResultItem(
             .combinedClickable(
                 onClick = {
                     viewModel.selectedResultId.value = result.id
-                    navController.navigate(ResultGridDestination.route+"/${result.id}")
+                    navController.navigate(ResultGridDestination.route + "/${result.id}")
                 },
                 onLongClick = {
                     showContextMenu = true
@@ -171,30 +177,36 @@ private fun ResultItem(
         val signage = signageState.value
 
         if (signage != null) {
-            Column(modifier = Modifier.padding(start = 10.dp)) {
-                signage.repImg?.let { byteArray ->
-                    GlideImage(
-                        model = byteArray,
-                        contentDescription = "글라이드",
-                        modifier = Modifier
-                            .size(45.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                    )
-                }
-
-                Text(
-                    text = signage.name,
-                    style = MaterialTheme.typography.h4,
-                    color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier.padding(bottom = 5.dp)
-                )
-                Text(
-                    text = result.resultDate,
-                    style = MaterialTheme.typography.h4,
-                    color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier.padding(bottom = 5.dp)
-                )
-            }// 열 끝
+            ResultHistoryBlock(
+                site = signage.name,
+                date = result.resultDate,
+                thumbnail = signage.repImg,
+                modifier = Modifier
+            )
+//            Column(modifier = Modifier.padding(start = 10.dp)) {
+//                signage.repImg?.let { byteArray ->
+//                    GlideImage(
+//                        model = byteArray,
+//                        contentDescription = "글라이드",
+//                        modifier = Modifier
+//                            .size(45.dp)
+//                            .clip(RoundedCornerShape(10.dp))
+//                    )
+//                }
+//
+//                Text(
+//                    text = signage.name,
+//                    style = MaterialTheme.typography.h4,
+//                    color = MaterialTheme.colors.onSecondary,
+//                    modifier = Modifier.padding(bottom = 5.dp)
+//                )
+//                Text(
+//                    text = result.resultDate,
+//                    style = MaterialTheme.typography.h4,
+//                    color = MaterialTheme.colors.onSecondary,
+//                    modifier = Modifier.padding(bottom = 5.dp)
+//                )
+//            }// 열 끝
             if (showContextMenu) {
                 ShowContextMenu(
                     closeMenu = {
@@ -215,7 +227,8 @@ private fun ResultItem(
 @Composable
 fun ShowContextMenu(
     onDelete: () -> Unit,
-    closeMenu: () -> Unit) {
+    closeMenu: () -> Unit
+) {
     DropdownMenu(
         expanded = true,
         onDismissRequest = {},
