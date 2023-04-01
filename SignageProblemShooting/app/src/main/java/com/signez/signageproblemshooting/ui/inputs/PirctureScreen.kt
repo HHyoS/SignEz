@@ -4,12 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,33 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.signature.ObjectKey
-import com.signez.signageproblemshooting.ErrorDetectActivity
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.ImagePicker
 import com.signez.signageproblemshooting.pickers.loadImageMetadata
-import com.signez.signageproblemshooting.service.PrePostProcessor
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
-import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.IntentButton
@@ -55,11 +40,8 @@ import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.pytorch.IValue
 import org.pytorch.Module
-import org.pytorch.torchvision.TensorImageUtils
 import java.io.File
-import kotlin.reflect.KFunction1
 
 object PictureScreenDestination : NavigationDestination {
     override val route = "PictureScreen"
@@ -101,6 +83,8 @@ fun PictureAnalysis(
     var mStartX = 0f
     var mStartY = 0f
     var imageUri by remember { mutableStateOf(contentUri) }
+    var rec : Rect? = null
+
     //test end
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
@@ -154,84 +138,14 @@ fun PictureAnalysis(
                 rightOnClickEvent = {
 
                     // test
-//                    if (contentUri == Uri.EMPTY)
-//                        Toast.makeText(context, "사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-//                    else {
-//                        mImgScaleX = mmWidth.toFloat() / PrePostProcessor.mInputWidth
-//                        mImgScaleY = mmHeight.toFloat() / PrePostProcessor.mInputHeight
-//                        mIvScaleX = (if (mmWidth > mmHeight) mWidth
-//                            .toFloat() / mmWidth else mHeight
-//                            .toFloat() / mmHeight)
-//                        mIvScaleY = (if (mmHeight > mmWidth) mHeight
-//                            .toFloat() / mmHeight else mWidth
-//                            .toFloat() / mmWidth)
-//                        mStartX = (mWidth - mIvScaleX * mmWidth) / 2
-//                        mStartY = (mHeight - mIvScaleY * mmHeight) / 2
-//
-//                        if (mModule == null) {
-//                            val temp = ErrorDetectActivity()
-//                            mModule = temp.getModel()
-//                        }
-//                        val thread = object : Thread() {
-//                            override fun run() {
-//                                Log.d("hyoyo", "1")
-//                                val resizedBitmap = Bitmap.createScaledBitmap(
-//                                    (BitmapFactory.decodeStream(
-//                                        activity.contentResolver.openInputStream(
-//                                            contentUri
-//                                        )
-//                                    ))!!,
-//                                    PrePostProcessor.mInputWidth,
-//                                    PrePostProcessor.mInputHeight,
-//                                    true
-//                                )
-//                                Log.d("hyoyo", "{")
-//                                val inputTensor = TensorImageUtils.bitmapToFloat32Tensor(
-//                                    resizedBitmap,
-//                                    PrePostProcessor.NO_MEAN_RGB,
-//                                    PrePostProcessor.NO_STD_RGB
-//                                )
-//                                Log.d("hyoyo", "3")
-//                                val outputTuple =
-//                                    mModule!!.forward(IValue.from(inputTensor)).toTuple()
-//                                val outputTensor = outputTuple[0].toTensor()
-//                                val outputs = outputTensor.dataAsFloatArray
-//                                Log.d("hyoyo", "4")
-//                                val results = PrePostProcessor.outputsToNMSPredictions(
-//                                    outputs,
-//                                    mImgScaleX,
-//                                    mImgScaleY,
-//                                    mIvScaleX,
-//                                    mIvScaleY,
-//                                    mStartX,
-//                                    mStartY
-//                                )
-//
-//                                if (results != null) {
-//                                    Log.d("hyoyo", "5")
-//                                    for (r in results!!) {
-//                                        Log.d(
-//                                            "test",
-//                                            "${r.classIndex} - ${r.rect.top} @ ${r.rect.left} @ ${r.rect.right} @ " +
-//                                                    "${r.rect.bottom} @ ${r.score}"
-//                                        )
-//                                    }
-//                                } else {
-//                                    Log.d("hyoyo", "555555555555555555")
-//                                }
-//                            }
-//                        }
-//                        thread.start()
-//                    }
-                    //
-                    /* 분석하기 이벤트를 넣으면 됨 */
-                    navController.popBackStack()
-                    openErrorDetectActivity(
-                        context,
-                        REQUEST_DETECT_PHOTO,
-                        analysisViewModel.signageId.value,
-                        analysisViewModel.imageContentUri.value
-                    )
+
+                    if(contentUri == Uri.EMPTY)
+                        Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    else {
+                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_DETECT_PHOTO, analysisViewModel.signageId.value, contentUri)
+                    }
+
+
                 }
             )
         }
@@ -284,9 +198,9 @@ fun PictureAnalysis(
                                     val width = ImageSize.width
                                     val height = ImageSize.height
                                     Log.d("Image Size", "width: $width, height: $height")
-                                },
+                                }
                         )
-
+                        rec = null
                         mWidth = LocalConfiguration.current.screenWidthDp
                         mHeight = LocalConfiguration.current.screenHeightDp
                         val uri = Uri.parse(contentUri.toString()) // 실제 Uri 주소를 사용하여 초기화합니다.
@@ -301,7 +215,7 @@ fun PictureAnalysis(
                         )
                         mmWidth = options.outWidth
                         mmHeight = options.outHeight
-
+                        Log.d("here","error")
 
 //                        imageBitmap?.let {
 //                            Image(
@@ -349,60 +263,7 @@ fun PictureAnalysis(
 
                     }
                 }
-//
-//                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
-//                ) {
-//                    Text(
-//                        text = "사진 분석",
-//                        modifier = Modifier.align(Alignment.Start),
-//                        fontSize = 40.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                    Row (
-//                        horizontalArrangement = Arrangement.SpaceAround
-//                    ){
-//                        Column (
-//                            modifier = Modifier.weight(0.5f)
-//                        ){
-//                            ImagePicker(onImageSelected = { address ->
-//                                viewModel.imageUri.value = Uri.parse(address)
-//                                imageBitmap = bitmap
-//                            })
-//                        }
-//
-//                        Column (
-//                            modifier = Modifier.weight(0.5f)
-//                        ){
-//                            IntentButton(title = "카메라") {
-//                                dispatchTakePictureIntent(activity, viewModel,2)
-//                            }
-//
-//                        }
-//                    }
 
-//                    Log.d("compare", viewModel.imageUri.value.toString())
-//                    //imageBitmap != null && last.value == "take"
-//                    if (viewModel.imageUri.value != Uri.EMPTY) {
-//                        Column {
-//                            Box(
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
-//                                    .height(400.dp)
-//                            ) {
-//                                imageBitmap?.let {
-//                                    Image(
-//                                        bitmap = it.asImageBitmap(),
-//                                        contentDescription = "Picture frame",
-//                                        contentScale = ContentScale.FillBounds,
-//                                        modifier = Modifier
-//                                    )
-//                                }
-//                            }
-//                            Text(text = "이미지 제목 : $imageTitle")
-//                            Text(text = "이미지 크기 : $imageSize byte")
-//                        }
-//                    }
             }
         }
     }

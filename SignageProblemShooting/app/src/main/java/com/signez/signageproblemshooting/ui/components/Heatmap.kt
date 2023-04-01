@@ -185,12 +185,12 @@ fun ErrorModuleHeatMap(
                                                                 .clickable(
                                                                     enabled = errorCount >= 1
                                                                 ) {
-                                                                    if (errorModuleList.isNotEmpty()) {
+                                                                    if (errorModules.isNotEmpty()) {
 //                                                                        isModuleRevealed = false
                                                                         moduleClickEvent(
-                                                                            x = (errorModuleList[0].x),
-                                                                            y = (errorModuleList[0].y),
-                                                                            resultId = (errorModuleList[0].resultId),
+                                                                            x = (errorModules[0].x),
+                                                                            y = (errorModules[0].y),
+                                                                            resultId = (errorModules[0].resultId),
                                                                             viewModel = viewModel,
                                                                             navController = navController
                                                                         )

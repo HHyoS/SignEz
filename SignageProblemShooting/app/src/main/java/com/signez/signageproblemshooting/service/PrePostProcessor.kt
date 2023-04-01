@@ -3,9 +3,10 @@ package com.signez.signageproblemshooting.service
 
 import android.graphics.Rect
 import android.util.Log
+import java.io.Serializable
 import java.util.*
 
-class Result(var classIndex: Int, var score: Float, var rect: Rect)
+class Result(var classIndex: Int, var score: Float, var rect: Rect) : Serializable
 object PrePostProcessor {
     // for yolov5 model, no need to apply MEAN and STD
     @JvmField
