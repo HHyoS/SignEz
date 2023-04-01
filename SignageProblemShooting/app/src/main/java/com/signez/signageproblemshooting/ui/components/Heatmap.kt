@@ -23,8 +23,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.ErrorModule
+import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
+import com.signez.signageproblemshooting.ui.analysis.moduleClickEvent
 import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 @Composable
@@ -37,6 +40,8 @@ fun ErrorModuleHeatMap(
     moduleSize: Dp,
     cabinetWidth: Dp,
     cabinetHeigth: Dp,
+    viewModel: AnalysisViewModel,
+    navController: NavController,
 ) {
     // set up all transformation states
     var scale by remember { mutableStateOf(1f) }
@@ -102,10 +107,10 @@ fun ErrorModuleHeatMap(
 //                            .border(width = 0.5.dp, color = MaterialTheme.colors.onSurface)
 //                            .padding(0.5.dp)
                             ) {
-                            val errorCount = errorModuleList.count { errorModule ->
-                                errorModule.x / moduleRowCount + 1 == cabinetR &&
-                                        errorModule.y / moduleColCount + 1 == cabinetC
-                            }
+                                val errorCount = errorModuleList.count { errorModule ->
+                                    errorModule.x / moduleRowCount + 1 == cabinetR &&
+                                            errorModule.y / moduleColCount + 1 == cabinetC
+                                }
 
 //                                val errorCount = 1
                                 var isModuleRevealed by remember {
@@ -155,12 +160,22 @@ fun ErrorModuleHeatMap(
                                                         Modifier
                                                             .size(moduleSize)
                                                     ) {
-                                            val errorCount = errorModuleList.count { errorModule ->
-                                                errorModule.x / moduleRowCount + 1 == cabinetR &&
-                                                        errorModule.y / moduleColCount + 1 == cabinetC &&
-                                                        errorModule.x % moduleRowCount + 1 == moduleR &&
-                                                        errorModule.y % moduleColCount + 1 == moduleC
-                                            }
+//                                                        val errorCount =
+//                                                            errorModuleList.count { errorModule ->
+//                                                                errorModule.x / moduleRowCount + 1 == cabinetR &&
+//                                                                        errorModule.y / moduleColCount + 1 == cabinetC &&
+//                                                                        errorModule.x % moduleRowCount + 1 == moduleR &&
+//                                                                        errorModule.y % moduleColCount + 1 == moduleC
+//                                                            }
+                                                        val errorModules =
+                                                            errorModuleList.filter { errorModule ->
+                                                                errorModule.x / moduleRowCount + 1 == cabinetR &&
+                                                                        errorModule.y / moduleColCount + 1 == cabinetC &&
+                                                                        errorModule.x % moduleRowCount + 1 == moduleR &&
+                                                                        errorModule.y % moduleColCount + 1 == moduleC
+                                                            }
+                                                        val errorCount = errorModules.size
+
 //                                                        val errorCount = 5
                                                         Canvas(
                                                             modifier = Modifier
@@ -170,7 +185,17 @@ fun ErrorModuleHeatMap(
                                                                 .clickable(
                                                                     enabled = errorCount >= 1
                                                                 ) {
-                                                                    isModuleRevealed = false
+                                                                    if (errorModuleList.isNotEmpty()) {
+//                                                                        isModuleRevealed = false
+                                                                        moduleClickEvent(
+                                                                            x = (errorModuleList[0].x),
+                                                                            y = (errorModuleList[0].y),
+                                                                            resultId = (errorModuleList[0].resultId),
+                                                                            viewModel = viewModel,
+                                                                            navController = navController
+                                                                        )
+                                                                    }
+
                                                                 }
 //                                                    .border(
 ////                                                        width = 0.05.dp,
@@ -259,16 +284,16 @@ fun HeatMapPreview() {
                     it.score >= threshold
                 }
 
-                ErrorModuleHeatMap(
-                    widthCabinetNumber = 11,
-                    heightCabinetNumber = 19,
-                    moduleRowCount = 4,
-                    moduleColCount = 4,
-                    errorModuleList = errorModuleFilteredList,
-                    moduleSize = 20.dp,
-                    cabinetHeigth = 10.dp,
-                    cabinetWidth = 10.dp
-                )
+//                ErrorModuleHeatMap(
+//                    widthCabinetNumber = 11,
+//                    heightCabinetNumber = 19,
+//                    moduleRowCount = 4,
+//                    moduleColCount = 4,
+//                    errorModuleList = errorModuleFilteredList,
+//                    moduleSize = 20.dp,
+//                    cabinetHeigth = 10.dp,
+//                    cabinetWidth = 10.dp,
+//                )
             }
 
             Text(text = threshold.toString())
