@@ -7,6 +7,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -28,7 +29,6 @@ import org.opencv.android.BaseLoaderCallback
 import org.opencv.android.LoaderCallbackInterface
 import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
-import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
 import org.pytorch.IValue
 import org.pytorch.Module
@@ -38,6 +38,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import org.opencv.core.*
+
+
 
 
 class SignageNotFoundException(message: String) : Exception(message)
@@ -131,23 +134,60 @@ class ErrorDetectActivity : ComponentActivity() {
         }
     }
 
+
+    fun findLargestRectangle(frame : Mat): MatOfPoint {
+        val gray = Mat()
+        Imgproc.cvtColor(frame, gray, Imgproc.COLOR_BGR2GRAY)
+        val gauss = Mat()
+        Imgproc.GaussianBlur(gray, gauss, Size(0.0, 0.0), 2.0)
+
+// 이미지의 경계선을 찾습니다.
+        val edged = Mat()
+        Imgproc.Canny(gauss, edged, 30.0, 80.0)
+        val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(3.0, 3.0))
+        val dilation = Mat()
+        Imgproc.dilate(edged, dilation, kernel, Point(-1.toDouble(), -1.toDouble()), 1)
+
+// 경계선에서 contour를 추출합니다.
+        val contours = mutableListOf<MatOfPoint>()
+        val hierarchy = Mat()
+        Imgproc.findContours(dilation, contours, hierarchy, Imgproc.RETR_CCOMP, Imgproc.CHAIN_APPROX_SIMPLE)
+
+// contour 중 특정 크기 이상의 사각형인 contour를 찾습니다.
+        val filteredContours = contours.filter { Imgproc.contourArea(it) > 100000 }
+        val approxContours = filteredContours.map { approxPolyDP(it, 0.01 * Imgproc.arcLength(MatOfPoint2f(it), true), true) }
+        val quadrilateralContours = approxContours.filter { it.size().height.toInt() == 4 }
+// 면적이 가장 큰 contour를 찾습니다.
+        val maxContour = quadrilateralContours.maxByOrNull { Imgproc.contourArea(it) }
+
+        Log.d("Mat","${maxContour}")
+        return MatOfPoint(*maxContour?.toArray())
+    }
+    fun approxPolyDP(contour: MatOfPoint, epsilon: Double, closed: Boolean): MatOfPoint2f {
+        val approxCurve = MatOfPoint2f()
+        Imgproc.approxPolyDP(MatOfPoint2f(*contour.toArray()), approxCurve, epsilon, closed)
+        return approxCurve
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        OpenCVLoader.initDebug()
+        analysisViewModel = ViewModelProvider(
 
-        analysisViewModel = ViewModelProvider( // 분석 종합
             this,
             factory = AppViewModelProvider.Factory
         ).get(AnalysisViewModel::class.java)
 
         val intents: Intent = intent
+
         val nullableType = intents.extras?.getInt(REQUEST_TYPE)
         val signageId: Long? = intents.extras?.getLong(REQUEST_SIGNAGE_ID)
 
-        setContent {
-            SignEzTheme {
-                AnalysisProgress(analysisViewModel = analysisViewModel)
-            }
-        }
+        var type = intents.extras?.getInt(REQUEST_TYPE)
+        val TopLeft = intents.getIntExtra("PointTopLeft", 0)
+        val TopRight = intents.getIntExtra("PointTopRight", 0)
+        val BottomLeft = intents.getIntExtra("PointBottomLeft", 0)
+        val BottomRight = intents.getIntExtra("PointBottomRight", 0)
+        Log.d("test","${TopLeft},${TopRight},${BottomLeft},${BottomRight}")
 
 
         try {
@@ -165,6 +205,11 @@ class ErrorDetectActivity : ComponentActivity() {
             setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
             finish()
         }
+
+//        var uri = intent.getStringExtra("uri")
+        // var temp:MutableList<Point> = getCorners(uriToMat(Uri.parse(uri),this))
+//        Log.d("Hi","hellow")
+
         lifecycleScope.launch {
             uri = intents.data!!
             signage = analysisViewModel.getSignageById(signageId!!)
@@ -182,6 +227,14 @@ class ErrorDetectActivity : ComponentActivity() {
                 mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS)
             }
         }
+
+
+        setContent {
+            SignEzTheme {
+                AnalysisProgress(analysisViewModel = analysisViewModel)
+            }
+        }
+
     }
 
 
@@ -475,7 +528,19 @@ class ErrorDetectActivity : ComponentActivity() {
     }
 
 
+
     private fun getCorners(originalMat: Mat): MutableList<Point> {
+        // hyosang
+        var left = intent.getIntExtra("left",0)
+        var right = intent.getIntExtra("right",0)
+        var top = intent.getIntExtra("top",0)
+        var bottom = intent.getIntExtra("bottom",0)
+
+        var uri = intent.getStringExtra("uri")
+        Log.d("uri","${Uri.parse(uri)}")
+        val maxContourFromRec = findLargestRectangle(originalMat)
+        Log.d("hyosang","${maxContourFromRec}")
+
         var points = mutableListOf<Point>()
 
         val grayMat = Mat()
@@ -579,7 +644,13 @@ class ErrorDetectActivity : ComponentActivity() {
             null
         }
     }
-
+    private fun uriToMat(uri: Uri, context: Context): Mat {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val mat = Mat()
+        Utils.bitmapToMat(bitmap, mat)
+        return mat
+    }
     private fun bitmapToMat(bitmap: Bitmap): Mat {
         val mat = Mat()
         Utils.bitmapToMat(bitmap, mat)
@@ -629,3 +700,4 @@ class ErrorDetectActivity : ComponentActivity() {
         super.onBackPressed()
     }
 }
+ 

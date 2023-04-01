@@ -6,18 +6,19 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
 import androidx.core.content.FileProvider
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.signez.signageproblemshooting.ErrorDetectActivity
+import com.signez.signageproblemshooting.ImageCropActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -192,20 +193,31 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openErrorDetectActivity(
-    context: Context,
-    type: Int,
-    signageId: Long,
-    uri: Uri
-) {
+
+fun openImageCropActivity(context: Context, mWidth:Int, mHeight:Int, mmWidth:Int, mmHeight:Int, REQUEST_TYPE:Int, uri: Uri) {
+    val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+    val intent = Intent(context, ImageCropActivity::class.java)
+    intent.putExtra("mWidth",mWidth)
+    intent.putExtra("mHeight",mHeight)
+    intent.putExtra("mmWidth",mmWidth)
+    intent.putExtra("mmHeight",mmHeight)
+    intent.putExtra("REQUEST_TYPE", REQUEST_TYPE)
+    intent.putExtra("uri",uri.toString())
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
+}
+fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
     val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
     val REQUEST_TYPE: String = "REQUEST_TYPE"
     val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
 
     val intent = Intent(context, ErrorDetectActivity::class.java)
-    intent.putExtra(REQUEST_TYPE, type)
-    intent.putExtra(REQUEST_SIGNAGE_ID, signageId)
-    intent.data = uri
 
+    intent.putExtra("left",rec.left)
+    intent.putExtra("right",rec.right)
+    intent.putExtra("top",rec.top)
+    intent.putExtra("bottom",rec.bottom)
+    intent.putExtra("uri",uri.toString())
+    Log.d("start","start ${uri}")
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+    Log.d("end","end")
 }
