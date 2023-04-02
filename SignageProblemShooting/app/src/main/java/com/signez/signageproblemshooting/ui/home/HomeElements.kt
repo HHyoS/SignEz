@@ -146,6 +146,7 @@ private fun HomeHistoryElement(
                         Log.d("HomeResult", "/${result.id}")
                         navController.navigate(ResultGridDestination.route+"/${result.id}")
                     }
+                    .background(color = Color.Black)
             )
         }
     } // if 끝

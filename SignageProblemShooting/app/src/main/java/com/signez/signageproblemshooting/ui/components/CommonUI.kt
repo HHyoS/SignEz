@@ -460,6 +460,7 @@ fun ResultHistoryBlock(
                         modifier = Modifier
                             .size(100.dp)
                             .clip(RoundedCornerShape(10.dp))
+                            .background(color = Color.Black)
                     )
                 }
             }
