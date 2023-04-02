@@ -139,9 +139,11 @@ fun PictureAnalysis(
 
                     // test
 
-                    if(contentUri == Uri.EMPTY)
+                    if(contentUri == Uri.EMPTY){
                         Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-                    else {
+                    } else if (analysisViewModel.signageId.value < 1) {
+                        Toast.makeText(context,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
                         openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_DETECT_PHOTO, analysisViewModel.signageId.value, contentUri)
                     }
 

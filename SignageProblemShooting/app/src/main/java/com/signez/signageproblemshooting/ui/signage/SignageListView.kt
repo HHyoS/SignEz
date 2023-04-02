@@ -34,10 +34,7 @@ import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
 import com.signez.signageproblemshooting.ui.components.SignEzFloatingButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.text.NumberFormat
 import java.util.*
 

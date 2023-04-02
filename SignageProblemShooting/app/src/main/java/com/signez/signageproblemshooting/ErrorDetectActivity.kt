@@ -103,6 +103,8 @@ class ErrorDetectActivity : ComponentActivity() {
     }
 
     private fun detect(defaultDispatcher: CoroutineDispatcher = Dispatchers.Default) {
+        Log.i("-------------State-----------", signage.toString())
+        Log.i("-------------State-----------", cabinet.toString())
         lifecycleScope.launch {
             withContext(defaultDispatcher) {
                 when (type) {
