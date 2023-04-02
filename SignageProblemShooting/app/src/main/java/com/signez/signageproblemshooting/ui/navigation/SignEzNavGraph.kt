@@ -198,5 +198,18 @@ fun SignEzNavHost(
             }
         }
 
+        composable(route = BlockLayoutDestination.route+"/{signageId}/{cabinetId}") {
+            backStackEntry ->
+            backStackEntry.arguments?.let {
+                LayoutScreen(
+                    signageId = it.getString("signageId")!!,
+                    cabinetId = it.getString("cabinetId")!!,
+                    navController = navController,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
+                )
+            }
+        }
+
     }
 }
