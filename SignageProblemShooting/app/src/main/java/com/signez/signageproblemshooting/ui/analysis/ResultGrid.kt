@@ -175,6 +175,7 @@ fun ResultGridView(
                                     cabinetWidth = (moduleSize * widthModuleNumber),
                                     viewModel = viewModel,
                                     navController = navController,
+                                    threshold = threshold
                                 )
                             }
                         }
@@ -291,14 +292,25 @@ x, y 좌표 고르면 해당 위치에 발생된
 -> 모듈에 달아 주세요~
  */
 fun moduleClickEvent(
+    cabinetX: Int,
+    cabinetY: Int,
+    moduleX: Int,
+    moduleY: Int,
     x: Int,
     y: Int,
+    threshold: Int,
     resultId: Long,
     viewModel: AnalysisViewModel,
     navController: NavController
 ) {
-    Log.d("moduleClickEvent", "${x}, ${y}, ${resultId}")
+//    Log.d("moduleClickEvent", "${x}, ${y}, ${resultId}")
     viewModel.selectedModuleX.value = x
     viewModel.selectedModuleY.value = y
+    viewModel.selectedCabinetX.value = cabinetX
+    viewModel.selectedCabinetY.value = cabinetY
+    viewModel.selectedMoudleXInCabinet.value = moduleX
+    viewModel.selectedMoudleYInCabinet.value = moduleY
+    viewModel.threshold.value = threshold
+
     navController.navigate(ErrorImageDestination.route + "/${x}/${y}/${resultId}")
 }

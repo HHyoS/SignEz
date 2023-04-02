@@ -53,6 +53,11 @@ fun ErrorImageView(
     }
     val deletionCompleted = remember { mutableStateOf(false) }
     val maisState = remember { mutableStateOf(null as List<ErrorModuleWithImage>?) }
+    var cabinetX = viewModel.selectedCabinetX.value
+    var cabinetY = viewModel.selectedCabinetY.value
+    var moduleX = viewModel.selectedMoudleXInCabinet.value
+    var moduleY = viewModel.selectedMoudleYInCabinet.value
+    var threshold = viewModel.threshold.value
     LaunchedEffect(deletionCompleted.value) {
         if (deletionCompleted.value) {
             deletionCompleted.value = false
@@ -61,7 +66,12 @@ fun ErrorImageView(
             x = viewModel.selectedModuleX.value,
             y = viewModel.selectedModuleY.value,
             resultId = viewModel.selectedResultId.value
-        )
+        ).filter {
+            (it.errorModule.score * 100).roundToInt() >= threshold
+        }.sortedByDescending {
+            (it.errorModule.score)
+        }
+
     }
     val mais = maisState.value //
 
@@ -156,7 +166,14 @@ fun ErrorImageView(
 //                            }
 
 //                            Spacer(modifier = Modifier.padding(10.dp))
-                            ErrorImageSlideBox(selectedIdx = selectedIdx, mais = mais)
+                            ErrorImageSlideBox(
+                                selectedIdx = selectedIdx,
+                                mais = mais,
+                                cabinetX = cabinetX,
+                                cabinetY = cabinetY,
+                                moduleX = moduleX,
+                                moduleY = moduleY
+                            )
                         }
                     }
 
@@ -172,7 +189,11 @@ fun ErrorImageView(
 fun ErrorImageSlideBox(
     modifier: Modifier = Modifier,
     selectedIdx: MutableState<Int>,
-    mais: List<ErrorModuleWithImage>
+    mais: List<ErrorModuleWithImage>,
+    cabinetX: Int = 0,
+    cabinetY: Int = 0,
+    moduleX: Int = 0,
+    moduleY: Int = 0,
 ) {
     //
     Surface(
@@ -193,8 +214,8 @@ fun ErrorImageSlideBox(
             ) {
                 androidx.compose.material3.Text(
                     text = "캐비닛 : " +
-                            "(X : ${mais[selectedIdx.value].errorModule.x}," +
-                            " Y : ${mais[selectedIdx.value].errorModule.y})",
+                            "(X : ${cabinetX}," +
+                            " Y : ${cabinetY})",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
@@ -208,8 +229,8 @@ fun ErrorImageSlideBox(
             ) {
                 androidx.compose.material3.Text(
                     text = "모듈 : " +
-                            "(X : ${mais[selectedIdx.value].errorModule.x}," +
-                            " Y : ${mais[selectedIdx.value].errorModule.y})",
+                            "(X : ${moduleX}," +
+                            " Y : ${moduleY})",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
