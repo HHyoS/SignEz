@@ -261,7 +261,7 @@ fun ErrorImageSlideBox(
                                 .width(100.dp)
                                 .height(100.dp)
                                 .clip(RoundedCornerShape(15.dp))
-                                .background(color = OneBGDarkGrey)
+                                .background(color = Color.Black)
                                 .clickable(onClick = { selectedIdx.value = mais.indexOf(item) })
                                 .padding(5.dp)
                         )
