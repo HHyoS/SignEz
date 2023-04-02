@@ -143,8 +143,9 @@ fun PictureAnalysis(
                         Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
                     } else if (analysisViewModel.signageId.value < 1) {
                         Toast.makeText(context,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        openImageCropActivity(context, mWidth, mHeight, mmWidth, mmHeight, REQUEST_DETECT_PHOTO, analysisViewModel.signageId.value, contentUri)
+                    }
+                    else {
+                        openImageCropActivity(context, REQUEST_DETECT_PHOTO, analysisViewModel.signageId.value, contentUri)
                     }
 
 
@@ -196,41 +197,8 @@ fun PictureAnalysis(
                                 .height(200.dp)
                                 .clip(RoundedCornerShape(15.dp))
                                 .background(color = MaterialTheme.colors.onSurface)
-                                .onSizeChanged { ImageSize ->
-                                    val width = ImageSize.width
-                                    val height = ImageSize.height
-                                    Log.d("Image Size", "width: $width, height: $height")
-                                }
                         )
-                        rec = null
-                        mWidth = LocalConfiguration.current.screenWidthDp
-                        mHeight = LocalConfiguration.current.screenHeightDp
-                        val uri = Uri.parse(contentUri.toString()) // 실제 Uri 주소를 사용하여 초기화합니다.
-                        val options = BitmapFactory.Options().apply {
-                            inJustDecodeBounds = true
-                        }
-                        // 사진 진짜크기
-                        BitmapFactory.decodeStream(
-                            activity.contentResolver.openInputStream(uri),
-                            null,
-                            options
-                        )
-                        mmWidth = options.outWidth
-                        mmHeight = options.outHeight
-                        Log.d("here","error")
 
-//                        imageBitmap?.let {
-//                            Image(
-//                                bitmap = it.asImageBitmap(),
-//                                contentDescription = "Picture frame",
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .height(200.dp)
-////                                    .fillMaxHeight(0.4f)
-//                                    .clip(RoundedCornerShape(15.dp))
-//                                    .background(color = MaterialTheme.colors.onSurface)
-//                            )
-//                        }
                     }
                 }
 
