@@ -29,6 +29,7 @@ import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.analysis.moduleClickEvent
 import com.signez.signageproblemshooting.ui.theme.SignEzTheme
+import kotlin.math.roundToInt
 
 @Composable
 fun ErrorModuleHeatMap(
@@ -113,33 +114,20 @@ fun ErrorModuleHeatMap(
                                             (errorModule.y - 1) / moduleRowCount + 1 == cabinetR
                                 }
 
-//                                val errorCount = 1
-                                var isModuleRevealed by remember {
-                                    mutableStateOf(false)
-                                }
-                                if (!isModuleRevealed) {
+                                if (errorCount == 0) {
                                     Canvas(
                                         modifier = Modifier
                                             .fillMaxSize()
-//                                        .width(moduleSize)
-//                                        .height(moduleSize)
-//                                        .clip(RoundedCornerShape(15))
-                                            .clickable(
-                                                enabled = errorCount >= 1
-                                            ) {
-                                                isModuleRevealed = true
-                                            }
-//                                        .border(width = 0.2.dp, color = Color(0xFF0D3EF1))
                                     ) {
                                         //draw shapes here
                                         drawRoundRect(
-                                            color =
-                                            when (errorCount) {
-                                                0 -> Color(0xFFECECEC)
-                                                1, 2, 3, 4 -> Color(0xFFFFB5B5)
-                                                5, 6, 7, 8 -> Color(0xFFFF6767)
-                                                else -> Color(0xFFFF1414)
-                                            },
+                                            color = Color(0xFFECECEC)
+//                                            when (errorCount) {
+//                                                0 -> Color(0xFFECECEC)
+//                                                1, 2, 3, 4 -> Color(0xFFFFB5B5)
+//                                                5, 6, 7, 8 -> Color(0xFFFF6767)
+//                                                else -> Color(0xFFFF1414)
+//                                            },
 //                                        cornerRadius = CornerRadius(5f, 5f)
                                         )
                                     }
@@ -167,8 +155,9 @@ fun ErrorModuleHeatMap(
                                                                         (errorModule.y - 1) / moduleRowCount + 1 == cabinetR &&
                                                                         (errorModule.x - 1) % moduleColCount + 1 == moduleC &&
                                                                         (errorModule.y - 1) % moduleRowCount + 1 == moduleR
+                                                            }.sortedByDescending {
+                                                                it.score
                                                             }
-                                                        val errorCount = errorModules.size
 
                                                         Canvas(
                                                             modifier = Modifier
@@ -192,22 +181,30 @@ fun ErrorModuleHeatMap(
                                                                     }
 
                                                                 }
-//                                                    .border(
-////                                                        width = 0.05.dp,
-////                                                        color = Color(0xFFFFFFFF)
-//                                                    )
+//
                                                         ) {
                                                             //draw shapes here
-                                                            drawRoundRect(
-                                                                color =
-                                                                when (errorCount) {
-                                                                    0 -> Color(0xFFE3E3E3)
-                                                                    1, 2, 3, 4 -> Color(0xFFFFB5B5)
-                                                                    5, 6, 7, 8 -> Color(0xFFFF6767)
-                                                                    else -> Color(0xFFFF1414)
-                                                                },
-//                                                    cornerRadius = CornerRadius(5f, 5f)
-                                                            )
+                                                            if (errorModules.isNotEmpty()) {
+                                                                val maxErrorScore =
+                                                                    (errorModules.get(0).score * 100).roundToInt()
+
+                                                                drawRoundRect(
+                                                                    color =
+                                                                    when (maxErrorScore) {
+                                                                        in 0..19 -> Color(0xFFECECEC)
+                                                                        in 20..30 -> Color(0xFFFFB5B5)
+                                                                        in 31..50 -> Color(0xFFFF8080)
+                                                                        in 51..70 -> Color(0xFFFF5B5B)
+                                                                        in 70..90 -> Color(0xFFFF1B1B)
+                                                                        else -> Color(0xFFFF0000)
+                                                                    },
+                                                                )
+                                                            } else {
+                                                                drawRoundRect(
+                                                                    color =
+                                                                    Color(0xFFECECEC),
+                                                                )
+                                                            }
                                                         }
                                                     }
                                                 }
