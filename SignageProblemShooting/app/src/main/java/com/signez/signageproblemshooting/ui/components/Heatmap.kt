@@ -42,6 +42,7 @@ fun ErrorModuleHeatMap(
     cabinetHeigth: Dp,
     viewModel: AnalysisViewModel,
     navController: NavController,
+    threshold: Int = 70,
 ) {
     // set up all transformation states
     var scale by remember { mutableStateOf(1f) }
@@ -160,13 +161,6 @@ fun ErrorModuleHeatMap(
                                                         Modifier
                                                             .size(moduleSize)
                                                     ) {
-//                                                        val errorCount =
-//                                                            errorModuleList.count { errorModule ->
-//                                                                errorModule.x / moduleRowCount + 1 == cabinetR &&
-//                                                                        errorModule.y / moduleColCount + 1 == cabinetC &&
-//                                                                        errorModule.x % moduleRowCount + 1 == moduleR &&
-//                                                                        errorModule.y % moduleColCount + 1 == moduleC
-//                                                            }
                                                         val errorModules =
                                                             errorModuleList.filter { errorModule ->
                                                                 (errorModule.x - 1) / moduleColCount + 1 == cabinetC &&
@@ -176,23 +170,24 @@ fun ErrorModuleHeatMap(
                                                             }
                                                         val errorCount = errorModules.size
 
-//                                                        val errorCount = 5
                                                         Canvas(
                                                             modifier = Modifier
                                                                 .fillMaxSize()
-//                                                                .size(moduleSize)
-//                                                                .clip(RoundedCornerShape(5))
                                                                 .clickable(
                                                                     enabled = errorCount >= 1
                                                                 ) {
                                                                     if (errorModules.isNotEmpty()) {
-//                                                                        isModuleRevealed = false
                                                                         moduleClickEvent(
+                                                                            cabinetX = (errorModules[0].x - 1) / moduleColCount + 1,
+                                                                            cabinetY = (errorModules[0].y - 1) / moduleRowCount + 1,
+                                                                            moduleX = (errorModules[0].x - 1) % moduleColCount + 1,
+                                                                            moduleY = (errorModules[0].y - 1) % moduleRowCount + 1,
                                                                             x = (errorModules[0].x),
                                                                             y = (errorModules[0].y),
                                                                             resultId = (errorModules[0].resultId),
                                                                             viewModel = viewModel,
-                                                                            navController = navController
+                                                                            navController = navController,
+                                                                            threshold = threshold
                                                                         )
                                                                     }
 

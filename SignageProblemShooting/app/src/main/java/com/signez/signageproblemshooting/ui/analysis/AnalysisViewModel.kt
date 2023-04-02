@@ -36,6 +36,11 @@ class AnalysisViewModel(
     var selectedResultId = mutableStateOf(-1L)
     var selectedModuleX = mutableStateOf(-1)
     var selectedModuleY = mutableStateOf(-1)
+    var selectedCabinetX = mutableStateOf(-1)
+    var selectedCabinetY = mutableStateOf(-1)
+    var threshold = mutableStateOf(-1)
+    var selectedMoudleXInCabinet = mutableStateOf(-1)
+    var selectedMoudleYInCabinet = mutableStateOf(-1)
     var progressMessage = mutableStateOf("분석 중")
     var progressFloat = mutableStateOf(0.0F)
 
