@@ -1,6 +1,8 @@
 package com.signez.signageproblemshooting.ui.analysis
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -261,16 +264,34 @@ fun ErrorImageSlideBox(
             ) {
                 items(items = mais, itemContent = { item ->
                     item.errorImage?.evidence_image?.let { byteArray ->
-                        GlideImage(
-                            model = byteArray,
-                            contentDescription = "글라이드",
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(100.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(color = Color.Black)
-                                .clickable(onClick = { selectedIdx.value = mais.indexOf(item) })
-                        )
+                        Box() {
+                            GlideImage(
+                                model = byteArray,
+                                contentDescription = "글라이드",
+                                modifier = Modifier
+                                    .width(100.dp)
+                                    .height(100.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(color = Color.Black)
+                                    .clickable(onClick = { selectedIdx.value = mais.indexOf(item) })
+                            )
+                            if (selectedIdx.value == mais.indexOf(item)) {
+                                Canvas(
+                                    modifier = Modifier
+                                        .width(100.dp)
+                                        .height(100.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                )
+                                {
+                                    //draw shapes here
+                                    drawRoundRect(
+                                        color = Color(0x80000000),
+                                        cornerRadius = CornerRadius(5f, 5f)
+                                    )
+                                }
+
+                            }
+                        }
                     }
                 })
             }
