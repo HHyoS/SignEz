@@ -63,16 +63,8 @@ fun PastResult(
     viewModel: AnalysisViewModel
 ) {
     val resultListState by viewModel.resultListState.collectAsState()
-    val itemList = resultListState.itemList
-//    val itemList = listOf<Painter>(
-//        painterResource(id = R.drawable.bluesign),
-//        painterResource(id = R.drawable.bluesign),
-//        painterResource(id = R.drawable.bluesign),
-//        painterResource(id = R.drawable.bluesign),
-//        painterResource(id = R.drawable.bluesign),
-//        painterResource(id = R.drawable.bluesign),
-//        painterResource(id = R.drawable.bluesign)
-//    )
+    val itemList = resultListState.itemList.sortedByDescending { it.resultDate }
+
     Surface(
         modifier = modifier
             .background(androidx.compose.material.MaterialTheme.colors.surface)
@@ -90,7 +82,6 @@ fun PastResult(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .weight(1f),
-//                        .align(alignment = Alignment.Top),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 androidx.compose.material.IconButton(
@@ -122,15 +113,6 @@ fun PastResult(
                             viewModel=viewModel,
                             navController=navController
                             )
-//                        Image(
-//                            painter = item,
-//                            contentDescription = "아이템",
-//                            modifier = Modifier
-//                                .width(100.dp)
-//                                .height(100.dp)
-//                                .clip(RoundedCornerShape(10.dp))
-//                                .clickable { /* 해당 분석 결과로 가는 이벤트 */ }
-//                        )
                     }
                 }
             }
