@@ -4,7 +4,10 @@ import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.signez.signageproblemshooting.data.entities.*
@@ -43,6 +46,7 @@ class AnalysisViewModel(
     var selectedMoudleYInCabinet = mutableStateOf(-1)
     var progressMessage = mutableStateOf("분석 중")
     var progressFloat = mutableStateOf(0.0F)
+    var isModuleClicked = mutableStateOf(false)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L

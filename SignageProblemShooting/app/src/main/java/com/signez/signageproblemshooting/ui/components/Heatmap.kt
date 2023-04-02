@@ -42,7 +42,6 @@ fun ErrorModuleHeatMap(
     cabinetWidth: Dp,
     cabinetHeigth: Dp,
     viewModel: AnalysisViewModel,
-    navController: NavController,
     threshold: Int = 70,
 ) {
     // set up all transformation states
@@ -157,6 +156,7 @@ fun ErrorModuleHeatMap(
                                                                     enabled = errorCount >= 1
                                                                 ) {
                                                                     if (errorModules.isNotEmpty()) {
+                                                                        viewModel.isModuleClicked.value = true
                                                                         moduleClickEvent(
                                                                             cabinetX = (errorModules[0].x - 1) / moduleColCount + 1,
                                                                             cabinetY = (errorModules[0].y - 1) / moduleRowCount + 1,
@@ -164,9 +164,7 @@ fun ErrorModuleHeatMap(
                                                                             moduleY = (errorModules[0].y - 1) % moduleRowCount + 1,
                                                                             x = (errorModules[0].x),
                                                                             y = (errorModules[0].y),
-                                                                            resultId = (errorModules[0].resultId),
                                                                             viewModel = viewModel,
-                                                                            navController = navController,
                                                                             threshold = threshold
                                                                         )
                                                                     }

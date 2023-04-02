@@ -102,9 +102,9 @@ fun ResultGridView(
             )
         },
         bottomBar = {
-            BottomSingleFlatButton(title = "사진보기", isUsable = true) {
-//                navController.navigate(ErrorImageDestination.route)
-                // moduleClickEvent 활용해주세요~
+            BottomSingleFlatButton(title = "사진 보기", isUsable = viewModel.isModuleClicked.value) {
+                viewModel.isModuleClicked.value = false
+                navController.navigate(ErrorImageDestination.route + "/${viewModel.selectedModuleX.value}/${viewModel.selectedModuleY.value}/${resultId}")
             }
         }
     ) { innerPadding ->
@@ -174,8 +174,7 @@ fun ResultGridView(
                                     cabinetHeigth = (moduleSize * heightModuleNumber),
                                     cabinetWidth = (moduleSize * widthModuleNumber),
                                     viewModel = viewModel,
-                                    navController = navController,
-                                    threshold = threshold
+                                    threshold = threshold,
                                 )
                             }
                         }
@@ -236,6 +235,7 @@ fun ResultGridView(
                                 onValueChangeFinished = {
                                     // launch some business logic update with the state you hold
                                     // viewModel.updateSelectedSliderValue(sliderPosition)
+                                    viewModel.isModuleClicked.value = false
                                 },
                                 steps = 79,
                                 colors = SliderDefaults.colors(
@@ -299,9 +299,7 @@ fun moduleClickEvent(
     x: Int,
     y: Int,
     threshold: Int,
-    resultId: Long,
     viewModel: AnalysisViewModel,
-    navController: NavController
 ) {
 //    Log.d("moduleClickEvent", "${x}, ${y}, ${resultId}")
     viewModel.selectedModuleX.value = x
@@ -311,6 +309,5 @@ fun moduleClickEvent(
     viewModel.selectedMoudleXInCabinet.value = moduleX
     viewModel.selectedMoudleYInCabinet.value = moduleY
     viewModel.threshold.value = threshold
-
-    navController.navigate(ErrorImageDestination.route + "/${x}/${y}/${resultId}")
 }
+
