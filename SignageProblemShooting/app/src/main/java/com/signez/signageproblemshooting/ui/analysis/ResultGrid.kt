@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,6 +29,7 @@ import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
 import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap
 import com.signez.signageproblemshooting.ui.components.InFocusBlockButton
+import com.signez.signageproblemshooting.ui.components.TutorialStartButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
 import kotlin.math.roundToInt
@@ -104,6 +107,8 @@ fun ResultGridView(
         bottomBar = {
             BottomSingleFlatButton(title = "사진 보기", isUsable = viewModel.isModuleClicked.value) {
                 viewModel.isModuleClicked.value = false
+                viewModel.selectedModuleXforEvent.value = -1
+                viewModel.selectedModuleYforEvent.value = -1
                 navController.navigate(ErrorImageDestination.route + "/${viewModel.selectedModuleX.value}/${viewModel.selectedModuleY.value}/${resultId}")
             }
         }
@@ -177,6 +182,30 @@ fun ResultGridView(
                                     threshold = threshold,
                                 )
                             }
+                            if (viewModel.selectedModuleXforEvent.value != -1 && viewModel.selectedModuleYforEvent.value != -1) {
+                                androidx.compose.material3.Button(
+                                    onClick = {},
+                                    enabled = false,
+                                    shape = RoundedCornerShape(20.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colors.primary,
+                                        disabledContainerColor = Color(0xCC656565),
+                                    ),
+                                    modifier = Modifier
+                                        .padding(bottom = 5.dp)
+                                        .fillMaxWidth(0.8f)
+                                        .wrapContentHeight()
+                                        .align(Alignment.BottomCenter),
+                                ) {
+                                    Text(
+                                        text = "캐비닛 (X : ${viewModel.selectedCabinetX.value}, Y : ${viewModel.selectedCabinetY.value}), " +
+                                                "모듈 (X : ${viewModel.selectedMoudleXInCabinet.value}, Y : ${viewModel.selectedMoudleYInCabinet.value})",
+                                        style = MaterialTheme.typography.body1,
+                                        color = MaterialTheme.colors.onPrimary,
+                                        modifier = Modifier.padding(bottom = 2.dp)
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -236,6 +265,8 @@ fun ResultGridView(
                                     // launch some business logic update with the state you hold
                                     // viewModel.updateSelectedSliderValue(sliderPosition)
                                     viewModel.isModuleClicked.value = false
+                                    viewModel.selectedModuleXforEvent.value = -1
+                                    viewModel.selectedModuleYforEvent.value = -1
                                 },
                                 steps = 79,
                                 colors = SliderDefaults.colors(
@@ -298,6 +329,8 @@ fun moduleClickEvent(
     moduleY: Int,
     x: Int,
     y: Int,
+    selectedModuleXforEvent: Int,
+    selectedModuleYforEvent: Int,
     threshold: Int,
     viewModel: AnalysisViewModel,
 ) {
@@ -309,5 +342,7 @@ fun moduleClickEvent(
     viewModel.selectedMoudleXInCabinet.value = moduleX
     viewModel.selectedMoudleYInCabinet.value = moduleY
     viewModel.threshold.value = threshold
+    viewModel.selectedModuleXforEvent.value = selectedModuleXforEvent
+    viewModel.selectedModuleYforEvent.value = selectedModuleYforEvent
 }
 
