@@ -218,7 +218,7 @@ fun ErrorImageSlideBox(
                             " Y : ${cabinetY})",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(start = 18.dp, top = 12.dp, bottom = 4.dp)
                 )
             } // Row 끝
             Row(
@@ -233,7 +233,7 @@ fun ErrorImageSlideBox(
                             " Y : ${moduleY})",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(start = 18.dp, top = 2.dp, bottom = 8.dp)
                 )
             } // Row 끝
             Row(
@@ -246,12 +246,19 @@ fun ErrorImageSlideBox(
                     text = "정확도 : ${(mais[selectedIdx.value].errorModule.score * 100).roundToInt()}%",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 16.dp)
                 )
             } // Row 끝
 
 
-            LazyRow(modifier = Modifier.fillMaxWidth()) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(
+                    start = 8.dp,
+                    end = 8.dp
+                ),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 items(items = mais, itemContent = { item ->
                     item.errorImage?.evidence_image?.let { byteArray ->
                         GlideImage(
@@ -260,10 +267,9 @@ fun ErrorImageSlideBox(
                             modifier = Modifier
                                 .width(100.dp)
                                 .height(100.dp)
-                                .clip(RoundedCornerShape(15.dp))
+                                .clip(RoundedCornerShape(10.dp))
                                 .background(color = Color.Black)
                                 .clickable(onClick = { selectedIdx.value = mais.indexOf(item) })
-                                .padding(5.dp)
                         )
                     }
                 })
