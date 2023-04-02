@@ -4,7 +4,7 @@ import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.net.Uri
-import androidx.compose.runtime.getValue
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -14,6 +14,8 @@ import com.signez.signageproblemshooting.data.entities.*
 import com.signez.signageproblemshooting.data.repository.*
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetState
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -36,6 +38,7 @@ class AnalysisViewModel(
     var videoContentUri = mutableStateOf(Uri.EMPTY)
     var imageContentUri = mutableStateOf(Uri.EMPTY)
     var signageId = mutableStateOf(-1L)
+    var cabinetId = mutableStateOf(-1L)
     var selectedResultId = mutableStateOf(-1L)
     var selectedModuleX = mutableStateOf(-1)
     var selectedModuleY = mutableStateOf(-1)
@@ -59,9 +62,13 @@ class AnalysisViewModel(
         return cabinetRepository.getCabinetBySignageId(signageId)
     }
 
+    fun getDeferredCabinet(signageId: Long): Deferred<Cabinet> {
+        return viewModelScope.async { cabinetRepository.getCabinetBySignageId(signageId) }
+    }
+
 
     fun getCabinet(): StateFlow<CabinetState> {
-        return cabinetRepository.getCabinetStream(getSignage().value.signage.modelId)
+        return cabinetRepository.getCabinetStream(cabinetId.value)
             .filterNotNull()
             .map {
                 CabinetState(cabinet = it)
