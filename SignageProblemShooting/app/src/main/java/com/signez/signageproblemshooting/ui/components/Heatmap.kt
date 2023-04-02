@@ -108,8 +108,8 @@ fun ErrorModuleHeatMap(
 //                            .padding(0.5.dp)
                             ) {
                                 val errorCount = errorModuleList.count { errorModule ->
-                                    errorModule.x / moduleRowCount + 1 == cabinetR &&
-                                            errorModule.y / moduleColCount + 1 == cabinetC
+                                    (errorModule.x - 1) / moduleColCount + 1 == cabinetC &&
+                                            (errorModule.y - 1) / moduleRowCount + 1 == cabinetR
                                 }
 
 //                                val errorCount = 1
@@ -169,10 +169,10 @@ fun ErrorModuleHeatMap(
 //                                                            }
                                                         val errorModules =
                                                             errorModuleList.filter { errorModule ->
-                                                                errorModule.x / moduleRowCount + 1 == cabinetR &&
-                                                                        errorModule.y / moduleColCount + 1 == cabinetC &&
-                                                                        errorModule.x % moduleRowCount + 1 == moduleR &&
-                                                                        errorModule.y % moduleColCount + 1 == moduleC
+                                                                (errorModule.x - 1) / moduleColCount + 1 == cabinetC &&
+                                                                        (errorModule.y - 1) / moduleRowCount + 1 == cabinetR &&
+                                                                        (errorModule.x - 1) % moduleColCount + 1 == moduleC &&
+                                                                        (errorModule.y - 1) % moduleRowCount + 1 == moduleR
                                                             }
                                                         val errorCount = errorModules.size
 
