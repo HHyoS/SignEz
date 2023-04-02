@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SignageProblemShooting.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#FF1E88E5</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/loading_logo</item>
+        <item name="windowSplashScreenAnimationDuration">500</item>
+        <item name="postSplashScreenTheme">@style/Theme.SignageProblemShooting</item>
+    </style>
+</resources>

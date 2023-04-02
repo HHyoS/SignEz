@@ -36,12 +36,15 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private lateinit var viewModel1: PictureViewModel
@@ -124,6 +127,9 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch{
+            installSplashScreen()
+        }
         viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
