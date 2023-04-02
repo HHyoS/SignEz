@@ -286,6 +286,7 @@ private fun InventoryItem(
                         modifier = Modifier
                             .size(45.dp)
                             .clip(RoundedCornerShape(10.dp))
+                            .background(color = Color.Black)
                     )
                 }
             } // 대표 이미지
