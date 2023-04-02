@@ -29,6 +29,7 @@ import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap
 import com.signez.signageproblemshooting.ui.components.InFocusBlockButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
+import kotlin.math.roundToInt
 
 object ResultGridDestination : NavigationDestination {
     override val route = "ResultGridScreen"
@@ -83,9 +84,8 @@ fun ResultGridView(
     var widthModuleNumber = cabinet?.moduleColCount ?: 2
     var heightModuleNumber = cabinet?.moduleRowCount ?: 2
 
-
     errorModuleFilteredList = modules?.filter {
-        (it.score * 100) >= threshold
+        (it.score * 100).roundToInt() >= threshold
     } ?: listOf(
         ErrorModule(resultId = 0, score = 20.0, x = 1, y = 1),
     )
