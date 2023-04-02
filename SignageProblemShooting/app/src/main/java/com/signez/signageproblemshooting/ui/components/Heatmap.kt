@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +43,6 @@ fun ErrorModuleHeatMap(
     cabinetWidth: Dp,
     cabinetHeigth: Dp,
     viewModel: AnalysisViewModel,
-    navController: NavController,
     threshold: Int = 70,
 ) {
     // set up all transformation states
@@ -106,8 +106,6 @@ fun ErrorModuleHeatMap(
                                     .padding(all = moduleSize / 8),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
-//                            .border(width = 0.5.dp, color = MaterialTheme.colors.onSurface)
-//                            .padding(0.5.dp)
                             ) {
                                 val errorCount = errorModuleList.count { errorModule ->
                                     (errorModule.x - 1) / moduleColCount + 1 == cabinetC &&
@@ -122,13 +120,6 @@ fun ErrorModuleHeatMap(
                                         //draw shapes here
                                         drawRoundRect(
                                             color = Color(0xFFECECEC)
-//                                            when (errorCount) {
-//                                                0 -> Color(0xFFECECEC)
-//                                                1, 2, 3, 4 -> Color(0xFFFFB5B5)
-//                                                5, 6, 7, 8 -> Color(0xFFFF6767)
-//                                                else -> Color(0xFFFF1414)
-//                                            },
-//                                        cornerRadius = CornerRadius(5f, 5f)
                                         )
                                     }
                                 } else {
@@ -166,6 +157,8 @@ fun ErrorModuleHeatMap(
                                                                     enabled = errorCount >= 1
                                                                 ) {
                                                                     if (errorModules.isNotEmpty()) {
+                                                                        viewModel.isModuleClicked.value =
+                                                                            true
                                                                         moduleClickEvent(
                                                                             cabinetX = (errorModules[0].x - 1) / moduleColCount + 1,
                                                                             cabinetY = (errorModules[0].y - 1) / moduleRowCount + 1,
@@ -173,13 +166,12 @@ fun ErrorModuleHeatMap(
                                                                             moduleY = (errorModules[0].y - 1) % moduleRowCount + 1,
                                                                             x = (errorModules[0].x),
                                                                             y = (errorModules[0].y),
-                                                                            resultId = (errorModules[0].resultId),
+                                                                            selectedModuleXforEvent = (errorModules[0].x),
+                                                                            selectedModuleYforEvent = (errorModules[0].y),
                                                                             viewModel = viewModel,
-                                                                            navController = navController,
                                                                             threshold = threshold
                                                                         )
                                                                     }
-
                                                                 }
 //
                                                         ) {
@@ -187,18 +179,32 @@ fun ErrorModuleHeatMap(
                                                             if (errorModules.isNotEmpty()) {
                                                                 val maxErrorScore =
                                                                     (errorModules.get(0).score * 100).roundToInt()
-
                                                                 drawRoundRect(
                                                                     color =
                                                                     when (maxErrorScore) {
                                                                         in 0..19 -> Color(0xFFECECEC)
-                                                                        in 20..30 -> Color(0xFFFFB5B5)
-                                                                        in 31..50 -> Color(0xFFFF8080)
-                                                                        in 51..70 -> Color(0xFFFF5B5B)
-                                                                        in 70..90 -> Color(0xFFFF1B1B)
+                                                                        in 20..30 -> Color(
+                                                                            0xFFFFB5B5
+                                                                        )
+                                                                        in 31..50 -> Color(
+                                                                            0xFFFF8080
+                                                                        )
+                                                                        in 51..70 -> Color(
+                                                                            0xFFFF5B5B
+                                                                        )
+                                                                        in 70..90 -> Color(
+                                                                            0xFFFF1B1B
+                                                                        )
                                                                         else -> Color(0xFFFF0000)
                                                                     },
                                                                 )
+                                                                if (viewModel.selectedModuleXforEvent.value == errorModules[0].x
+                                                                    && viewModel.selectedModuleYforEvent.value == errorModules[0].y
+                                                                ) {
+                                                                    drawRoundRect(
+                                                                        color = Color(0x4D000000),
+                                                                    )
+                                                                }
                                                             } else {
                                                                 drawRoundRect(
                                                                     color =

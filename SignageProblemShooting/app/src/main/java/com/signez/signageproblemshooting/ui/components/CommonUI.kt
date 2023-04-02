@@ -312,6 +312,7 @@ fun BottomSingleFlatButton(
         shape = RectangleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colors.background,
+            disabledContainerColor = MaterialTheme.colors.background,
         ),
         enabled = isUsable,
         modifier = Modifier
@@ -323,7 +324,7 @@ fun BottomSingleFlatButton(
         Text(
             text = title,
             style = MaterialTheme.typography.button,
-            color = MaterialTheme.colors.onSurface,
+            color = if(isUsable) MaterialTheme.colors.onSurface else MaterialTheme.colors.onBackground,
             modifier = Modifier.padding(bottom = 2.dp)
         )
     }
