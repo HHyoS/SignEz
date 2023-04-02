@@ -106,8 +106,6 @@ fun ErrorModuleHeatMap(
                                     .padding(all = moduleSize / 8),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
-//                            .border(width = 0.5.dp, color = MaterialTheme.colors.onSurface)
-//                            .padding(0.5.dp)
                             ) {
                                 val errorCount = errorModuleList.count { errorModule ->
                                     (errorModule.x - 1) / moduleColCount + 1 == cabinetC &&
@@ -122,13 +120,6 @@ fun ErrorModuleHeatMap(
                                         //draw shapes here
                                         drawRoundRect(
                                             color = Color(0xFFECECEC)
-//                                            when (errorCount) {
-//                                                0 -> Color(0xFFECECEC)
-//                                                1, 2, 3, 4 -> Color(0xFFFFB5B5)
-//                                                5, 6, 7, 8 -> Color(0xFFFF6767)
-//                                                else -> Color(0xFFFF1414)
-//                                            },
-//                                        cornerRadius = CornerRadius(5f, 5f)
                                         )
                                     }
                                 } else {

@@ -96,7 +96,7 @@ fun ResultGridView(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "전체 도식화 보기",
+                title = "${signage?.name}",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
