@@ -139,9 +139,11 @@ fun VideoAnalysis(
                 rightOnClickEvent = {
 
                 /* 분석하기 이벤트를 넣으면 됨 */
-                    if(contentUri == Uri.EMPTY)
+                    if(contentUri == Uri.EMPTY){
                         Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
-                    else {
+                    } else if (analysisViewModel.signageId.value < 1) {
+                        Toast.makeText(context,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
                         val configuration = context.resources.configuration
                         val retriever = MediaMetadataRetriever()
                         retriever.setDataSource(context, contentUri)
