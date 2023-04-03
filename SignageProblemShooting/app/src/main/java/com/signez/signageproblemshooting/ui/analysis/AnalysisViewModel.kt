@@ -53,6 +53,7 @@ class AnalysisViewModel(
 
     var selectedModuleXforEvent = mutableStateOf(-1)
     var selectedModuleYforEvent = mutableStateOf(-1)
+    var selectedModuleAccuracy = mutableStateOf(-1)
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
