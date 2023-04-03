@@ -4,14 +4,18 @@ import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -27,7 +31,7 @@ import java.util.*
 //    override val titleRes = "ResultsHistory"
 //}
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun TutorialView(
     modifier: Modifier = Modifier,
@@ -37,6 +41,15 @@ fun TutorialView(
     val dataStore = StoreInitialLaunch(context)
     val state = rememberPagerState()
 
+    val tutorialimage = listOf<Int>(R.drawable.tutorial_1,R.drawable.tutorial_2,R.drawable.tutorial_3,R.drawable.tutorial_4,R.drawable.tutorial_5,R.drawable.tutorial_6)
+
+    val tutorialtext = listOf<String>(
+        "사이니지 스펙 입력 버튼을 눌러 분석할 사이니지를 선택 해 주세요.",
+        "기존 설치된 사이니지를 선택하거나 사이니지를 새로 추가 할 수 있습니다.\n사이니지 상세 페이지에서는 캐비닛 정보를 설정 할 수 있습니다.",
+        "오류 모듈을 분석할 사이니지 영상 또는 사진을 입력 해 주세요.",
+        "분석 시작 전 사이니지의 세부 위치를 조정해주세요",
+        "분석 후 오류 캐비닛과 모듈의 행과 열을 확인 하실 수 있습니다.",
+        "사진 보기를 클릭시 근거 사진을 확인 할 수 있습니다.")
 
     Scaffold(
         modifier = Modifier
@@ -99,7 +112,7 @@ fun TutorialView(
                 )
                 HorizontalPager(
                     state = state,
-                    count = 5,
+                    count = 6,
                     modifier = Modifier
                         .padding(top = 8.dp, bottom = 8.dp)
                         .fillMaxWidth()
@@ -107,9 +120,6 @@ fun TutorialView(
                 ) { page ->
                     androidx.compose.material3.Card(
                         modifier = Modifier,
-//                            .padding(top = 8.dp, bottom = 8.dp)
-//                            .fillMaxWidth()
-//                            .fillMaxHeight(0.89f),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colors.surface
                         )
@@ -118,12 +128,15 @@ fun TutorialView(
                             modifier = Modifier.fillMaxHeight(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            Image(
+                            GlideImage(
+                                model = tutorialimage.get(page),
+                                contentDescription = "글라이드",
                                 modifier = Modifier
+                                    .fillMaxWidth(0.9f)
                                     .fillMaxHeight(0.7f)
-                                    .padding(vertical = 8.dp),
-                                painter = painterResource(id = R.drawable.bluesign),
-                                contentDescription = "Tutorial"
+                                    .clip(RoundedCornerShape(15.dp))
+                                    .background(color = MaterialTheme.colors.surface)
+                                    .padding(vertical = 10.dp)
                             )
                             Divider()
                             Box(
@@ -134,11 +147,11 @@ fun TutorialView(
                                 Text(
                                     modifier = Modifier
                                         .padding(vertical = 16.dp, horizontal = 24.dp),
-                                    text = "설명설명",
+                                    text = tutorialtext[page],
                                     style = MaterialTheme.typography.h4,
                                     color = MaterialTheme.colors.onSurface,
                                 )
-                                if (page == 4) {
+                                if (page == 5) {
                                     Row(
                                         modifier = Modifier
                                             .wrapContentWidth()
