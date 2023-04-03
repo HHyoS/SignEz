@@ -187,11 +187,18 @@ class AnalysisViewModel(
     }
 
     suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long): List<ErrorModuleWithImage> {
-        return errorModulesRepository.getModulesByXYResultId(x, y, resultId)
+        if (resultId != -1L) {
+            return errorModulesRepository.getModulesByXYResultId(x, y, resultId)
+        }
+        return errorModulesRepository.getModulesByXYResultId(x, y, getMostRecentResultId())
     }
 
     suspend fun deleteResult(resultId: Long) {
-        analysisResultRepository.deleteById(resultId)
+        if (resultId != -1L) {
+            analysisResultRepository.deleteById(resultId)
+        } else {
+            analysisResultRepository.deleteById(getMostRecentResultId())
+        }
     }
 
     suspend fun deleteErrorModule(module: ErrorModule) {
@@ -203,8 +210,8 @@ class AnalysisViewModel(
             val resultById = getResultById(resultId = resultId)
             getSignageById(resultById.signageId)
         } else { // 분석 마치고 왔을 때
-            val resultById = getResultById(resultId = resultId)
-            getSignageById(getMostRecentResultId())
+            val resultById = getResultById(resultId = getMostRecentResultId())
+            getSignageById(resultById.signageId)
         }
     }
 
