@@ -3,6 +3,7 @@ package com.signez.signageproblemshooting.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -286,7 +287,7 @@ fun TutorialStartButton(
             containerColor = MaterialTheme.colors.primary,
         ),
         modifier = Modifier
-            .padding(top = 10.dp, end = 15.dp)
+            .padding(start = 8.dp, end = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
     ) {
@@ -324,7 +325,7 @@ fun BottomSingleFlatButton(
         Text(
             text = title,
             style = MaterialTheme.typography.button,
-            color = if(isUsable) MaterialTheme.colors.onSurface else MaterialTheme.colors.onBackground,
+            color = if (isUsable) MaterialTheme.colors.onSurface else MaterialTheme.colors.onBackground,
             modifier = Modifier.padding(bottom = 2.dp)
         )
     }
@@ -495,6 +496,121 @@ fun ResultHistoryBlock(
     Spacer(modifier = Modifier.height(10.dp))
 }
 
+
+@Composable
+fun DotsIndicator(
+    totalDots: Int,
+    selectedIndex: Int
+) {
+
+    LazyRow(
+        modifier = Modifier
+            .wrapContentWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+
+        items(totalDots) { index ->
+            if (index == selectedIndex) {
+                Box(
+                    modifier = Modifier
+                        .size(7.dp)
+                        .clip(CircleShape)
+                        .background(color = Color(0xFF0F429D))
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(7.dp)
+                        .clip(CircleShape)
+                        .background(color = Color(0xFFB3CCF8))
+                )
+            }
+
+            if (index != totalDots - 1) {
+                Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomTutorialFlatButton(
+    leftTitle: String,
+    rightTitle: String,
+    isLeftUsable: Boolean,
+    isRightUsable: Boolean,
+    totalDots: Int,
+    selectedIndex: Int,
+    leftOnClickEvent: () -> Unit,
+    rightOnClickEvent: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        androidx.compose.material3.Button(
+            onClick = leftOnClickEvent,
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colors.background,
+                disabledContainerColor = MaterialTheme.colors.background,
+            ),
+            enabled = isLeftUsable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(65.dp)
+                .weight(1f)
+        ) {
+            if (isLeftUsable) {
+                Text(
+                    text = leftTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            } else {
+                Text(
+                    text = leftTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+        DotsIndicator(totalDots = totalDots, selectedIndex = selectedIndex)
+        androidx.compose.material3.Button(
+            onClick = rightOnClickEvent,
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colors.background,
+                disabledContainerColor = MaterialTheme.colors.background,
+            ),
+            enabled = isRightUsable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(65.dp)
+                .weight(1f),
+        ) {
+            if (isRightUsable) {
+                Text(
+                    text = rightTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            } else {
+                Text(
+                    text = rightTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+    }
+
+}
 
 @Preview
 @Composable

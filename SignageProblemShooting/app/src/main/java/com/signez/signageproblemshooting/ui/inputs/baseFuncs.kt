@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.signez.signageproblemshooting.ErrorDetectActivity
 import com.signez.signageproblemshooting.ImageCropActivity
+import com.signez.signageproblemshooting.TutorialActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -221,4 +222,10 @@ fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
     Log.d("start","start ${uri}")
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
     Log.d("end","end")
+}
+
+fun openTutorialActivity(context: Context) {
+    val REQUEST_CODE_TUTORIAL_ACTIVITY = 310
+    val intent = Intent(context, TutorialActivity::class.java)
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_TUTORIAL_ACTIVITY)
 }
