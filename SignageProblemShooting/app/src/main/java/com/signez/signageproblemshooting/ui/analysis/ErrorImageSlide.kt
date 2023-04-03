@@ -85,7 +85,7 @@ fun ErrorImageView(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "근거 이미지 슬라이드",
+                title = "에러 모듈 근거 사진",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -112,23 +112,6 @@ fun ErrorImageView(
                                 style = MaterialTheme.typography.subtitle2
                             )
                         }
-//                        else {
-//                            LazyColumn(
-//                                modifier = modifier.background(MaterialTheme.colors.surface),
-//                                //            verticalArrangement = Arrangement.spacedBy(8.dp)
-//                            ) {
-//                                items(items = mais, key = { it.errorModule.id }) { item ->
-//                                    Text(text = "${item.errorModule.id}번 에러 모듈 좌표 : ${item.errorModule.x} , ${item.errorModule.y}")
-//                                    Divider(
-//                                        modifier = Modifier
-//                                            .height(1.dp)
-//                                            .fillMaxWidth(0.95f),
-//                                        startIndent = 70.dp
-//                                    )
-//
-//                                }
-//                            }
-//                        }
                     } // 모듈 눌체크
 
                     if (mais != null && mais.isNotEmpty()) {
@@ -225,9 +208,7 @@ fun ErrorImageSlideBox(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 androidx.compose.material3.Text(
-                    text = "캐비닛 : " +
-                            "(X : ${cabinetX}," +
-                            " Y : ${cabinetY})",
+                    text = "캐비닛 ${cabinetY} 행 ${cabinetX} 열",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 12.dp, bottom = 4.dp)
@@ -240,9 +221,7 @@ fun ErrorImageSlideBox(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 androidx.compose.material3.Text(
-                    text = "모듈 : " +
-                            "(X : ${moduleX}," +
-                            " Y : ${moduleY})",
+                    text = "모듈 ${moduleY} 행 ${moduleX} 열",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 2.dp, bottom = 8.dp)
@@ -255,7 +234,7 @@ fun ErrorImageSlideBox(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 androidx.compose.material3.Text(
-                    text = "정확도 : ${(mais[selectedIdx.value].errorModule.score * 100).roundToInt()}%",
+                    text = "정확도 ${(mais[selectedIdx.value].errorModule.score * 100).roundToInt()}%",
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(start = 18.dp, top = 8.dp, bottom = 16.dp)
