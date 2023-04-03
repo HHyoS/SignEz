@@ -39,6 +39,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import org.opencv.core.*
+import kotlin.math.abs
 
 
 class SignageNotFoundException(message: String) : Exception(message)
@@ -332,6 +333,9 @@ class ErrorDetectActivity : ComponentActivity() {
                     Utils.bitmapToMat(bitmapFrame, frame)
 
                     if (bitmapFrame != null) {
+                        if (i == 0) {
+                            getPoints(frame)
+                        }
                         points = getCornersByPrevCorners(frame)
 
                         val warpedMat = getWarp(frame, points!!, width, height)
@@ -413,6 +417,7 @@ class ErrorDetectActivity : ComponentActivity() {
                 val originalMat: Mat = bitmapToMat(originalImage!!)
                 Log.d("originalMatSize", "${originalMat.size().toString()}")
                 try {
+                    getPoints(originalMat)
                     var points: MutableList<Point> = getCornersByPrevCorners(originalMat)
                     Log.d("ImageProcess", "points = ${points.toString()}")
                     analysisViewModel.progressFloat.value = 0.3f
@@ -680,7 +685,7 @@ class ErrorDetectActivity : ComponentActivity() {
 //        val blur = Mat()
 //        Imgproc.GaussianBlur(grayMat, blur, Size(0.0,0.0), 1.0)
         val corners = MatOfPoint()
-        Imgproc.goodFeaturesToTrack(grayMat, corners, 100, 0.1, 3.0)
+        Imgproc.goodFeaturesToTrack(grayMat, corners, 300, 0.1, 3.0)
         Log.d("corners", corners.toList().toString())
 
         points.add(getNearestCorner(tl, corners))
@@ -693,7 +698,10 @@ class ErrorDetectActivity : ComponentActivity() {
     }
 
     private fun getNearestCorner(prev: Point, corners: MatOfPoint): Point {
-        val next = corners.toList().minByOrNull { corner ->
+        val next = corners.toList().filter { p ->
+            abs(p.x - prev.x) < 15 &&
+                    abs(p.y - prev.y) < 15
+        }.minByOrNull { corner ->
             val dx = corner.x - prev.x
             val dy = corner.y - prev.y
             dx * dx + dy * dy
@@ -817,6 +825,69 @@ class ErrorDetectActivity : ComponentActivity() {
             return path
         }
     }
+
+
+    private fun getPoints(frame: Mat) {
+        topLeftX = if (topLeftX < 0) {
+            0
+        } else if (topLeftX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            topLeftX
+        }
+        topRightX = if (topRightX < 0) {
+            0
+        } else if (topRightX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            topRightX
+        }
+        bottomLeftX = if (bottomLeftX < 0) {
+            0
+        } else if (bottomLeftX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            bottomLeftX
+        }
+        bottomRightX = if (bottomRightX < 0) {
+            0
+        } else if (bottomRightX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            bottomRightX
+        }
+
+        topLeftY = if (topLeftY < 0) {
+            0
+        } else if (topLeftY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            topLeftY
+        }
+        topRightY = if (topRightY < 0) {
+            0
+        } else if (topRightY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            topRightY
+        }
+        bottomLeftY = if (bottomLeftY < 0) {
+            0
+        } else if (bottomLeftY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            bottomLeftY
+        }
+        bottomRightY = if (bottomRightY < 0) {
+            0
+        } else if (bottomRightY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            bottomRightY
+        }
+
+    }
+
 
     override fun onBackPressed() {
         setResult(Activity.RESULT_OK)
