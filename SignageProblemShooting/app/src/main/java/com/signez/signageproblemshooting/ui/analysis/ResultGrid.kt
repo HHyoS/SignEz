@@ -193,13 +193,14 @@ fun ResultGridView(
                                     ),
                                     modifier = Modifier
                                         .padding(bottom = 5.dp)
-                                        .fillMaxWidth(0.8f)
+                                        .wrapContentWidth()
                                         .wrapContentHeight()
                                         .align(Alignment.BottomCenter),
                                 ) {
                                     Text(
-                                        text = "캐비닛 (X : ${viewModel.selectedCabinetX.value}, Y : ${viewModel.selectedCabinetY.value}), " +
-                                                "모듈 (X : ${viewModel.selectedMoudleXInCabinet.value}, Y : ${viewModel.selectedMoudleYInCabinet.value})",
+                                        text =  "캐비닛 ${viewModel.selectedCabinetY.value} 행 ${viewModel.selectedCabinetX.value} 열, " +
+                                                "모듈 ${viewModel.selectedMoudleYInCabinet.value} 행 ${viewModel.selectedMoudleXInCabinet.value} 열\n" +
+                                                "정확도 ${viewModel.selectedModuleAccuracy.value}%",
                                         style = MaterialTheme.typography.body1,
                                         color = MaterialTheme.colors.onPrimary,
                                         modifier = Modifier.padding(bottom = 2.dp)
@@ -267,6 +268,7 @@ fun ResultGridView(
                                     viewModel.isModuleClicked.value = false
                                     viewModel.selectedModuleXforEvent.value = -1
                                     viewModel.selectedModuleYforEvent.value = -1
+                                    viewModel.selectedModuleAccuracy.value = -1
                                 },
                                 steps = 79,
                                 colors = SliderDefaults.colors(
@@ -333,6 +335,7 @@ fun moduleClickEvent(
     selectedModuleYforEvent: Int,
     threshold: Int,
     viewModel: AnalysisViewModel,
+    selectedModuleAccuracy: Int,
 ) {
 //    Log.d("moduleClickEvent", "${x}, ${y}, ${resultId}")
     viewModel.selectedModuleX.value = x
@@ -344,5 +347,6 @@ fun moduleClickEvent(
     viewModel.threshold.value = threshold
     viewModel.selectedModuleXforEvent.value = selectedModuleXforEvent
     viewModel.selectedModuleYforEvent.value = selectedModuleYforEvent
+    viewModel.selectedModuleAccuracy.value = selectedModuleAccuracy
 }
 
