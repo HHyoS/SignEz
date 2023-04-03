@@ -2,6 +2,9 @@ package com.signez.signageproblemshooting
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.provider.Settings.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -13,19 +16,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import com.signez.signageproblemshooting.ui.inputs.PictureViewModel
-import com.signez.signageproblemshooting.ui.inputs.VideoViewModel
-import com.signez.signageproblemshooting.ui.inputs.openTutorialActivity
+import com.signez.signageproblemshooting.ui.inputs.*
 import com.signez.signageproblemshooting.ui.navigation.SignEzNavHost
 import com.signez.signageproblemshooting.ui.signage.CabinetDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetViewModel
 import com.signez.signageproblemshooting.ui.signage.SignageDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.SignageViewModel
 import com.signez.signageproblemshooting.ui.theme.SignEzTheme
+
 
 @Composable
 fun SignEzApp(
@@ -129,6 +132,7 @@ fun SignEzTopAppBar(
                     }
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                        openSettingIntent(context)
                     }) {
                         Text(
                             text = "설정",
@@ -215,6 +219,7 @@ fun SignEzTopAppBar(
                     }
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                       openSettingIntent(context)
                     }) {
                         Text(
                             text = "설정",
