@@ -71,7 +71,7 @@ class ImageCropActivity : AppCompatActivity() {
         val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
             val retriever = MediaMetadataRetriever()
             retriever.setDataSource(this, uri)
-            retriever.getFrameAtTime()
+            retriever.getFrameAtIndex(0)
         }
         val imageUri = Uri.parse(intent.getStringExtra("uri"))
         val contentResolver = contentResolver
@@ -107,12 +107,10 @@ class ImageCropActivity : AppCompatActivity() {
 
         bitmapp = Bitmap.createBitmap(bitmapp, 0, 0, bitmapp.width, bitmapp.height, matrix, true)
         imageView = findViewById(R.id.imageView)
-        val originalWidth = bitmapp.width.toFloat()
-        val originalHeight = bitmapp.height.toFloat()
+        val originalWidth = bitmapp.width
+        val originalHeight = bitmapp.height
 
 
-        viewWidth = imageView.width.toFloat()
-        viewHeight = imageView.height.toFloat()
         imageWidth = bitmapp.width.toFloat()
         imageHeight = bitmapp.height.toFloat()
 
@@ -124,6 +122,8 @@ class ImageCropActivity : AppCompatActivity() {
         viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
             override fun onPreDraw(): Boolean {
 
+                viewWidth = imageView.width.toFloat()
+                viewHeight = imageView.height.toFloat()
 
                 // 여기서 머신러닝 돌리기
                 mImgScaleX = bitmapp!!.width.toFloat() / PrePostProcessor.mInputWidth
@@ -136,6 +136,7 @@ class ImageCropActivity : AppCompatActivity() {
                     .toFloat() / bitmapp!!.width)
                 mStartX = (imageView.width - mIvScaleX * bitmapp!!.width) / 2
                 mStartY = (imageView.height - mIvScaleY * bitmapp!!.height) / 2
+
 
                 if (mModule == null) {
                     val temp = ErrorDetectActivity()
@@ -171,14 +172,26 @@ class ImageCropActivity : AppCompatActivity() {
                             mStartY
                         )
                         if (results.size != 0) {
-                            var tempRect = results[0].rect
+
+                            val tempRect = results[0].rect
+                            val drawable = imageView.drawable
+                            val imageWidth = drawable.intrinsicWidth
+                            val imageHeight = drawable.intrinsicHeight
+                            val scaleFactor =
+                                if (imageWidth * viewHeight > imageHeight * viewWidth) {
+                                    viewWidth.toFloat() / imageWidth.toFloat()
+                                } else {
+                                    viewHeight.toFloat() / imageHeight.toFloat()
+                                }
+                            val scaledWidth = (viewWidth - (imageWidth * scaleFactor)) / 2.toInt()
+                            val scaledHeight =
+                                (viewHeight - (imageHeight * scaleFactor)) / 2.toInt()
                             rec = Rect(
-                                (tempRect.left).toInt(),
-                                (tempRect.top).toInt(),
-                                (tempRect.right).toInt(),
-                                (tempRect.bottom).toInt()
+                                (tempRect.left + scaledWidth).toInt(),
+                                (tempRect.top - scaledHeight).toInt(),
+                                (tempRect.right + scaledWidth).toInt(),
+                                (tempRect.bottom - scaledHeight).toInt()
                             )
-                            Log.d("result[0]", "${results[0].rect}")
                             Log.d("rec", "$rec")
 
                         } else {
@@ -189,10 +202,7 @@ class ImageCropActivity : AppCompatActivity() {
                 thread.start()
                 thread.join()
                 // ViewTreeObserver 리스너가 불리면서 ImageView와 Drawable 객체 모두의 크기를 구할 수 있습니다.
-                viewWidth = imageView.width.toFloat()
-                viewHeight = imageView.height.toFloat()
-                imageWidth = bitmapp.width.toFloat()
-                imageHeight = bitmapp.height.toFloat()
+
                 val scaleX = viewWidth / imageWidth
                 val scaleY = viewHeight / imageHeight
 
@@ -210,9 +220,9 @@ class ImageCropActivity : AppCompatActivity() {
                     val imageWidth = drawable.intrinsicWidth
                     val imageHeight = drawable.intrinsicHeight
                     val scaleFactor = if (imageWidth * viewHeight > imageHeight * viewWidth) {
-                        viewWidth.toFloat() / imageWidth.toFloat()
+                        viewWidth / imageWidth
                     } else {
-                        viewHeight.toFloat() / imageHeight.toFloat()
+                        viewHeight / imageHeight
                     }
                     val scaledWidth = (imageWidth * scaleFactor).toInt()
                     val scaledHeight = (imageHeight * scaleFactor).toInt()
@@ -224,18 +234,17 @@ class ImageCropActivity : AppCompatActivity() {
                     pointTopRight = Point(halfWidth + quatWidth, quatHeight)
                     pointBottomLeft = Point(quatWidth, quatHeight + halfHeight)
                     pointBottomRight = Point(halfWidth + quatWidth, quatHeight + halfHeight)
-
-
                 } else {
-                    pointTopLeft = Point(rec.left, rec.top)
+                    pointTopLeft = Point((rec.left), rec.top)
                     pointTopRight = Point(rec.right, rec.top)
                     pointBottomLeft = Point(rec.left, rec.bottom)
                     pointBottomRight = Point(rec.right, rec.bottom)
                 }
 
+                onDrawBitmap(imageView, bitmapp)
                 // 리스너 제거
                 imageView.viewTreeObserver.removeOnPreDrawListener(this)
-                onDrawBitmap(imageView, bitmapp)
+
                 return true
             }
         })
@@ -315,16 +324,18 @@ class ImageCropActivity : AppCompatActivity() {
         btn.setOnClickListener {
             val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
             val intent = Intent(this, ErrorDetectActivity::class.java).apply {
+                // 비율 맞춰서 전달 -- 수정 금지
                 val lastScaleX = originalWidth / imageView.drawable.intrinsicWidth.toFloat()
                 val lastScaleY = originalHeight / imageView.drawable.intrinsicHeight.toFloat()
-                putExtra("PointTopLeftX", pointTopLeft.x * lastScaleX)
-                putExtra("PointTopLeftY", pointTopLeft.y * lastScaleY)
-                putExtra("PointTopRightX", pointTopRight.x * lastScaleX)
-                putExtra("PointTopRightY", pointTopRight.y * lastScaleY)
-                putExtra("PointBottomLeftX", pointBottomLeft.x * lastScaleX)
-                putExtra("PointBottomLeftY", pointBottomLeft.y * lastScaleY)
-                putExtra("PointBottomRightX", pointBottomRight.x * lastScaleX)
-                putExtra("PointBottomRightY", pointBottomRight.y * lastScaleY)
+                putExtra("PointTopLeftX", (pointTopLeft.x * lastScaleX).toInt())
+                putExtra("PointTopLeftY", (pointTopLeft.y * lastScaleY).toInt())
+                putExtra("PointTopRightX", (pointTopRight.x * lastScaleX).toInt())
+                putExtra("PointTopRightY", (pointTopRight.y * lastScaleY).toInt())
+                putExtra("PointBottomLeftX", (pointBottomLeft.x * lastScaleX).toInt())
+                putExtra("PointBottomLeftY", (pointBottomLeft.y * lastScaleY).toInt())
+                putExtra("PointBottomRightX", (pointBottomRight.x * lastScaleX).toInt())
+                putExtra("PointBottomRightY", (pointBottomRight.y * lastScaleY).toInt())
+
                 putExtra("scaleX", scaleX)
                 putExtra("scaleY", scaleY)
                 putExtra("REQUEST_CODE", intent.getIntExtra("REQUEST_CODE", 0))
@@ -465,7 +476,9 @@ class ImageCropActivity : AppCompatActivity() {
         val imageHeight = drawable.intrinsicHeight
         val imageViewWidth = imageView.width
         val imageViewHeight = imageView.height
-
+        Log.d("intrinsicSize", "${imageWidth}, ${imageHeight}")
+        Log.d("viewSize", "${imageViewWidth}, ${imageViewHeight}")
+        
         // 이미지와 이미지 뷰의 가로세로비를 계산합니다.
         val imageRatio = imageWidth.toFloat() / imageHeight.toFloat()
         val imageViewRatio = imageViewWidth.toFloat() / imageViewHeight.toFloat()
@@ -489,6 +502,7 @@ class ImageCropActivity : AppCompatActivity() {
             translateX = (imageViewWidth - (imageWidth * scaleX)) / 2f
             translateY = 0f
         }
+
 
         // 이미지 뷰에서 실제 이미지의 크기와 위치를 고려하여 좌표를 변환합니다.
         val imageX = (x - translateX) / scaleX
