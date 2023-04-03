@@ -476,16 +476,32 @@ class ImageCropActivity : AppCompatActivity() {
         val imageHeight = drawable.intrinsicHeight
         val imageViewWidth = imageView.width
         val imageViewHeight = imageView.height
-
+        Log.d("intrinsicSize", "${imageWidth}, ${imageHeight}")
+        Log.d("viewSize", "${imageViewWidth}, ${imageViewHeight}")
+        
         // 이미지와 이미지 뷰의 가로세로비를 계산합니다.
         val imageRatio = imageWidth.toFloat() / imageHeight.toFloat()
         val imageViewRatio = imageViewWidth.toFloat() / imageViewHeight.toFloat()
 
         // 이미지의 스케일과 평행 이동 값을 계산합니다.
-        val scaleX: Float = imageViewWidth.toFloat() / imageWidth.toFloat()
-        val scaleY: Float = imageViewHeight.toFloat() / imageHeight.toFloat()
-        val translateX: Float = (imageViewWidth - (imageWidth * scaleX)) / 2f
-        val translateY: Float = (imageViewHeight - (imageHeight * scaleY)) / 2f
+        val scaleX: Float
+        val scaleY: Float
+        val translateX: Float
+        val translateY: Float
+
+        if (imageRatio > imageViewRatio) {
+            // 이미지가 이미지 뷰보다 더 넓은 경우
+            scaleX = imageViewWidth.toFloat() / imageWidth.toFloat()
+            scaleY = scaleX
+            translateX = 0f
+            translateY = (imageViewHeight - (imageHeight * scaleY)) / 2f
+        } else {
+            // 이미지가 이미지 뷰보다 더 높은 경우
+            scaleY = imageViewHeight.toFloat() / imageHeight.toFloat()
+            scaleX = scaleY
+            translateX = (imageViewWidth - (imageWidth * scaleX)) / 2f
+            translateY = 0f
+        }
 
 
         // 이미지 뷰에서 실제 이미지의 크기와 위치를 고려하여 좌표를 변환합니다.
