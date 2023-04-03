@@ -680,7 +680,8 @@ class ErrorDetectActivity : ComponentActivity() {
 //        val blur = Mat()
 //        Imgproc.GaussianBlur(grayMat, blur, Size(0.0,0.0), 1.0)
         val corners = MatOfPoint()
-        Imgproc.goodFeaturesToTrack(grayMat, corners, 100, 0.02, 5.0)
+        Imgproc.goodFeaturesToTrack(grayMat, corners, 100, 0.1, 3.0)
+        Log.d("corners", corners.toList().toString())
 
         points.add(getNearestCorner(tl, corners))
         points.add(getNearestCorner(tr, corners))
@@ -697,7 +698,7 @@ class ErrorDetectActivity : ComponentActivity() {
             val dy = corner.y - prev.y
             dx * dx + dy * dy
         } ?: return prev
-        if ((next.x - prev.x) * (next.x - prev.x) + (next.y - prev.y) * (next.y - prev.y) > 1600) {
+        if ((next.x - prev.x) * (next.x - prev.x) + (next.y - prev.y) * (next.y - prev.y) > 300) {
             return prev
         }
         return next
