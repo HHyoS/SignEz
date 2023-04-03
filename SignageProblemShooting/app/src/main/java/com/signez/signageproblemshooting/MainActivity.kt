@@ -159,8 +159,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
             factory = AppViewModelProvider.Factory
         ).get(CabinetDetailViewModel::class.java)
 
-        viewModel4.insertTestRecord()
-        viewModel3.insertTestRecord()
+        viewModel4.insertTestRecord(applicationContext)
+        viewModel3.insertTestRecord(applicationContext)
         viewModel5.insertTestRecord()
         mainViewModel.insertTestRecord()
         setContent {
