@@ -332,15 +332,8 @@ class ErrorDetectActivity : ComponentActivity() {
                     Utils.bitmapToMat(bitmapFrame, frame)
 
                     if (bitmapFrame != null) {
-                        if (i == 0) {
-                            points = if (topLeftX != 0 || topLeftY != 0) {
-                                getCornersByPrevCorners(frame)
-                            } else {
-                                getCorners(frame)
-                            }
-                        } else {
-                            points = getCornersByPrevCorners(frame)
-                        }
+                        points = getCornersByPrevCorners(frame)
+
                         val warpedMat = getWarp(frame, points!!, width, height)
                         val errorModuleList = getPredictions(
                             warpedMat,
@@ -420,11 +413,7 @@ class ErrorDetectActivity : ComponentActivity() {
                 val originalMat: Mat = bitmapToMat(originalImage!!)
                 Log.d("originalMatSize", "${originalMat.size().toString()}")
                 try {
-                    var points: MutableList<Point> = if (topLeftX != 0 || topLeftY != 0) {
-                        getCornersByPrevCorners(originalMat)
-                    } else {
-                        getCorners(originalMat)
-                    }
+                    var points: MutableList<Point> = getCornersByPrevCorners(originalMat)
                     Log.d("ImageProcess", "points = ${points.toString()}")
                     analysisViewModel.progressFloat.value = 0.3f
 
