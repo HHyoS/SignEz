@@ -11,12 +11,12 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.common.reflect.Reflection.getPackageName
 import com.signez.signageproblemshooting.ErrorDetectActivity
 import com.signez.signageproblemshooting.ImageCropActivity
 import com.signez.signageproblemshooting.TutorialActivity
@@ -228,4 +228,10 @@ fun openTutorialActivity(context: Context) {
     val REQUEST_CODE_TUTORIAL_ACTIVITY = 310
     val intent = Intent(context, TutorialActivity::class.java)
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_TUTORIAL_ACTIVITY)
+}
+
+fun openSettingIntent(context: Context){
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+    intent.setData(Uri.parse("package:" + "com.signez.signageproblemshooting"));
+    ContextCompat.startActivity(context, intent, null);
 }
