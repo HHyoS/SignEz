@@ -127,9 +127,7 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        lifecycleScope.launch{
-            installSplashScreen()
-        }
+        installSplashScreen()
         viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
