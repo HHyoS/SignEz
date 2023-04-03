@@ -169,7 +169,8 @@ fun ErrorModuleHeatMap(
                                                                             selectedModuleXforEvent = (errorModules[0].x),
                                                                             selectedModuleYforEvent = (errorModules[0].y),
                                                                             viewModel = viewModel,
-                                                                            threshold = threshold
+                                                                            threshold = threshold,
+                                                                            selectedModuleAccuracy = (errorModules[0].score*100).roundToInt()
                                                                         )
                                                                     }
                                                                 }
