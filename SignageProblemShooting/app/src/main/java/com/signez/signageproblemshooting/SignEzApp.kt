@@ -1,12 +1,14 @@
 package com.signez.signageproblemshooting
 
 import android.app.Activity
+import android.content.Context
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
@@ -17,6 +19,7 @@ import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.inputs.PictureViewModel
 import com.signez.signageproblemshooting.ui.inputs.VideoViewModel
+import com.signez.signageproblemshooting.ui.inputs.openTutorialActivity
 import com.signez.signageproblemshooting.ui.navigation.SignEzNavHost
 import com.signez.signageproblemshooting.ui.signage.CabinetDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetViewModel
@@ -59,7 +62,8 @@ fun SignEzTopAppBar(
     title: String,
     canNavigateBack: Boolean,
     modifier: Modifier = Modifier,
-    navigateUp: () -> Unit = {}
+    navigateUp: () -> Unit = {},
+    context: Context = LocalContext.current,
 ) {
 
     var dropDownMenuExpanded by remember {
@@ -113,6 +117,9 @@ fun SignEzTopAppBar(
                     // items are added vertically
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                        // 튜토리얼 액티비티로 이동
+                        openTutorialActivity(context)
+                        //
                     }) {
                         Text(
                             text = "튜토리얼",
@@ -196,6 +203,9 @@ fun SignEzTopAppBar(
                     // items are added vertically
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                        // 튜토리얼 액티비티로 이동
+                        openTutorialActivity(context)
+                        //
                     }) {
                         Text(
                             text = "튜토리얼",

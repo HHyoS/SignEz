@@ -36,12 +36,14 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
+import com.signez.signageproblemshooting.data.datastore.StoreInitialLaunch
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import kotlinx.coroutines.launch
@@ -68,6 +70,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
     private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
     private val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+    private val REQUEST_CODE_TUTORIAL_ACTIVITY = 310
+
 
     val permissions = arrayOf(
         Manifest.permission.CAMERA,
@@ -120,6 +124,10 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                     navController.navigate(ResultGridDestination.route+"/-1")
                     Log.d("godetect","clear ${requestCode}")
                 }
+                REQUEST_CODE_TUTORIAL_ACTIVITY-> {
+                    finishActivity(REQUEST_CODE_TUTORIAL_ACTIVITY)
+                    Log.d("TUTORIAL","tutorial ended")
+                }
             }
         }
     }
@@ -163,7 +171,11 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         mainViewModel.insertTestRecord()
         setContent {
             navController = rememberNavController()
+            val isInitialLaunch = StoreInitialLaunch(LocalContext.current).getInitialLaunch.collectAsState(initial = false).value!!
             SignEzTheme {
+                if(isInitialLaunch){
+                    openTutorialActivity(context = LocalContext.current)
+                }
                 SignEzApp(
                     activity = this,
                     navController = navController,
