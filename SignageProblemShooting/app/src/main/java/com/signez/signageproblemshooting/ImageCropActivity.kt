@@ -31,6 +31,7 @@ import org.pytorch.Module
 import org.pytorch.torchvision.TensorImageUtils
 import java.lang.Math.min
 import java.lang.Math.sqrt
+
 class ImageCropActivity : AppCompatActivity() {
 
     private lateinit var imageView: ImageView
@@ -42,9 +43,10 @@ class ImageCropActivity : AppCompatActivity() {
     var pointBottomRight = Point(300, 300)
 
     var mModule: Module? = null
+
     // m : viewFrame
     // mm : 이미지 실제 크기
-    lateinit var bitmapp : Bitmap
+    lateinit var bitmapp: Bitmap
     var mImgScaleX = 0f
     var mImgScaleY = 0f
     var mIvScaleX = 0f
@@ -52,12 +54,12 @@ class ImageCropActivity : AppCompatActivity() {
     var mStartX = 0f
     var mStartY = 0f
     var rec = Rect(-999, -999, -999, -999)
-    var viewWidth : Float  = 0f
-    var viewHeight : Float  = 0f
-    var imageWidth : Float  = 0f
-    var imageHeight  : Float  = 0f
+    var viewWidth: Float = 0f
+    var viewHeight: Float = 0f
+    var imageWidth: Float = 0f
+    var imageHeight: Float = 0f
     var scaleX: Float = 0f
-    var scaleY : Float = 0f
+    var scaleY: Float = 0f
     private val REQUEST_TYPE: String = "REQUEST_TYPE"
     private val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
 
@@ -82,7 +84,8 @@ class ImageCropActivity : AppCompatActivity() {
         } else {
             ExifInterface(imageUri.path!!)
         }
-        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+        val orientation =
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
         val matrix = Matrix()
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -103,6 +106,8 @@ class ImageCropActivity : AppCompatActivity() {
         }!!
 
         bitmapp = Bitmap.createBitmap(bitmapp, 0, 0, bitmapp.width, bitmapp.height, matrix, true)
+        val originalWidth = bitmapp.width.toFloat()
+        val originalHeight = bitmapp.height.toFloat()
         imageView = findViewById(R.id.imageView)
 
 
@@ -168,7 +173,12 @@ class ImageCropActivity : AppCompatActivity() {
                         if (results.size != 0) {
                             var tempRect = results[0].rect
 
-                            rec = Rect((tempRect.left).toInt(),(tempRect.top).toInt(),(tempRect.right).toInt(),(tempRect.bottom).toInt())
+                            rec = Rect(
+                                (tempRect.left).toInt(),
+                                (tempRect.top).toInt(),
+                                (tempRect.right).toInt(),
+                                (tempRect.bottom).toInt()
+                            )
                             Log.d("result[0]", "${results[0].rect}")
                             Log.d("rec", "$rec")
 
@@ -188,9 +198,12 @@ class ImageCropActivity : AppCompatActivity() {
                 val originalImageHeight = imageHeight
                 imageWidth *= scaleX
                 imageHeight *= scaleY
-                Log.d("llog","viewWidth $viewWidth viewHeight = $viewHeight imageWidth $imageWidth imageHeight $imageHeight")
+                Log.d(
+                    "llog",
+                    "viewWidth $viewWidth viewHeight = $viewHeight imageWidth $imageWidth imageHeight $imageHeight"
+                )
                 if (rec.left == -999) {
-                    Log.d("find","$originalImageWidth $originalImageHeight")
+                    Log.d("find", "$originalImageWidth $originalImageHeight")
                     val drawable = imageView.drawable
                     val imageWidth = drawable.intrinsicWidth
                     val imageHeight = drawable.intrinsicHeight
@@ -201,16 +214,16 @@ class ImageCropActivity : AppCompatActivity() {
                     }
                     val scaledWidth = (imageWidth * scaleFactor).toInt()
                     val scaledHeight = (imageHeight * scaleFactor).toInt()
-                    val halfWidth = scaledWidth/2
-                    val halfHeight = scaledHeight/2
-                    val quatWidth = halfWidth/2
-                    val quatHeight = halfHeight/2
-                    scaleX = viewWidth/ originalImageWidth
-                    scaleY = viewHeight/ originalImageHeight
-                    pointTopLeft = Point(quatWidth,quatHeight)
-                    pointTopRight = Point(halfWidth+quatWidth,quatHeight)
-                    pointBottomLeft = Point(quatWidth,quatHeight+halfHeight)
-                    pointBottomRight = Point(halfWidth+quatWidth, quatHeight+halfHeight)
+                    val halfWidth = scaledWidth / 2
+                    val halfHeight = scaledHeight / 2
+                    val quatWidth = halfWidth / 2
+                    val quatHeight = halfHeight / 2
+                    scaleX = viewWidth / originalImageWidth
+                    scaleY = viewHeight / originalImageHeight
+                    pointTopLeft = Point(quatWidth, quatHeight)
+                    pointTopRight = Point(halfWidth + quatWidth, quatHeight)
+                    pointBottomLeft = Point(quatWidth, quatHeight + halfHeight)
+                    pointBottomRight = Point(halfWidth + quatWidth, quatHeight + halfHeight)
 
 
                 } else {
@@ -222,249 +235,256 @@ class ImageCropActivity : AppCompatActivity() {
 
                 // 리스너 제거
                 imageView.viewTreeObserver.removeOnPreDrawListener(this)
-
+                onDrawBitmap(imageView, bitmapp)
                 return true
             }
         })
 
-imageView.setOnTouchListener { v, event ->
+        imageView.setOnTouchListener { v, event ->
 
 
-    when (event.actionMasked) {
-        MotionEvent.ACTION_DOWN -> {
-            // 터치 다운 이벤트 처리
-            // 가장 가까운 점을 찾아 이동
-            val touchPointF = imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
-            val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
-            Log.d("touchPoint","${touchPoint}")
-            Log.d("bottomright", "${pointBottomRight}")
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 터치 다운 이벤트 처리
+                    // 가장 가까운 점을 찾아 이동
+                    val touchPointF =
+                        imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
+                    val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
+                    Log.d("touchPoint", "${touchPoint}")
+                    Log.d("bottomright", "${pointBottomRight}")
 
-            val closestPoint = findClosestPoint(
-                touchPoint,
-                pointTopLeft,
-                pointTopRight,
-                pointBottomRight,
-                pointBottomLeft
-            )
-            Log.d("closestPoint1", "${closestPoint}")
-            if (touchPoint.distanceTo(closestPoint) < 50) {
-                closestPoint.x = touchPoint.x
-                closestPoint.y = touchPoint.y
-                imageView.invalidate() // ImageView 다시 그리기
-            }
-            Log.d("closestPoint2", "${closestPoint}")
-            onDrawBitmap(imageView, bitmapp)
+                    val closestPoint = findClosestPoint(
+                        touchPoint,
+                        pointTopLeft,
+                        pointTopRight,
+                        pointBottomRight,
+                        pointBottomLeft
+                    )
+                    Log.d("closestPoint1", "${closestPoint}")
+                    if (touchPoint.distanceTo(closestPoint) < 50) {
+                        closestPoint.x = touchPoint.x
+                        closestPoint.y = touchPoint.y
+                        imageView.invalidate() // ImageView 다시 그리기
+                    }
+                    Log.d("closestPoint2", "${closestPoint}")
+                    onDrawBitmap(imageView, bitmapp)
 
-            true
-        }
-        MotionEvent.ACTION_MOVE -> {
-            // 터치 이동 이벤트 처리
-            // 이동된 점 다시 그리기
+                    true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    // 터치 이동 이벤트 처리
+                    // 이동된 점 다시 그리기
 
 //                    val touchPoint = Point(scaledTouchX.toInt(), scaledTouchY.toInt())
-            val touchPointF = imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
-            val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
-            val closestPoint = findClosestPoint(
-                touchPoint,
-                pointTopLeft,
-                pointTopRight,
-                pointBottomRight,
-                pointBottomLeft
-            )
+                    val touchPointF =
+                        imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
+                    val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
+                    val closestPoint = findClosestPoint(
+                        touchPoint,
+                        pointTopLeft,
+                        pointTopRight,
+                        pointBottomRight,
+                        pointBottomLeft
+                    )
 
 
-            // 시작 위치와 가장 가까운 점 사이의 거리를 계산하여 일정 거리 이내인 경우에만 이동
-            if (touchPoint.distanceTo(closestPoint) < 50) {
-                closestPoint.x = touchPoint.x
-                closestPoint.y = touchPoint.y
-                imageView.invalidate() // ImageView 다시 그리기
+                    // 시작 위치와 가장 가까운 점 사이의 거리를 계산하여 일정 거리 이내인 경우에만 이동
+                    if (touchPoint.distanceTo(closestPoint) < 50) {
+                        closestPoint.x = touchPoint.x
+                        closestPoint.y = touchPoint.y
+                        imageView.invalidate() // ImageView 다시 그리기
+                    }
+
+                    onDrawBitmap(imageView, bitmapp)
+
+                    true
+                }
+                else -> false
             }
-
-            onDrawBitmap(imageView, bitmapp)
-
-            true
         }
-        else -> false
-    }
-}
-val btn: Button = findViewById(R.id.exit_btn)
-btn.setOnClickListener {
-    val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
-    val intent = Intent(this, ErrorDetectActivity::class.java).apply {
-        putExtra("PointTopLeftX", pointTopLeft.x)
-        putExtra("PointTopLeftY", pointTopLeft.y)
-        putExtra("PointTopRightX", pointTopRight.x)
-        putExtra("PointTopRightY", pointTopRight.y)
-        putExtra("PointBottomLeftX", pointBottomLeft.x)
-        putExtra("PointBottomLeftY", pointBottomLeft.y)
-        putExtra("PointBottomRightX", pointBottomRight.x)
-        putExtra("PointBottomRightY", pointBottomRight.y)
-        putExtra("scaleX", scaleX)
-        putExtra("scaleY", scaleY)
-        putExtra("REQUEST_CODE", intent.getIntExtra("REQUEST_CODE", 0))
-        putExtra("uri", intent.data.toString())
-        putExtra(REQUEST_TYPE, intent.getIntExtra(REQUEST_TYPE, -1))
-        putExtra(REQUEST_SIGNAGE_ID, intent.getLongExtra(REQUEST_SIGNAGE_ID, -1L))
-        setData(intent.data)
-    }
-    setResult(Activity.RESULT_OK)
-    startActivity(intent)
-}
+        val btn: Button = findViewById(R.id.exit_btn)
+        btn.setOnClickListener {
+            val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+            val intent = Intent(this, ErrorDetectActivity::class.java).apply {
+                val lastScaleX = originalWidth / imageView.drawable.intrinsicWidth.toFloat()
+                val lastScaleY = originalHeight / imageView.drawable.intrinsicHeight.toFloat()
+                putExtra("PointTopLeftX", pointTopLeft.x * lastScaleX)
+                putExtra("PointTopLeftY", pointTopLeft.y * lastScaleY)
+                putExtra("PointTopRightX", pointTopRight.x * lastScaleX)
+                putExtra("PointTopRightY", pointTopRight.y * lastScaleY)
+                putExtra("PointBottomLeftX", pointBottomLeft.x * lastScaleX)
+                putExtra("PointBottomLeftY", pointBottomLeft.y * lastScaleY)
+                putExtra("PointBottomRightX", pointBottomRight.x * lastScaleX)
+                putExtra("PointBottomRightY", pointBottomRight.y * lastScaleY)
+                putExtra("scaleX", scaleX)
+                putExtra("scaleY", scaleY)
+                putExtra("REQUEST_CODE", intent.getIntExtra("REQUEST_CODE", 0))
+                putExtra("uri", intent.data.toString())
+                putExtra(REQUEST_TYPE, intent.getIntExtra(REQUEST_TYPE, -1))
+                putExtra(REQUEST_SIGNAGE_ID, intent.getLongExtra(REQUEST_SIGNAGE_ID, -1L))
+                setData(intent.data)
+            }
+            setResult(Activity.RESULT_OK)
+            startActivity(intent)
+        }
 // ImageView 다시 그리기
 //        imageView.viewTreeObserver.addOnDrawListener {
 //            onDraw(imageView, imageUri)
 //        }
-}
+    }
 
-override fun onPause() {
-    super.onPause()
-    finish()
-}
+    override fun onPause() {
+        super.onPause()
+        finish()
+    }
 
-private fun onDraw(imageView: ImageView, uri : Uri) {
-    // 사각형 그리기
-    val paint = Paint()
-    paint.color = Color.RED
-    paint.strokeWidth = 4f
-    paint.style = Paint.Style.STROKE
+    private fun onDraw(imageView: ImageView, uri: Uri) {
+        // 사각형 그리기
+        val paint = Paint()
+        paint.color = Color.RED
+        paint.strokeWidth = 4f
+        paint.style = Paint.Style.STROKE
 
-    val path = Path()
-    path.moveTo(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat())
-    path.lineTo(pointTopRight.x.toFloat(), pointTopRight.y.toFloat())
-    path.lineTo(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat())
-    path.lineTo(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat())
-    path.close()
-
-
-    imageView.setImageBitmap(null) // 이전 이미지 제거
-    bitmapp = uriToBitmap(this, uri)
-    val scaleFactor = viewWidth / bitmapp.width.toFloat()
-    //val mutableBitmap = Bitmap.createScaledBitmap(bitmap, imageViewWidth, (bitmap.height * scaleFactor).toInt(), false)
-    val mutableBitmap = Bitmap.createScaledBitmap(
-        bitmapp,
-        viewWidth.toInt(),
-        (bitmapp.height * scaleFactor).toInt(),
-        true
-    ).copy(Bitmap.Config.ARGB_8888, true)
-    val canvas = Canvas(mutableBitmap!!)
-    canvas.drawPath(path, paint)
-
-    // 점 그리기
-    paint.color = Color.BLUE
-    paint.strokeWidth = 12f
-    paint.style = Paint.Style.FILL_AND_STROKE
-
-    canvas.drawPoint(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat(), paint)
-    canvas.drawPoint(pointTopRight.x.toFloat(), pointTopRight.y.toFloat(), paint)
-    canvas.drawPoint(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat(), paint)
-    canvas.drawPoint(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat(), paint)
-
-    // ImageView에 비트맵 이미지 적용
-    imageView.setImageBitmap(mutableBitmap)
-}
-private fun onDrawBitmap(imageView: ImageView, bitmap: Bitmap) {
-    // 사각형 그리기
-    val paint = Paint()
-    paint.color = Color.RED
-    paint.strokeWidth = 4f
-    paint.style = Paint.Style.STROKE
-    val path = Path()
-    path.moveTo(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat())
-    path.lineTo(pointTopRight.x.toFloat(), pointTopRight.y.toFloat())
-    path.lineTo(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat())
-    path.lineTo(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat())
-    path.close()
+        val path = Path()
+        path.moveTo(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat())
+        path.lineTo(pointTopRight.x.toFloat(), pointTopRight.y.toFloat())
+        path.lineTo(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat())
+        path.lineTo(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat())
+        path.close()
 
 
-    imageView.setImageBitmap(null) // 이전 이미지 제거
-    val imageViewWidth = imageView.width
-    val scaleFactor = imageViewWidth.toFloat() / bitmapp.width.toFloat()
-    //val mutableBitmap = Bitmap.createScaledBitmap(bitmap, imageViewWidth, (bitmap.height * scaleFactor).toInt(), false)
-    val mutableBitmap = Bitmap.createScaledBitmap(
-        bitmapp,
-        imageViewWidth,
-        (bitmapp.height * scaleFactor).toInt(),
-        true
-    ).copy(Bitmap.Config.ARGB_8888, true)
-    val canvas = Canvas(mutableBitmap!!)
-    canvas.drawPath(path, paint)
+        imageView.setImageBitmap(null) // 이전 이미지 제거
+        bitmapp = uriToBitmap(this, uri)
+        val scaleFactor = viewWidth / bitmapp.width.toFloat()
+        //val mutableBitmap = Bitmap.createScaledBitmap(bitmap, imageViewWidth, (bitmap.height * scaleFactor).toInt(), false)
+        val mutableBitmap = Bitmap.createScaledBitmap(
+            bitmapp,
+            viewWidth.toInt(),
+            (bitmapp.height * scaleFactor).toInt(),
+            true
+        ).copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(mutableBitmap!!)
+        canvas.drawPath(path, paint)
 
-    // 점 그리기
-    paint.color = Color.BLUE
-    paint.strokeWidth = 12f
-    paint.style = Paint.Style.FILL_AND_STROKE
+        // 점 그리기
+        paint.color = Color.BLUE
+        paint.strokeWidth = 12f
+        paint.style = Paint.Style.FILL_AND_STROKE
 
-    canvas.drawPoint(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat(), paint)
-    canvas.drawPoint(pointTopRight.x.toFloat(), pointTopRight.y.toFloat(), paint)
-    canvas.drawPoint(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat(), paint)
-    canvas.drawPoint(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat(), paint)
+        canvas.drawPoint(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat(), paint)
+        canvas.drawPoint(pointTopRight.x.toFloat(), pointTopRight.y.toFloat(), paint)
+        canvas.drawPoint(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat(), paint)
+        canvas.drawPoint(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat(), paint)
 
-    // 이미지 사이즈 재조정
-    // ImageView에 비트맵 이미지 적용
-    imageView.setImageBitmap(mutableBitmap)
-}
+        // ImageView에 비트맵 이미지 적용
+        imageView.setImageBitmap(mutableBitmap)
+    }
 
-fun uriToBitmap(context: Context, uri: Uri): Bitmap {
-    val inputStream = context.contentResolver.openInputStream(uri)
-    return BitmapFactory.decodeStream(inputStream)
-}
-private fun findClosestPoint(point: Point, vararg points: Point): Point {
-    var closestPoint = points[0]
-    var minDistance = closestPoint.distanceTo(point)
+    private fun onDrawBitmap(imageView: ImageView, bitmap: Bitmap) {
+        // 사각형 그리기
+        val paint = Paint()
+        paint.color = Color.RED
+        paint.strokeWidth = 4f
+        paint.style = Paint.Style.STROKE
+        val path = Path()
+        path.moveTo(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat())
+        path.lineTo(pointTopRight.x.toFloat(), pointTopRight.y.toFloat())
+        path.lineTo(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat())
+        path.lineTo(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat())
+        path.close()
 
-    for (i in 1 until points.size) {
-        val distance = points[i].distanceTo(point)
-        if (distance < minDistance) {
-            closestPoint = points[i]
-            minDistance = distance
+
+        imageView.setImageBitmap(null) // 이전 이미지 제거
+        val imageViewWidth = imageView.width
+        val scaleFactor = imageViewWidth.toFloat() / bitmapp.width.toFloat()
+        //val mutableBitmap = Bitmap.createScaledBitmap(bitmap, imageViewWidth, (bitmap.height * scaleFactor).toInt(), false)
+        val mutableBitmap = Bitmap.createScaledBitmap(
+            bitmapp,
+            imageViewWidth,
+            (bitmapp.height * scaleFactor).toInt(),
+            true
+        ).copy(Bitmap.Config.ARGB_8888, true)
+        val canvas = Canvas(mutableBitmap!!)
+        canvas.drawPath(path, paint)
+
+        // 점 그리기
+        paint.color = Color.BLUE
+        paint.strokeWidth = 12f
+        paint.style = Paint.Style.FILL_AND_STROKE
+
+        canvas.drawPoint(pointTopLeft.x.toFloat(), pointTopLeft.y.toFloat(), paint)
+        canvas.drawPoint(pointTopRight.x.toFloat(), pointTopRight.y.toFloat(), paint)
+        canvas.drawPoint(pointBottomRight.x.toFloat(), pointBottomRight.y.toFloat(), paint)
+        canvas.drawPoint(pointBottomLeft.x.toFloat(), pointBottomLeft.y.toFloat(), paint)
+
+        // 이미지 사이즈 재조정
+        // ImageView에 비트맵 이미지 적용
+        imageView.setImageBitmap(mutableBitmap)
+    }
+
+    fun uriToBitmap(context: Context, uri: Uri): Bitmap {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        return BitmapFactory.decodeStream(inputStream)
+    }
+
+    private fun findClosestPoint(point: Point, vararg points: Point): Point {
+        var closestPoint = points[0]
+        var minDistance = closestPoint.distanceTo(point)
+
+        for (i in 1 until points.size) {
+            val distance = points[i].distanceTo(point)
+            if (distance < minDistance) {
+                closestPoint = points[i]
+                minDistance = distance
+            }
         }
-    }
-    return closestPoint
-}
-fun Point.distanceTo(other: Point): Float {
-    val dx = (x - other.x).toDouble()
-    val dy = (y - other.y).toDouble()
-
-    return sqrt((dx * dx + dy * dy)).toFloat()
-}
-
-fun imageViewToImageCoordinatesFitCenter(imageView: ImageView, x: Float, y: Float): PointF {
-    val drawable: Drawable = imageView.drawable ?: return PointF(x, y)
-    val imageWidth = drawable.intrinsicWidth
-    val imageHeight = drawable.intrinsicHeight
-    val imageViewWidth = imageView.width
-    val imageViewHeight = imageView.height
-
-    // 이미지와 이미지 뷰의 가로세로비를 계산합니다.
-    val imageRatio = imageWidth.toFloat() / imageHeight.toFloat()
-    val imageViewRatio = imageViewWidth.toFloat() / imageViewHeight.toFloat()
-
-    // 이미지의 스케일과 평행 이동 값을 계산합니다.
-    val scaleX: Float
-    val scaleY: Float
-    val translateX: Float
-    val translateY: Float
-
-    if (imageRatio > imageViewRatio) {
-        // 이미지가 이미지 뷰보다 더 넓은 경우
-        scaleX = imageViewWidth.toFloat() / imageWidth.toFloat()
-        scaleY = scaleX
-        translateX = 0f
-        translateY = (imageViewHeight - (imageHeight * scaleY)) / 2f
-    } else {
-        // 이미지가 이미지 뷰보다 더 높은 경우
-        scaleY = imageViewHeight.toFloat() / imageHeight.toFloat()
-        scaleX = scaleY
-        translateX = (imageViewWidth - (imageWidth * scaleX)) / 2f
-        translateY = 0f
+        return closestPoint
     }
 
-    // 이미지 뷰에서 실제 이미지의 크기와 위치를 고려하여 좌표를 변환합니다.
-    val imageX = (x - translateX) / scaleX
-    val imageY = (y - translateY) / scaleY
+    fun Point.distanceTo(other: Point): Float {
+        val dx = (x - other.x).toDouble()
+        val dy = (y - other.y).toDouble()
 
-    Log.d("ScaledPoint", "${imageX}, ${imageY}")
+        return sqrt((dx * dx + dy * dy)).toFloat()
+    }
 
-    return PointF(imageX, imageY)
-}
+    fun imageViewToImageCoordinatesFitCenter(imageView: ImageView, x: Float, y: Float): PointF {
+        val drawable: Drawable = imageView.drawable ?: return PointF(x, y)
+        val imageWidth = drawable.intrinsicWidth
+        val imageHeight = drawable.intrinsicHeight
+        val imageViewWidth = imageView.width
+        val imageViewHeight = imageView.height
+
+        // 이미지와 이미지 뷰의 가로세로비를 계산합니다.
+        val imageRatio = imageWidth.toFloat() / imageHeight.toFloat()
+        val imageViewRatio = imageViewWidth.toFloat() / imageViewHeight.toFloat()
+
+        // 이미지의 스케일과 평행 이동 값을 계산합니다.
+        val scaleX: Float
+        val scaleY: Float
+        val translateX: Float
+        val translateY: Float
+
+        if (imageRatio > imageViewRatio) {
+            // 이미지가 이미지 뷰보다 더 넓은 경우
+            scaleX = imageViewWidth.toFloat() / imageWidth.toFloat()
+            scaleY = scaleX
+            translateX = 0f
+            translateY = (imageViewHeight - (imageHeight * scaleY)) / 2f
+        } else {
+            // 이미지가 이미지 뷰보다 더 높은 경우
+            scaleY = imageViewHeight.toFloat() / imageHeight.toFloat()
+            scaleX = scaleY
+            translateX = (imageViewWidth - (imageWidth * scaleX)) / 2f
+            translateY = 0f
+        }
+
+        // 이미지 뷰에서 실제 이미지의 크기와 위치를 고려하여 좌표를 변환합니다.
+        val imageX = (x - translateX) / scaleX
+        val imageY = (y - translateY) / scaleY
+
+        Log.d("ScaledPoint", "${imageX}, ${imageY}")
+
+        return PointF(imageX, imageY)
+    }
 }

@@ -11,12 +11,14 @@ object PrePostProcessor {
     // for yolov5 model, no need to apply MEAN and STD
     @JvmField
     var NO_MEAN_RGB = floatArrayOf(0.0f, 0.0f, 0.0f)
+
     @JvmField
     var NO_STD_RGB = floatArrayOf(1.0f, 1.0f, 1.0f)
 
     // model input image size
     @JvmField
     var mInputWidth = 640
+
     @JvmField
     var mInputHeight = 640
 
@@ -99,12 +101,13 @@ object PrePostProcessor {
         return intersectionArea / (areaA + areaB - intersectionArea)
     }
 
-    fun getValue(a :Int): Int {
-        if(a < 0)
+    fun getValue(a: Int): Int {
+        if (a < 0)
             return 0
         else
             return a
     }
+
     @JvmStatic
     fun outputsToNMSPredictions(
         outputs: FloatArray,
@@ -138,8 +141,8 @@ object PrePostProcessor {
                 val centerY = (top + bottom) / 2
                 val width = right - left
                 val height = bottom - top
-                val newWidth = width * 1.4f
-                val newHeight = height * 1.4f
+                val newWidth = width * 1.0f
+                val newHeight = height * 1.0f
                 val newLeft = centerX - newWidth / 2
                 val newTop = centerY - newHeight / 2
                 val newRight = centerX + newWidth / 2
