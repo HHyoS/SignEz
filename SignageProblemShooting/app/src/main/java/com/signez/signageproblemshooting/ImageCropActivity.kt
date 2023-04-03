@@ -43,9 +43,10 @@ class ImageCropActivity : AppCompatActivity() {
     var pointBottomRight = Point(300, 300)
 
     var mModule: Module? = null
+
     // m : viewFrame
     // mm : 이미지 실제 크기
-    lateinit var bitmapp : Bitmap
+    lateinit var bitmapp: Bitmap
     var mImgScaleX = 0f
     var mImgScaleY = 0f
     var mIvScaleX = 0f
@@ -53,12 +54,12 @@ class ImageCropActivity : AppCompatActivity() {
     var mStartX = 0f
     var mStartY = 0f
     var rec = Rect(-999, -999, -999, -999)
-    var viewWidth : Float  = 0f
-    var viewHeight : Float  = 0f
-    var imageWidth : Float  = 0f
-    var imageHeight  : Float  = 0f
+    var viewWidth: Float = 0f
+    var viewHeight: Float = 0f
+    var imageWidth: Float = 0f
+    var imageHeight: Float = 0f
     var scaleX: Float = 0f
-    var scaleY : Float = 0f
+    var scaleY: Float = 0f
     private val REQUEST_TYPE: String = "REQUEST_TYPE"
     private val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
 
@@ -83,7 +84,8 @@ class ImageCropActivity : AppCompatActivity() {
         } else {
             ExifInterface(imageUri.path!!)
         }
-        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+        val orientation =
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
         val matrix = Matrix()
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -105,6 +107,8 @@ class ImageCropActivity : AppCompatActivity() {
 
         bitmapp = Bitmap.createBitmap(bitmapp, 0, 0, bitmapp.width, bitmapp.height, matrix, true)
         imageView = findViewById(R.id.imageView)
+        val originalWidth = bitmapp.width.toFloat()
+        val originalHeight = bitmapp.height.toFloat()
 
 
         viewWidth = imageView.width.toFloat()
@@ -168,7 +172,12 @@ class ImageCropActivity : AppCompatActivity() {
                         )
                         if (results.size != 0) {
                             var tempRect = results[0].rect
-                            rec = Rect((tempRect.left).toInt(),(tempRect.top).toInt(),(tempRect.right).toInt(),(tempRect.bottom).toInt())
+                            rec = Rect(
+                                (tempRect.left).toInt(),
+                                (tempRect.top).toInt(),
+                                (tempRect.right).toInt(),
+                                (tempRect.bottom).toInt()
+                            )
                             Log.d("result[0]", "${results[0].rect}")
                             Log.d("rec", "$rec")
 
@@ -191,9 +200,12 @@ class ImageCropActivity : AppCompatActivity() {
                 val originalImageHeight = imageHeight
                 imageWidth *= scaleX
                 imageHeight *= scaleY
-                Log.d("llog","viewWidth $viewWidth viewHeight = $viewHeight imageWidth $imageWidth imageHeight $imageHeight")
+                Log.d(
+                    "llog",
+                    "viewWidth $viewWidth viewHeight = $viewHeight imageWidth $imageWidth imageHeight $imageHeight"
+                )
                 if (rec.left == -999) {
-                    Log.d("find","$originalImageWidth $originalImageHeight")
+                    Log.d("find", "$originalImageWidth $originalImageHeight")
                     val drawable = imageView.drawable
                     val imageWidth = drawable.intrinsicWidth
                     val imageHeight = drawable.intrinsicHeight
@@ -204,14 +216,14 @@ class ImageCropActivity : AppCompatActivity() {
                     }
                     val scaledWidth = (imageWidth * scaleFactor).toInt()
                     val scaledHeight = (imageHeight * scaleFactor).toInt()
-                    val halfWidth = scaledWidth/2
-                    val halfHeight = scaledHeight/2
-                    val quatWidth = halfWidth/2
-                    val quatHeight = halfHeight/2
-                    pointTopLeft = Point(quatWidth,quatHeight)
-                    pointTopRight = Point(halfWidth+quatWidth,quatHeight)
-                    pointBottomLeft = Point(quatWidth,quatHeight+halfHeight)
-                    pointBottomRight = Point(halfWidth+quatWidth, quatHeight+halfHeight)
+                    val halfWidth = scaledWidth / 2
+                    val halfHeight = scaledHeight / 2
+                    val quatWidth = halfWidth / 2
+                    val quatHeight = halfHeight / 2
+                    pointTopLeft = Point(quatWidth, quatHeight)
+                    pointTopRight = Point(halfWidth + quatWidth, quatHeight)
+                    pointBottomLeft = Point(quatWidth, quatHeight + halfHeight)
+                    pointBottomRight = Point(halfWidth + quatWidth, quatHeight + halfHeight)
 
 
                 } else {
@@ -223,7 +235,7 @@ class ImageCropActivity : AppCompatActivity() {
 
                 // 리스너 제거
                 imageView.viewTreeObserver.removeOnPreDrawListener(this)
-
+                onDrawBitmap(imageView, bitmapp)
                 return true
             }
         })
@@ -244,9 +256,10 @@ class ImageCropActivity : AppCompatActivity() {
                 MotionEvent.ACTION_DOWN -> {
                     // 터치 다운 이벤트 처리
                     // 가장 가까운 점을 찾아 이동
-                    val touchPointF = imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
+                    val touchPointF =
+                        imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
                     val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
-                    Log.d("touchPoint","${touchPoint}")
+                    Log.d("touchPoint", "${touchPoint}")
                     Log.d("bottomright", "${pointBottomRight}")
 
                     val closestPoint = findClosestPoint(
@@ -272,7 +285,8 @@ class ImageCropActivity : AppCompatActivity() {
                     // 이동된 점 다시 그리기
 
 //                    val touchPoint = Point(scaledTouchX.toInt(), scaledTouchY.toInt())
-                    val touchPointF = imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
+                    val touchPointF =
+                        imageViewToImageCoordinatesFitCenter(imageView, event.x, event.y)
                     val touchPoint = Point(touchPointF.x.toInt(), touchPointF.y.toInt())
                     val closestPoint = findClosestPoint(
                         touchPoint,
@@ -301,14 +315,16 @@ class ImageCropActivity : AppCompatActivity() {
         btn.setOnClickListener {
             val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
             val intent = Intent(this, ErrorDetectActivity::class.java).apply {
-                putExtra("PointTopLeftX", pointTopLeft.x)
-                putExtra("PointTopLeftY", pointTopLeft.y)
-                putExtra("PointTopRightX", pointTopRight.x)
-                putExtra("PointTopRightY", pointTopRight.y)
-                putExtra("PointBottomLeftX", pointBottomLeft.x)
-                putExtra("PointBottomLeftY", pointBottomLeft.y)
-                putExtra("PointBottomRightX", pointBottomRight.x)
-                putExtra("PointBottomRightY", pointBottomRight.y)
+                val lastScaleX = originalWidth / imageView.drawable.intrinsicWidth.toFloat()
+                val lastScaleY = originalHeight / imageView.drawable.intrinsicHeight.toFloat()
+                putExtra("PointTopLeftX", pointTopLeft.x * lastScaleX)
+                putExtra("PointTopLeftY", pointTopLeft.y * lastScaleY)
+                putExtra("PointTopRightX", pointTopRight.x * lastScaleX)
+                putExtra("PointTopRightY", pointTopRight.y * lastScaleY)
+                putExtra("PointBottomLeftX", pointBottomLeft.x * lastScaleX)
+                putExtra("PointBottomLeftY", pointBottomLeft.y * lastScaleY)
+                putExtra("PointBottomRightX", pointBottomRight.x * lastScaleX)
+                putExtra("PointBottomRightY", pointBottomRight.y * lastScaleY)
                 putExtra("scaleX", scaleX)
                 putExtra("scaleY", scaleY)
                 putExtra("REQUEST_CODE", intent.getIntExtra("REQUEST_CODE", 0))
@@ -331,7 +347,7 @@ class ImageCropActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun onDraw(imageView: ImageView, uri : Uri) {
+    private fun onDraw(imageView: ImageView, uri: Uri) {
         // 사각형 그리기
         val paint = Paint()
         paint.color = Color.RED
@@ -374,6 +390,7 @@ class ImageCropActivity : AppCompatActivity() {
         // ImageView에 비트맵 이미지 적용
         imageView.setImageBitmap(mutableBitmap)
     }
+
     private fun onDrawBitmap(imageView: ImageView, bitmap: Bitmap) {
         // 사각형 그리기
         val paint = Paint()
@@ -420,6 +437,7 @@ class ImageCropActivity : AppCompatActivity() {
         val inputStream = context.contentResolver.openInputStream(uri)
         return BitmapFactory.decodeStream(inputStream)
     }
+
     private fun findClosestPoint(point: Point, vararg points: Point): Point {
         var closestPoint = points[0]
         var minDistance = closestPoint.distanceTo(point)
@@ -433,6 +451,7 @@ class ImageCropActivity : AppCompatActivity() {
         }
         return closestPoint
     }
+
     fun Point.distanceTo(other: Point): Float {
         val dx = (x - other.x).toDouble()
         val dy = (y - other.y).toDouble()
