@@ -173,8 +173,6 @@ class ImageCropActivity : AppCompatActivity() {
                             val drawable = imageView.drawable
                             val imageWidth = drawable.intrinsicWidth
                             val imageHeight = drawable.intrinsicHeight
-                            Log.d("eeee","$viewWidth $viewHeight")
-                            Log.d("eeee","$imageWidth $imageHeight")
                             val scaleFactor = if (imageWidth * viewHeight > imageHeight * viewWidth) {
                                 viewWidth.toFloat() / imageWidth.toFloat()
                             } else {
@@ -182,10 +180,7 @@ class ImageCropActivity : AppCompatActivity() {
                             }
                             val scaledWidth =  (viewWidth -(imageWidth * scaleFactor))/2.toInt()
                             val scaledHeight = (viewHeight - (imageHeight * scaleFactor))/2.toInt()
-                            Log.d("qqqq","$scaledWidth $scaledHeight $scaleFactor")
                             rec = Rect((tempRect.left+scaledWidth).toInt(),(tempRect.top-scaledHeight).toInt(),(tempRect.right+scaledWidth).toInt(),(tempRect.bottom-scaledHeight).toInt())
-//                            rec = Rect(tempRect.left,(tempRect.top-marginY/2).toInt(),tempRect.right,(tempRect.bottom-marginY/2).toInt())
-//                            Log.d("result[0]", "${results[0].rect}")
                             Log.d("rec", "$rec")
 
                         } else {
@@ -208,6 +203,8 @@ class ImageCropActivity : AppCompatActivity() {
                 if (rec.left == -999) {
                     Log.d("find","$originalImageWidth $originalImageHeight")
                     val drawable = imageView.drawable
+                    val imageWidth = drawable.intrinsicWidth
+                    val imageHeight = drawable.intrinsicHeight
                     val scaleFactor = if (imageWidth * viewHeight > imageHeight * viewWidth) {
                         viewWidth / imageWidth
                     } else {
