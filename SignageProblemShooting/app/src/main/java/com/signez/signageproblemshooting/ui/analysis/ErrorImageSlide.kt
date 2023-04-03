@@ -1,5 +1,6 @@
 package com.signez.signageproblemshooting.ui.analysis
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -66,10 +67,18 @@ fun ErrorImageView(
         if (deletionCompleted.value) {
             deletionCompleted.value = false
         }
+        Log.d(
+            "x, y, resultid",
+            "${viewModel.selectedModuleX.value}, ${viewModel.selectedModuleY.value}, ${viewModel.selectedResultId.value}"
+        )
+        Log.d(
+            "x, y, resultid",
+            "${x}, ${y}, ${resultId}"
+        )
         maisState.value = viewModel.getModulesByXYResultId(
-            x = viewModel.selectedModuleX.value,
-            y = viewModel.selectedModuleY.value,
-            resultId = viewModel.selectedResultId.value
+            x = x,
+            y = y,
+            resultId = resultId
         ).filter {
             (it.errorModule.score * 100).roundToInt() >= threshold
         }.sortedByDescending {
@@ -77,7 +86,11 @@ fun ErrorImageView(
         }
 
     }
-    val mais = maisState.value //
+    var mais = maisState.value //
+    LaunchedEffect(maisState.value) {
+        mais = maisState.value
+    }
+    Log.d("mais", mais.toString())
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
@@ -106,7 +119,7 @@ fun ErrorImageView(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (mais != null) {
-                        if (mais.isEmpty()) {
+                        if (mais!!.isEmpty()) {
                             Text(
                                 text = "텅 비었어요.",
                                 style = MaterialTheme.typography.subtitle2
@@ -114,9 +127,9 @@ fun ErrorImageView(
                         }
                     } // 모듈 눌체크
 
-                    if (mais != null && mais.isNotEmpty()) {
+                    if (mais != null && mais!!.isNotEmpty()) {
                         GlideImage(
-                            model = mais[selectedIdx.value].errorImage?.evidence_image,
+                            model = mais!![selectedIdx.value].errorImage?.evidence_image,
                             contentDescription = "글라이드",
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -125,7 +138,7 @@ fun ErrorImageView(
                                 .background(color = Color.Black)
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        mais[selectedIdx.value].errorModule.let {
+                        mais!![selectedIdx.value].errorModule.let {
 //                            Row(horizontalArrangement = Arrangement.SpaceBetween) {
 //                                Column {
 //                                    Text(
@@ -155,7 +168,7 @@ fun ErrorImageView(
 //                            Spacer(modifier = Modifier.padding(10.dp))
                             ErrorImageSlideBox(
                                 selectedIdx = selectedIdx,
-                                mais = mais,
+                                mais = mais!!,
                                 cabinetX = cabinetX,
                                 cabinetY = cabinetY,
                                 moduleX = moduleX,
@@ -163,7 +176,7 @@ fun ErrorImageView(
                                 deleteEvent =
                                 {
                                     coroutineScope.launch {
-                                        viewModel.deleteErrorModule(mais[selectedIdx.value].errorModule)
+                                        viewModel.deleteErrorModule(mais!![selectedIdx.value].errorModule)
                                         deletionCompleted.value = true
                                     }
                                 }
