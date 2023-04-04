@@ -204,14 +204,11 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     }
 
     override fun onDenied(requestCode: Int, permissions: Array<String>) {
-        if (permissions.isNotEmpty()) {
-            mainViewModel.permissionsGranted.value=false
-            Toast.makeText(this, "거부된 권한 수: " + permissions.size, Toast.LENGTH_LONG).show()
-        }
+        {}
     }
 
     override fun onGranted(requestCode: Int, permissions: Array<String>) {
-        Toast.makeText(this, "허용된 권한 수: " + permissions.size, Toast.LENGTH_LONG).show()
+        {}
     }
     private fun checkAndRequestPermissions(): Boolean {
         val notGrantedPermissions = permissions.filter {

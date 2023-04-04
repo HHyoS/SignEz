@@ -133,7 +133,7 @@ fun AddSignageScreen(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "새 사이니지 추가",
+                title = "새 사이트 추가",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -192,7 +192,7 @@ fun AddSignageScreen(
                         }
 
                         Text(
-                            text = "사이니지 사진을 추가해 주세요.",
+                            text = "사이트 사진을 추가해 주세요.",
                             modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
                             style = TextStyle(color = Color.Black), // Customize the text style
                         )
@@ -272,7 +272,7 @@ fun AddSignageScreen(
                             CustomTextInput(
                                 value = viewModel.sName.value,
                                 onValueChange = { it -> viewModel.sName.value = it },
-                                placeholder = "사이니지 이름"
+                                placeholder = "사이트 이름"
                             )
                         }
                         Row(

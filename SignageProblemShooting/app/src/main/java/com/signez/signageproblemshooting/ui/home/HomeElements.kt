@@ -172,7 +172,7 @@ fun SignEzSpec(
         FocusBlock(
             title = stringResource(id = R.string.signage_spec_title),
             subtitle = signage.name,
-            infols = listOf("너비 : ${signage.width}", "높이 : ${signage.height}"),
+            infols = listOf("너비 : ${signage.width} mm", "높이 : ${signage.height} mm"),
             buttonTitle = "입력",
             isbuttonVisible = true,
             buttonOnclickEvent = navigateToSignageList,
@@ -207,10 +207,10 @@ fun CabinetSpec(
     if (cabinet != null) {
         FocusBlock(
             title = stringResource(id = R.string.cabinet_spec_title),
-            subtitle = "${cabinet.name}",
+            subtitle = cabinet.name,
             infols = listOf(
-                "너비 : ${cabinet.cabinetWidth}",
-                "높이 : ${cabinet.cabinetHeight}",
+                "너비 : ${cabinet.cabinetWidth} mm",
+                "높이 : ${cabinet.cabinetHeight} mm",
                 "모듈 : ${cabinet.moduleColCount}X${cabinet.moduleRowCount}"
             ),
             buttonTitle = null,
@@ -319,9 +319,9 @@ fun PermissionInfo() {
             Text(text = "정상적인 앱 사용을 위해서")
             Text(text = "아래와 같은 권한이 필요합니다.")
             Text(text = "- 카메라 권한")
-            Text(text = " : 사이니지 촬영\n")
+            Text(text = " : 사이트 촬영\n")
             Text(text = "- 파일 및 미디어 접근 권한")
-            Text(text = " : 디바이스의 사이니지 사진/영상 자료 불러오기")
+            Text(text = " : 디바이스의 사이트 사진/영상 자료 불러오기")
         }
     }
 }
