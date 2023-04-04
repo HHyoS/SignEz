@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.*
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.media.ExifInterface
 import android.media.MediaMetadataRetriever
@@ -21,6 +22,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.signez.signageproblemshooting.service.PrePostProcessor
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
@@ -67,6 +69,7 @@ class ImageCropActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_crop)
+
 
         val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
             val retriever = MediaMetadataRetriever()
