@@ -1,9 +1,7 @@
-# <img src="README.assets/slogo.png" align="left" width="40" height="40">SignEz - Signage ProblemShooting Solution
-
->
+# <img src="README.assets/slogo.png" align="left" width="40" height="40">SignEz - Signage ProblemShooting Solution> 
 
 <h3> Signage 문제, SignEz로 해결하세요
-<div align="center"><img src="README.assets/logo.png"></div>
+<div align="center"><img src="README.assets/logo.png" width = 300px></div>
 
 <br>
 
