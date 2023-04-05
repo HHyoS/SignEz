@@ -1,43 +1,34 @@
 package com.signez.signageproblemshooting
 
 import android.app.Activity
-import android.app.Application
 import android.content.Context
-import android.net.Uri
-import android.view.Menu
-import android.widget.Toast
-import android.widget.VideoView
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import android.content.Intent
+import android.provider.Settings
+import android.provider.Settings.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import com.signez.signageproblemshooting.ui.inputs.PictureViewModel
-import com.signez.signageproblemshooting.ui.inputs.VideoViewModel
+import com.signez.signageproblemshooting.ui.inputs.*
 import com.signez.signageproblemshooting.ui.navigation.SignEzNavHost
 import com.signez.signageproblemshooting.ui.signage.CabinetDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetViewModel
 import com.signez.signageproblemshooting.ui.signage.SignageDetailViewModel
 import com.signez.signageproblemshooting.ui.signage.SignageViewModel
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
+
 
 @Composable
 fun SignEzApp(
@@ -74,7 +65,8 @@ fun SignEzTopAppBar(
     title: String,
     canNavigateBack: Boolean,
     modifier: Modifier = Modifier,
-    navigateUp: () -> Unit = {}
+    navigateUp: () -> Unit = {},
+    context: Context = LocalContext.current,
 ) {
 
     var dropDownMenuExpanded by remember {
@@ -128,6 +120,9 @@ fun SignEzTopAppBar(
                     // items are added vertically
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                        // 튜토리얼 액티비티로 이동
+                        openTutorialActivity(context)
+                        //
                     }) {
                         Text(
                             text = "튜토리얼",
@@ -137,6 +132,7 @@ fun SignEzTopAppBar(
                     }
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                        openSettingIntent(context)
                     }) {
                         Text(
                             text = "설정",
@@ -211,6 +207,9 @@ fun SignEzTopAppBar(
                     // items are added vertically
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                        // 튜토리얼 액티비티로 이동
+                        openTutorialActivity(context)
+                        //
                     }) {
                         Text(
                             text = "튜토리얼",
@@ -220,6 +219,7 @@ fun SignEzTopAppBar(
                     }
 
                     DropdownMenuItem(modifier = Modifier.padding(end = 30.dp), onClick = {
+                       openSettingIntent(context)
                     }) {
                         Text(
                             text = "설정",
@@ -263,7 +263,7 @@ fun SignEzTopAppBar(
 @Preview
 @Composable
 fun AppbarPreview() {
-    SignEzPrototypeTheme(darkTheme = false) {
+    SignEzTheme(darkTheme = false) {
         SignEzTopAppBar(title = "SignEz", canNavigateBack = false)
     }
 }

@@ -12,11 +12,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Signage
+import com.signez.signageproblemshooting.ui.components.LoadingSpinner
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
 
 @Composable
 fun AnalysisProgress(
     modifier: Modifier = Modifier,
+    analysisViewModel: AnalysisViewModel
 ) {
     val focusManager = LocalFocusManager.current
     androidx.compose.material.Scaffold(
@@ -39,9 +41,9 @@ fun AnalysisProgress(
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopCenter
+                contentAlignment = Alignment.Center
             ) {
-                Text(text="분석중 페이지")
+                LoadingSpinner(analysisViewModel.progressMessage.value, analysisViewModel.progressFloat.value)
             }
         }
     }

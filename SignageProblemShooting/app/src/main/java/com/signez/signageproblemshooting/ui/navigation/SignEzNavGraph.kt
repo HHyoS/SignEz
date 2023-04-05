@@ -2,6 +2,7 @@ package com.signez.signageproblemshooting.ui.navigation
 
 import android.app.Activity
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModelProvider
@@ -40,8 +41,20 @@ fun SignEzNavHost(
     ) {
         composable(route = HomeDestination.route) {
             HomeScreen(
-                navigateToVideo = { navController.navigate(VideoScreenDestination.route) },
-                navigateToPicture = { navController.navigate(PictureScreenDestination.route) },
+                navigateToVideo = {
+                    if(viewModel5.signageId.value > -1){
+                        navController.navigate(VideoScreenDestination.route)
+                    } else {
+                        Toast.makeText(activity,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                                  },
+                navigateToPicture = {
+                    if(viewModel5.signageId.value > -1){
+                        navController.navigate(PictureScreenDestination.route)
+                    } else {
+                        Toast.makeText(activity,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                                    },
                 navigateToSignageList = { navController.navigate(SignageListScreenDestination.route) },
                 viewModel = viewModel5,
                 mainViewModel = viewModel8,
@@ -150,28 +163,52 @@ fun SignEzNavHost(
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel5
             )
+
         }
 
-        composable(route = ResultGridDestination.route) {
-            ResultGridView(
-                onItemClick = {},
-                modifier = Modifier,
-                navController = navController,
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel5
-            )
+        composable(route = ResultGridDestination.route+"/{resultId}") {
+            backStackEntry ->
+            backStackEntry.arguments?.getString("resultId")?.let {
+                ResultGridView(
+                    onItemClick = {},
+                    modifier = Modifier,
+                    navController = navController,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
+                    viewModel = viewModel5,
+                    resultId = it.toLong()
+                )
+            }
         }
 
-        composable(route = ErrorImageDestination.route) {
-            ErrorImageView(
-                onItemClick = {},
-                modifier = Modifier,
-                navController = navController,
-                navigateBack = { navController.popBackStack() },
-                onNavigateUp = { navController.navigateUp() },
-                viewModel = viewModel5
-            )
+        composable(route = ErrorImageDestination.route+"/{x}/{y}/{resultId}") {
+            backStackEntry ->
+            backStackEntry.arguments?.let {
+                ErrorImageView(
+                    onItemClick = {},
+                    modifier = Modifier,
+                    navController = navController,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
+                    viewModel = viewModel5,
+                    x = it.getString("x")!!.toInt(),
+                    y = it.getString("y")!!.toInt(),
+                    resultId = it.getString("resultId")!!.toLong()
+                )
+            }
+        }
+
+        composable(route = BlockLayoutDestination.route+"/{signageId}/{cabinetId}") {
+            backStackEntry ->
+            backStackEntry.arguments?.let {
+                LayoutScreen(
+                    signageId = it.getString("signageId")!!,
+                    cabinetId = it.getString("cabinetId")!!,
+                    navController = navController,
+                    navigateBack = { navController.popBackStack() },
+                    onNavigateUp = { navController.navigateUp() },
+                )
+            }
         }
 
     }

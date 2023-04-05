@@ -6,18 +6,20 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.runtime.MutableState
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.common.reflect.Reflection.getPackageName
 import com.signez.signageproblemshooting.ErrorDetectActivity
+import com.signez.signageproblemshooting.ImageCropActivity
+import com.signez.signageproblemshooting.TutorialActivity
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
@@ -75,7 +77,7 @@ fun createVideoFile(viewModel: VideoViewModel): File {
     return videoFile
 }
 
-fun dispatchTakePictureIntent(activity: Activity, viewModel: MediaViewModel,type:Int) {
+fun dispatchTakePictureIntent(activity: Activity, viewModel: MediaViewModel, type: Int) {
     Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
         // Ensure that there's a camera activity to handle the intent
         takePictureIntent.resolveActivity(activity.packageManager)?.also {
@@ -89,14 +91,17 @@ fun dispatchTakePictureIntent(activity: Activity, viewModel: MediaViewModel,type
             // Continue only if the File was successfully created
             // getUriForFile의 두 번째 인자는 Manifest provier의 authorites와 일치해야 함
             if (photoFile != null) { // getUriForFile의 두 번째 인자는 Manifest provier의 authorites와 일치해야 함
-                val providerURI = FileProvider.getUriForFile(activity, "com.signez.signageproblemshooting.provider", photoFile)
+                val providerURI = FileProvider.getUriForFile(
+                    activity,
+                    "com.signez.signageproblemshooting.provider",
+                    photoFile
+                )
                 // 인텐트에 전달할 때는 FileProvier의 Return값인 content://로만!!, providerURI의 값에 카메라 데이터를 넣어 보냄
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, providerURI)
                 viewModel.type = type
                 if (type == REQUEST_CODE_IMAGE_CAPTURE) {
                     activity.startActivityForResult(takePictureIntent, REQUEST_CODE_IMAGE_CAPTURE)
-                }
-                else {
+                } else {
                     activity.startActivityForResult(takePictureIntent, type)
                 }
             }
@@ -117,9 +122,16 @@ fun dispatchTakeVideoIntent(activity: Activity, viewModel: VideoViewModel) {
             }
             // Continue only if the File was successfully created
             if (videoFile != null) {
-                val videoURI = FileProvider.getUriForFile(activity, "com.signez.signageproblemshooting.provider", videoFile)
+                val videoURI = FileProvider.getUriForFile(
+                    activity,
+                    "com.signez.signageproblemshooting.provider",
+                    videoFile
+                )
                 takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoURI)
-                takeVideoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 600) // Limit video duration to 30 seconds
+                takeVideoIntent.putExtra(
+                    MediaStore.EXTRA_DURATION_LIMIT,
+                    600
+                ) // Limit video duration to 30 seconds
                 takeVideoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0) // 화질 가능한 낮게
                 activity.startActivityForResult(takeVideoIntent, REQUEST_CODE_VIDEO_CAPTURE)
             }
@@ -156,7 +168,7 @@ fun galleryAddVideo(context: Context, viewModel: VideoViewModel) {
     Toast.makeText(context, "Video saved to gallery.", Toast.LENGTH_SHORT).show()
 }
 
-fun getRealPathFromURI(uri: Uri,activity: Activity): String? {
+fun getRealPathFromURI(uri: Uri, activity: Activity): String? {
     val projection = arrayOf(MediaStore.Images.Media.DATA)
     val cursor = activity.contentResolver.query(uri, projection, null, null, null)
     val columnIndex = cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
@@ -169,7 +181,8 @@ fun getRealPathFromURI(uri: Uri,activity: Activity): String? {
 fun getImageUri(inContext: Context, inImage: Bitmap): Uri {
     val bytes = ByteArrayOutputStream()
     inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-    val path = MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
+    val path =
+        MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
     return Uri.parse(path)
 }
 
@@ -181,8 +194,44 @@ fun playVideoFromUri(context: Context, uri: Uri) {
     }
 }
 
-fun openErrorDetectActivity(context: Context) {
-    val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+
+fun openImageCropActivity(context: Context, type:Int, signageId: Long, uri: Uri) {
+    val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+    val REQUEST_TYPE: String = "REQUEST_TYPE"
+    val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
+    val intent = Intent(context, ImageCropActivity::class.java)
+    intent.putExtra(REQUEST_TYPE, type)
+    intent.putExtra(REQUEST_SIGNAGE_ID, signageId)
+    intent.putExtra("uri",uri.toString())
+    intent.setData(uri)
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
+}
+fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
+    val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+    val REQUEST_TYPE: String = "REQUEST_TYPE"
+    val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
+
     val intent = Intent(context, ErrorDetectActivity::class.java)
-    (context as Activity).startActivityForResult(intent, REQUEST_CODE_ERROR_DETECT_ACTIVITY)
+
+    intent.putExtra("left",rec.left)
+    intent.putExtra("right",rec.right)
+    intent.putExtra("top",rec.top)
+    intent.putExtra("bottom",rec.bottom)
+    intent.putExtra("uri",uri.toString())
+    intent.data = uri
+    Log.d("start","start ${uri}")
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
+    Log.d("end","end")
+}
+
+fun openTutorialActivity(context: Context) {
+    val REQUEST_CODE_TUTORIAL_ACTIVITY = 310
+    val intent = Intent(context, TutorialActivity::class.java)
+    (context as Activity).startActivityForResult(intent, REQUEST_CODE_TUTORIAL_ACTIVITY)
+}
+
+fun openSettingIntent(context: Context){
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+    intent.setData(Uri.parse("package:" + "com.signez.signageproblemshooting"));
+    ContextCompat.startActivity(context, intent, null);
 }

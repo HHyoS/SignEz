@@ -261,6 +261,7 @@ private fun InventoryItem(
                         modifier = Modifier
                             .size(45.dp)
                             .clip(RoundedCornerShape(10.dp))
+                            .background(color = Color.Black)
                     )
                 }
             }// 대표 이미지
@@ -287,7 +288,7 @@ private fun InventoryItem(
                         color = MaterialTheme.colors.onBackground,
                     )
                     Text(
-                        text = "${cabinet.moduleColCount}X${cabinet.moduleRowCount}",
+                        text = " ${cabinet.moduleColCount}X${cabinet.moduleRowCount}",
                         style = MaterialTheme.typography.body2,
                         color = MaterialTheme.colors.onBackground,
                     )

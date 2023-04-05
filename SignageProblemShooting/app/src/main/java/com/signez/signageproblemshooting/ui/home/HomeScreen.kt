@@ -19,10 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
+import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
+import kotlinx.coroutines.launch
 
 
 object HomeDestination : NavigationDestination {
@@ -36,20 +38,25 @@ fun HomeScreen(
     navigateToVideo: () -> Unit,
     navigateToSignageList: () -> Unit,
     viewModel: AnalysisViewModel,
-    mainViewModel:MainViewModel,
+    mainViewModel: MainViewModel,
     navController: NavController
 ) {
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-        value = viewModel.getCabinet(viewModel.signageId.value)
-    })
-    val cabinet = cabinetState.value
+
     val signageState by viewModel.getSignage().collectAsState()
-    val appSettingsResultLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        onAppSettingsClosed()
-        checkAndRequestPermissions(context,mainViewModel)
+    var signage by remember { mutableStateOf(Signage(0, "", 0, 0, 0.0, 0.0, 0L)) }
+    var cabinet by remember { mutableStateOf(Cabinet(0, "", 0.0, 0.0, 0, 0)) }
+    LaunchedEffect(viewModel.signageId.value) {
+        signage = viewModel.getSignageById(viewModel.signageId.value)
+        cabinet = viewModel.getCabinet(viewModel.signageId.value)
     }
+
+    val appSettingsResultLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            onAppSettingsClosed()
+            checkAndRequestPermissions(context, mainViewModel)
+        }
 
     androidx.compose.material.Scaffold(
         topBar = {
@@ -92,44 +99,52 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            if ( !mainViewModel.permissionsGranted.value) {
+//            if (!mainViewModel.permissionsGranted.value) {
+//                Column(
+//                    modifier = Modifier
+//                        .align(alignment = Alignment.TopCenter),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    PermissionInfo()
+//                    Button(onClick = { openAppSettings(context, appSettingsResultLauncher) }) {
+//                        Text(text = "권한 설정")
+//                    }
+//                }
+//
+//            } else {
+            Column(
+                modifier = Modifier
+                    .align(alignment = Alignment.TopCenter)
+            ) {
+
+                Spacer(modifier = Modifier.padding(5.dp))
+                PastResult(
+                    modifier = Modifier,
+                    navController = navController,
+                    viewModel = viewModel
+                )
+                Spacer(modifier = Modifier.padding(8.dp))
                 Column(
                     modifier = Modifier
-                    .align(alignment = Alignment.TopCenter),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    PermissionInfo()
-                    Button(onClick = {openAppSettings(context, appSettingsResultLauncher)}) {
-                        Text(text = "권한 설정")
+                        .padding(start = 16.dp, end = 16.dp)
+                        .fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                )
+                {
+                    if (viewModel.signageId.value > -1) {
+                        SignEzSpec(
+                            modifier = Modifier,
+                            navigateToSignageList,
+                            signage
+                        )
+                        CabinetSpec(modifier = Modifier, cabinet)
+                    } else {
+                        SignEzSpec(modifier = Modifier, navigateToSignageList, null)
+                        CabinetSpec(modifier = Modifier, null)
                     }
                 }
-
-            }
-            else {
-                Column(
-                    modifier = Modifier
-                        .align(alignment = Alignment.TopCenter)
-                ) {
-
-                    Spacer(modifier = Modifier.padding(5.dp))
-                    PastResult(modifier = Modifier, navController = navController)
-                    Spacer(modifier = Modifier.padding(8.dp))
-                    Column(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp)
-                            .fillMaxHeight(),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    )
-                    {
-                        if (viewModel.signageId.value > -1) {
-                            SignEzSpec(modifier = Modifier, navigateToSignageList, signageState.signage)
-                            CabinetSpec(modifier = Modifier, cabinet)
-                        } else {
-                            SignEzSpec(modifier = Modifier, navigateToSignageList, null)
-                            CabinetSpec(modifier = Modifier, null)
-                        }
-                    }
-                }
+//                }
             }
         }
     }

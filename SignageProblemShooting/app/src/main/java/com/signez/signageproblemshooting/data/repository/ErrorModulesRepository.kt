@@ -17,10 +17,7 @@
 package com.signez.signageproblemshooting.data.repository
 
 import androidx.room.Query
-import com.signez.signageproblemshooting.data.entities.AnalysisResult
-import com.signez.signageproblemshooting.data.entities.Cabinet
-import com.signez.signageproblemshooting.data.entities.ErrorImage
-import com.signez.signageproblemshooting.data.entities.ErrorModule
+import com.signez.signageproblemshooting.data.entities.*
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -55,4 +52,6 @@ interface ErrorModulesRepository {
     suspend fun getModulesByResultId(resultId: Long): List<ErrorModule>
 
     suspend fun getModuleById(resultId: Long): ErrorModule
+
+    suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long): List<ErrorModuleWithImage>
 }

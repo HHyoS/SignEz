@@ -50,6 +50,6 @@ interface AnalysisResultsRepository {
     suspend fun updateResult(analysisResult: AnalysisResult)
     suspend fun getResultsBySignageId(signageId: Long) : List<AnalysisResult>
     suspend fun getResultById(resultId: Long): AnalysisResult
-
     suspend fun deleteById(id: Long)
+    suspend fun getMostRecentResult(): AnalysisResult
 }
