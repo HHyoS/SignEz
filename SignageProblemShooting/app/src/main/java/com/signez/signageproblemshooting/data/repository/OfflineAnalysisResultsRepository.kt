@@ -36,4 +36,6 @@ class OfflineAnalysisResultsRepository(private val analysisResultDao: AnalysisRe
     override suspend fun getResultById(resultId: Long) = analysisResultDao.getResultById(resultId)
 
     override suspend fun deleteById(id: Long) = analysisResultDao.deleteById(id)
+
+    override suspend fun getMostRecentResult() = analysisResultDao.getMostRecentResult()
 }

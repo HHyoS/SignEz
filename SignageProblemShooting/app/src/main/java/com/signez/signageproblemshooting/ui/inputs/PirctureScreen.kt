@@ -3,11 +3,12 @@ package com.signez.signageproblemshooting.ui.inputs
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,27 +19,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.ImagePicker
 import com.signez.signageproblemshooting.pickers.loadImageMetadata
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
-import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.IntentButton
@@ -47,8 +40,8 @@ import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.pytorch.Module
 import java.io.File
-import kotlin.reflect.KFunction1
 
 object PictureScreenDestination : NavigationDestination {
     override val route = "PictureScreen"
@@ -65,7 +58,7 @@ fun PictureAnalysis(
     viewModel: PictureViewModel,
     analysisViewModel: AnalysisViewModel,
     modifier: Modifier = Modifier,
-    navController:NavController
+    navController: NavController
 ) {
     val context = LocalContext.current
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -75,7 +68,24 @@ fun PictureAnalysis(
     val coroutineScope = rememberCoroutineScope()
     val file = File(viewModel.imageUri.value.toString())
     var contentUri: Uri = Uri.EMPTY
+    val REQUEST_DETECT_PHOTO: Int = 101
 
+    //test start
+    var mModule: Module? = null
+    var mWidth: Int = 2
+    var mHeight: Int = 2
+    var mmWidth: Int = 3
+    var mmHeight: Int = 5
+    var mImgScaleX = 0f
+    var mImgScaleY = 0f
+    var mIvScaleX = 0f
+    var mIvScaleY = 0f
+    var mStartX = 0f
+    var mStartY = 0f
+    var imageUri by remember { mutableStateOf(contentUri) }
+    var rec : Rect? = null
+
+    //test end
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
@@ -126,12 +136,19 @@ fun PictureAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
-                /* 분석하기 이벤트를 넣으면 됨 */
-//                    navController.currentDestination?.let { navController.popBackStack(it.id , true) }
-                    navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+
+                    // test
+
+                    if(contentUri == Uri.EMPTY){
+                        Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    } else if (analysisViewModel.signageId.value < 1) {
+                        Toast.makeText(context,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        openImageCropActivity(context, REQUEST_DETECT_PHOTO, analysisViewModel.signageId.value, contentUri)
+                    }
+
+
                 }
             )
         }
@@ -181,18 +198,7 @@ fun PictureAnalysis(
                                 .clip(RoundedCornerShape(15.dp))
                                 .background(color = MaterialTheme.colors.onSurface)
                         )
-//                        imageBitmap?.let {
-//                            Image(
-//                                bitmap = it.asImageBitmap(),
-//                                contentDescription = "Picture frame",
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .height(200.dp)
-////                                    .fillMaxHeight(0.4f)
-//                                    .clip(RoundedCornerShape(15.dp))
-//                                    .background(color = MaterialTheme.colors.onSurface)
-//                            )
-//                        }
+
                     }
                 }
 
@@ -227,60 +233,7 @@ fun PictureAnalysis(
 
                     }
                 }
-//
-//                Column( // 예는 정렬 evenly나 spacebetween 같은거 가능
-//                ) {
-//                    Text(
-//                        text = "사진 분석",
-//                        modifier = Modifier.align(Alignment.Start),
-//                        fontSize = 40.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                    Row (
-//                        horizontalArrangement = Arrangement.SpaceAround
-//                    ){
-//                        Column (
-//                            modifier = Modifier.weight(0.5f)
-//                        ){
-//                            ImagePicker(onImageSelected = { address ->
-//                                viewModel.imageUri.value = Uri.parse(address)
-//                                imageBitmap = bitmap
-//                            })
-//                        }
-//
-//                        Column (
-//                            modifier = Modifier.weight(0.5f)
-//                        ){
-//                            IntentButton(title = "카메라") {
-//                                dispatchTakePictureIntent(activity, viewModel,2)
-//                            }
-//
-//                        }
-//                    }
 
-//                    Log.d("compare", viewModel.imageUri.value.toString())
-//                    //imageBitmap != null && last.value == "take"
-//                    if (viewModel.imageUri.value != Uri.EMPTY) {
-//                        Column {
-//                            Box(
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .border(BorderStroke(width = 4.dp, color = Color.Black))
-//                                    .height(400.dp)
-//                            ) {
-//                                imageBitmap?.let {
-//                                    Image(
-//                                        bitmap = it.asImageBitmap(),
-//                                        contentDescription = "Picture frame",
-//                                        contentScale = ContentScale.FillBounds,
-//                                        modifier = Modifier
-//                                    )
-//                                }
-//                            }
-//                            Text(text = "이미지 제목 : $imageTitle")
-//                            Text(text = "이미지 크기 : $imageSize byte")
-//                        }
-//                    }
             }
         }
     }

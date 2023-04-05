@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AnalysisResultDao {
 
-    @Query("SELECT * from results ORDER BY resultDate ASC")
+    @Query("SELECT * from results ORDER BY resultDate DESC")
     fun getAllResults(): Flow<List<AnalysisResult>>
 
     @Query("SELECT * from results WHERE id = :id")
@@ -65,4 +65,7 @@ interface AnalysisResultDao {
 
     @Query("DELETE FROM results WHERE id = :id")
     suspend fun deleteById(id: Long)
+
+    @Query("SELECT * FROM results ORDER BY resultDate DESC LIMIT 1")
+    suspend fun getMostRecentResult(): AnalysisResult
 }

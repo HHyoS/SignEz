@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-feature android:name="android.hardware.camera2" />
 
     <application
@@ -22,16 +24,37 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.SignageProblemShooting">
+            android:theme="@style/Theme.SignageProblemShooting.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <meta-data android:name="@string/permissions_loader_meta_key"
-                android:value="android.permission.READ_EXTERNAL_STORAGE, android.permission.CAMERA"/>
+            <meta-data
+                android:name="@string/permissions_loader_meta_key"
+                android:value="android.permission.READ_EXTERNAL_STORAGE, android.permission.CAMERA" />
         </activity>
         <activity
-            android:name=".ErrorDetectActivity" />
+            android:name=".ErrorDetectActivity"
+            android:exported="true" />
+
+        <service
+            android:name=".service.ObjectDetectService"
+            android:exported="true" />
+        <!-- Define the FileProvider -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.signez.signageproblemshooting.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <activity
+            android:name=".ImageCropActivity"
+            android:theme="@style/Theme.AppCompat"/>
+        <activity
+            android:name=".TutorialActivity" />
         <!-- Define the FileProvider -->
         <provider
             android:name="androidx.core.content.FileProvider"

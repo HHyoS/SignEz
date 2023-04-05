@@ -1,11 +1,12 @@
 package com.signez.signageproblemshooting.ui.inputs
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,16 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
-import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.VideoPicker
 import com.signez.signageproblemshooting.pickers.getVideoTitle
@@ -69,12 +66,16 @@ fun VideoAnalysis(
     var videoLength by remember { mutableStateOf(0L) }
     var videoSize by remember { mutableStateOf(0L) }
     var videoFrame by remember { mutableStateOf(bitmap) }
+    val REQUEST_DETECT_VIDEO: Int = 100
+
+    var rec : Rect? = null
 
     val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, uri)
         retriever.getFrameAtTime()
     }
+    var contentUri: Uri = Uri.EMPTY
 
     val loadVideoThumbnail = {
         if (viewModel.videoUri.value != Uri.EMPTY) {
@@ -90,7 +91,6 @@ fun VideoAnalysis(
 
     val loadVideoMetadata = {
         if (viewModel.videoUri.value != Uri.EMPTY) {
-            var contentUri: Uri
             if (!viewModel.videoUri.value.toString().contains("content")) {
                 val file = File(viewModel.videoUri.value.toString())
                 contentUri =
@@ -137,12 +137,28 @@ fun VideoAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
+
                 /* 분석하기 이벤트를 넣으면 됨 */
+                    if(contentUri == Uri.EMPTY){
+                        Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    } else if (analysisViewModel.signageId.value < 1) {
+                        Toast.makeText(context,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val configuration = context.resources.configuration
+                        val retriever = MediaMetadataRetriever()
+                        retriever.setDataSource(context, contentUri)
+
+                        val mWidth = configuration.screenWidthDp
+                        val mHeight = configuration.screenHeightDp
+                        val mmWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toInt() ?: 0
+                        val mmHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
+                        openImageCropActivity(context, REQUEST_DETECT_VIDEO, analysisViewModel.signageId.value, contentUri)
+                    }
                     // .currentDestination?.let { navController.popBackStack(it.id , true) }
-                    navController.popBackStack()
-                    navController.navigate(ResultsHistoryDestination.route)
-                    navController.navigate(ResultGridDestination.route)
-                    openErrorDetectActivity(context)
+//                    navController.popBackStack()
+//                    navController.navigate(ResultsHistoryDestination.route)
+//                    navController.navigate(ResultGridDestination.route)
+                   // openErrorDetectActivity(context,rec!!,contentUri)
                 }
             )
         }
@@ -227,7 +243,6 @@ fun VideoAnalysis(
                     }
                 }
             }//Column
-
 
 
 //            if (!videoFrame.sameAs(bitmap)) {

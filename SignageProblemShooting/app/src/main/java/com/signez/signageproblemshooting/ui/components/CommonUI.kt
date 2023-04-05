@@ -1,12 +1,11 @@
 package com.signez.signageproblemshooting.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -18,14 +17,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.signez.signageproblemshooting.fields.CustomTextInput
-import com.signez.signageproblemshooting.fields.EditNumberField
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 
 /**
  *
@@ -77,7 +76,7 @@ fun FocusBlock(
                             onClickEvent = buttonOnclickEvent
                         )
                     }
-                } else if(buttonTitle == null) {
+                } else if (buttonTitle == null) {
                     Spacer(
                         modifier = Modifier.weight(0.3f)
                     )
@@ -94,7 +93,7 @@ fun FocusBlock(
 
             }
 
-            if (subtitle!=null) {
+            if (subtitle != null) {
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.h4,
@@ -103,15 +102,15 @@ fun FocusBlock(
                 )
             }
 
-            if(infols!=null){
-            for (info in infols) {
-                Text(
-                    text = info,
-                    style = MaterialTheme.typography.body1,
-                    color = MaterialTheme.colors.onBackground,
-                    modifier = Modifier.padding(start = 18.dp, top = 4.dp, bottom = 4.dp)
-                )
-            }
+            if (infols != null) {
+                for (info in infols) {
+                    Text(
+                        text = info,
+                        style = MaterialTheme.typography.body1,
+                        color = MaterialTheme.colors.onBackground,
+                        modifier = Modifier.padding(start = 18.dp, top = 4.dp, bottom = 4.dp)
+                    )
+                }
             }
 
 //                Text(
@@ -288,7 +287,7 @@ fun TutorialStartButton(
             containerColor = MaterialTheme.colors.primary,
         ),
         modifier = Modifier
-            .padding(top = 10.dp, end = 15.dp)
+            .padding(start = 8.dp, end = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
     ) {
@@ -314,6 +313,7 @@ fun BottomSingleFlatButton(
         shape = RectangleShape,
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colors.background,
+            disabledContainerColor = MaterialTheme.colors.background,
         ),
         enabled = isUsable,
         modifier = Modifier
@@ -325,7 +325,7 @@ fun BottomSingleFlatButton(
         Text(
             text = title,
             style = MaterialTheme.typography.button,
-            color = MaterialTheme.colors.onSurface,
+            color = if (isUsable) MaterialTheme.colors.onSurface else MaterialTheme.colors.onBackground,
             modifier = Modifier.padding(bottom = 2.dp)
         )
     }
@@ -427,10 +427,195 @@ fun BottomDoubleFlatButton(
 //    }
 //}
 
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ResultHistoryBlock(
+    site: String = "",
+    date: String = "",
+    thumbnail: ByteArray? = null,
+//    blockOnclickEvent: () -> Unit,
+//    blockOnLongclickEvent: () -> Unit,
+    modifier: Modifier
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colors.surface
+        )
+    ) {
+        //
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                thumbnail?.let { byteArray ->
+                    GlideImage(
+                        model = byteArray,
+                        contentDescription = "글라이드",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(color = Color.Black)
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = site,
+                    style = MaterialTheme.typography.h4,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(start = 10.dp, bottom = 5.dp)
+                )
+
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Text(
+                    text = date,
+                    style = MaterialTheme.typography.h4,
+                    color = MaterialTheme.colors.onSecondary,
+                    modifier = Modifier.padding(start = 10.dp, bottom = 5.dp),
+                )
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(10.dp))
+}
+
+
+@Composable
+fun DotsIndicator(
+    totalDots: Int,
+    selectedIndex: Int
+) {
+
+    LazyRow(
+        modifier = Modifier
+            .wrapContentWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+
+        items(totalDots) { index ->
+            if (index == selectedIndex) {
+                Box(
+                    modifier = Modifier
+                        .size(7.dp)
+                        .clip(CircleShape)
+                        .background(color = Color(0xFF0F429D))
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(7.dp)
+                        .clip(CircleShape)
+                        .background(color = Color(0xFFB3CCF8))
+                )
+            }
+
+            if (index != totalDots - 1) {
+                Spacer(modifier = Modifier.padding(horizontal = 2.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomTutorialFlatButton(
+    leftTitle: String,
+    rightTitle: String,
+    isLeftUsable: Boolean,
+    isRightUsable: Boolean,
+    totalDots: Int,
+    selectedIndex: Int,
+    leftOnClickEvent: () -> Unit,
+    rightOnClickEvent: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        androidx.compose.material3.Button(
+            onClick = leftOnClickEvent,
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colors.background,
+                disabledContainerColor = MaterialTheme.colors.background,
+            ),
+            enabled = isLeftUsable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(65.dp)
+                .weight(1f)
+        ) {
+            if (isLeftUsable) {
+                Text(
+                    text = leftTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            } else {
+                Text(
+                    text = leftTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+        DotsIndicator(totalDots = totalDots, selectedIndex = selectedIndex)
+        androidx.compose.material3.Button(
+            onClick = rightOnClickEvent,
+            shape = RectangleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colors.background,
+                disabledContainerColor = MaterialTheme.colors.background,
+            ),
+            enabled = isRightUsable,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(65.dp)
+                .weight(1f),
+        ) {
+            if (isRightUsable) {
+                Text(
+                    text = rightTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            } else {
+                Text(
+                    text = rightTitle,
+                    style = MaterialTheme.typography.button,
+                    color = MaterialTheme.colors.onBackground,
+                    modifier = Modifier.padding(bottom = 2.dp)
+                )
+            }
+        }
+    }
+
+}
+
 @Preview
 @Composable
 fun ComponentPreview() {
-    SignEzPrototypeTheme(darkTheme = false) {
+    SignEzTheme(darkTheme = false) {
         Column() {
 //            FocusBlock(
 //                title = "사이니지 스펙",

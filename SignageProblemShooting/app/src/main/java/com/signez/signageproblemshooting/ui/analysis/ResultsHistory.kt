@@ -1,8 +1,11 @@
 package com.signez.signageproblemshooting.ui.analysis
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -14,9 +17,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -26,10 +34,15 @@ import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
+import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
+import com.signez.signageproblemshooting.ui.components.ResultHistoryBlock
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 object ResultsHistoryDestination : NavigationDestination {
     override val route = "ResultsHistoryScreen"
@@ -63,7 +76,7 @@ fun ResultsHistoryView(
         Spacer(modifier = modifier.padding(innerPadding))
         Column(
             modifier = modifier
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp, start = 16.dp, end = 16.dp)
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.Top
         ) {
@@ -77,6 +90,7 @@ fun ResultsHistoryView(
                         selectedId = selectedId,
                         navController = navController,
                         onItemClick = {},
+                        viewModel = viewModel
                     )
 
                 }
@@ -90,12 +104,13 @@ fun ResultsHistoryView(
 fun ResultList(
     onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: AnalysisViewModel,
     selectedId: Long,
     navController: NavHostController,
 ) {
     val resultListState by viewModel.resultListState.collectAsState()
     val itemList = resultListState.itemList
+
 
     if (itemList.isEmpty()) {
         Text(
@@ -103,22 +118,27 @@ fun ResultList(
             style = MaterialTheme.typography.subtitle2
         )
     } else {
-        LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-            items(count=itemList.size) { item ->
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.fillMaxHeight()
+        ) {
+            items(count = itemList.size) { item ->
                 // Item content here
                 ResultItem(
                     result = itemList[item],
-                    onItemClick={},
+                    onItemClick = {},
                     navController = navController,
-                    selectedId = selectedId
+                    selectedId = selectedId,
+                    viewModel = viewModel
                 )
-                Text(text = itemList[item].id.toString())
             }
         }
     }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun ResultItem(
     result: AnalysisResult,
@@ -126,21 +146,28 @@ private fun ResultItem(
     modifier: Modifier = Modifier,
     selectedId: Long,
     navController: NavHostController,
-    viewModel: AnalysisViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: AnalysisViewModel,
 ) {
+    var showContextMenu by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .conditional(selectedId == result.id) {
                 background(
                     color = Color(0xFFE6E6E6)
                 )
             }
-            .clickable {
-                viewModel.selectedResultId.value = selectedId
-                navController.navigate(ResultGridDestination.route)
-            }
-        ,
+            .combinedClickable(
+                onClick = {
+                    viewModel.selectedResultId.value = result.id
+                    navController.navigate(ResultGridDestination.route + "/${result.id}")
+                },
+                onLongClick = {
+                    showContextMenu = true
+                },
+            ),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -150,24 +177,67 @@ private fun ResultItem(
         val signage = signageState.value
 
         if (signage != null) {
-            Column(modifier = Modifier.padding(start = 10.dp)) {
-                signage.repImg?.let { byteArray ->
-                    GlideImage(
-                        model = byteArray,
-                        contentDescription = "글라이드",
-                        modifier = Modifier
-                            .size(45.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                    )
-                }
-
-                Text(
-                    text = signage.name,
-                    style = MaterialTheme.typography.h4,
-                    color = MaterialTheme.colors.onSecondary,
-                    modifier = Modifier.padding(bottom = 5.dp)
+            ResultHistoryBlock(
+                site = signage.name,
+                date = result.resultDate,
+                thumbnail = signage.repImg,
+                modifier = Modifier
+            )
+//            Column(modifier = Modifier.padding(start = 10.dp)) {
+//                signage.repImg?.let { byteArray ->
+//                    GlideImage(
+//                        model = byteArray,
+//                        contentDescription = "글라이드",
+//                        modifier = Modifier
+//                            .size(45.dp)
+//                            .clip(RoundedCornerShape(10.dp))
+//                    )
+//                }
+//
+//                Text(
+//                    text = signage.name,
+//                    style = MaterialTheme.typography.h4,
+//                    color = MaterialTheme.colors.onSecondary,
+//                    modifier = Modifier.padding(bottom = 5.dp)
+//                )
+//                Text(
+//                    text = result.resultDate,
+//                    style = MaterialTheme.typography.h4,
+//                    color = MaterialTheme.colors.onSecondary,
+//                    modifier = Modifier.padding(bottom = 5.dp)
+//                )
+//            }// 열 끝
+            if (showContextMenu) {
+                ShowContextMenu(
+                    closeMenu = {
+                        showContextMenu = false
+                    },
+                    onDelete = {
+                        coroutineScope.launch {
+                            viewModel.deleteResult(result.id)
+                            showContextMenu = false
+                        }
+                    }
                 )
-            }// 열 끝
+            }
         } // if 끝
+    }
+}
+
+@Composable
+fun ShowContextMenu(
+    onDelete: () -> Unit,
+    closeMenu: () -> Unit
+) {
+    DropdownMenu(
+        expanded = true,
+        onDismissRequest = {},
+    ) {
+        DropdownMenuItem(onClick = onDelete) {
+            Text("Delete")
+        }
+        DropdownMenuItem(onClick = closeMenu) {
+            Text("닫기")
+        }
     }
 }

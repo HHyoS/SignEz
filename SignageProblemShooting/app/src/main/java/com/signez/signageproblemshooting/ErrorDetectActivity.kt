@@ -1,34 +1,35 @@
 package com.signez.signageproblemshooting
 
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorModule
+import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
-import com.signez.signageproblemshooting.ui.MainViewModelFactory
 import com.signez.signageproblemshooting.ui.analysis.AnalysisProgress
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.signez.signageproblemshooting.ui.theme.SignEzTheme
+import kotlinx.coroutines.*
+import org.opencv.android.BaseLoaderCallback
+import org.opencv.android.LoaderCallbackInterface
+import org.opencv.android.OpenCVLoader
 import org.opencv.android.Utils
-import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
-import org.opencv.videoio.VideoCapture
-import org.opencv.videoio.Videoio
 import org.pytorch.IValue
 import org.pytorch.Module
 import org.pytorch.Tensor
@@ -37,70 +38,203 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import org.opencv.core.*
+import kotlin.math.abs
 
 
 class SignageNotFoundException(message: String) : Exception(message)
 
 class ErrorDetectActivity : ComponentActivity() {
-    // constants
-    private val REQUEST_DETECT_VIDEO: Int = 100
-    private val REQUEST_DETECT_PHOTO: Int = 101
-    private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+
+    companion object {
+        // constants
+        private const val REQUEST_DETECT_VIDEO: Int = 100
+        private const val REQUEST_DETECT_PHOTO: Int = 101
+        private const val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
+        private const val REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY = 998
+        private const val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
+
+        private val REQUEST_TYPE: String = "REQUEST_TYPE"
+        private val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
+
+        private val signageDetectModuleFileName: String = "signage_detect.torchscript.pt"
+        private val errorDetectModuleFileName: String = "error_detect.torchscript.pt"
+
+        private const val RESIZE_SIZE: Int = 640
+        private val NO_MEAN_RGB = floatArrayOf(0.0f, 0.0f, 0.0f)
+        private val NO_STD_RGB = floatArrayOf(1.0f, 1.0f, 1.0f)
+
+        // model output is of size 25200*(num_of_class+5)
+        private const val mOutputRow =
+            25200 // as decided by the YOLOv5 model for input image of size 640*640
+        private const val mOutputColumn = 6 // left, top, right, bottom, score and class probability
+        private const val scoreThreshold = 0.20f // score above which a detection is generated
+
+        private const val rectThreshold = 5.0f
 
 
-    // viewModels
-    private lateinit var analysisViewModel: AnalysisViewModel
+    }
 
     // Torch Modules
     private lateinit var signageDetectModule: Module
     private lateinit var errorDetectModule: Module
-    private val signageDetectModuleFileName: String = "signage_detect.torchscript.pt"
-    private val errorDetectModuleFileName: String = "error_detect.torchscript.pt"
 
-    private val RESIZE_SIZE: Int = 640
-    private val NO_MEAN_RGB = floatArrayOf(0.0f, 0.0f, 0.0f)
-    private val NO_STD_RGB = floatArrayOf(1.0f, 1.0f, 1.0f)
 
-    // model output is of size 25200*(num_of_class+5)
-    private val mOutputRow = 25200 // as decided by the YOLOv5 model for input image of size 640*640
-    private val mOutputColumn = 6 // left, top, right, bottom, score and class probability
-    private val scoreThreshold = 0.20f // score above which a detection is generated
+    private lateinit var analysisViewModel: AnalysisViewModel
 
-    private val rectThreshold = 5.0f
+    private lateinit var signage: Signage
+    private lateinit var cabinet: Cabinet
+    private lateinit var uri: Uri
+    private var type: Int = -1
 
-    private val mainViewModel: MainViewModel by viewModels {
-        MainViewModelFactory((application as SignEzApplication).container)
+    var topLeftX = 0
+    var topLeftY = 0
+    var topRightX = 0
+    var topRightY = 0
+    var bottomLeftX = 0
+    var bottomLeftY = 0
+    var bottomRightX = 0
+    var bottomRightY = 0
+
+
+    fun getModel(): Module {
+        return Module.load(assetFilePath(SignEzApplication.instance, signageDetectModuleFileName))
     }
 
-    @Throws(IOException::class)
-    private fun assetFilePath(context: Context, assetName: String): String {
-        val file = File(context.filesDir, assetName)
-        if (file.exists() && file.length() > 0) {
-            return file.absolutePath
-        }
-        context.assets.open(assetName).use { inputStream ->
-            FileOutputStream(file).use { outputStream ->
-                val buffer = ByteArray(4 * 1024)
-                var read: Int
-                while (inputStream.read(buffer).also { read = it } != -1) {
-                    outputStream.write(buffer, 0, read)
-                }
-                outputStream.flush()
+    private fun detect(defaultDispatcher: CoroutineDispatcher = Dispatchers.Default) {
+        Log.i("-------------State-----------", signage.toString())
+        Log.i("-------------State-----------", cabinet.toString())
+        lifecycleScope.launch {
+            withContext(defaultDispatcher) {
+                when (type) {
+                    REQUEST_DETECT_VIDEO -> detectVideo()
+                    REQUEST_DETECT_PHOTO -> detectPhoto()
+                    else -> {
+                        Log.i("-------------State-----------", uri.toString())
+                        Log.i("-------------State-----------", signage.toString())
+                        Log.i("-------------State-----------", cabinet.toString())
+
+                        delay(5000)
+                        Log.e("ErrorDetectActivity", "Wrong Access to Activity!")
+                        finish()
+                        //
+                    }
+                } // when end
             }
-            return file.absolutePath
+            Log.d("Detect", "Detect Finish!!!")
+            setResult(Activity.RESULT_OK)
+            val intentToMain = Intent(this@ErrorDetectActivity, MainActivity::class.java)
+            intentToMain.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            startActivityForResult(intentToMain, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
+            finish()
         }
     }
 
+    private val mLoaderCallback: BaseLoaderCallback = object : BaseLoaderCallback(this) {
+        override fun onManagerConnected(status: Int) {
+            when (status) {
+                SUCCESS -> {
+                    Log.i("OpenCV", "OpenCV loaded successfully")
+                    detect()
+                }
+
+                else -> {
+                    super.onManagerConnected(status)
+                    Log.e("OpenCV", "OpenCV load failed!")
+                    setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
+                    finish()
+                }
+            }
+        }
+    }
+
+
+    fun findLargestRectangle(frame: Mat): MatOfPoint {
+        val gray = Mat()
+        Imgproc.cvtColor(frame, gray, Imgproc.COLOR_BGR2GRAY)
+        val gauss = Mat()
+        Imgproc.GaussianBlur(gray, gauss, Size(0.0, 0.0), 2.0)
+
+// 이미지의 경계선을 찾습니다.
+        val edged = Mat()
+        Imgproc.Canny(gauss, edged, 30.0, 80.0)
+        val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(3.0, 3.0))
+        val dilation = Mat()
+        Imgproc.dilate(edged, dilation, kernel, Point(-1.toDouble(), -1.toDouble()), 1)
+
+// 경계선에서 contour를 추출합니다.
+        val contours = mutableListOf<MatOfPoint>()
+        val hierarchy = Mat()
+        Imgproc.findContours(
+            dilation,
+            contours,
+            hierarchy,
+            Imgproc.RETR_CCOMP,
+            Imgproc.CHAIN_APPROX_SIMPLE
+        )
+
+// contour 중 특정 크기 이상의 사각형인 contour를 찾습니다.
+        val filteredContours = contours.filter { Imgproc.contourArea(it) > 100000 }
+        val approxContours = filteredContours.map {
+            approxPolyDP(
+                it,
+                0.01 * Imgproc.arcLength(MatOfPoint2f(it), true),
+                true
+            )
+        }
+        val quadrilateralContours = approxContours.filter { it.size().height.toInt() == 4 }
+// 면적이 가장 큰 contour를 찾습니다.
+        val maxContour = (quadrilateralContours.maxByOrNull { Imgproc.contourArea(it) })
+
+        if (maxContour == null) {
+            return MatOfPoint(
+                *arrayOf(
+                    Point(0.0, 0.0),
+                    Point(0.0, frame.size().height - 1),
+                    Point(frame.size().width - 1, 0.0),
+                    Point(frame.size().width - 1, frame.size().height - 1)
+                )
+            )
+        }
+
+        Log.d("Mat", "${maxContour}")
+        return MatOfPoint(*maxContour?.toArray())
+    }
+
+    fun approxPolyDP(contour: MatOfPoint, epsilon: Double, closed: Boolean): MatOfPoint2f {
+        val approxCurve = MatOfPoint2f()
+        Imgproc.approxPolyDP(MatOfPoint2f(*contour.toArray()), approxCurve, epsilon, closed)
+        return approxCurve
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        OpenCVLoader.initDebug()
         analysisViewModel = ViewModelProvider(
+
             this,
             factory = AppViewModelProvider.Factory
-        )[AnalysisViewModel::class.java]
+        ).get(AnalysisViewModel::class.java)
 
         val intents: Intent = intent
-        val type = intents.extras?.getInt("REQUEST_TYPE")
+
+        val nullableType = intents.extras?.getInt(REQUEST_TYPE)
+        val signageId: Long? = intents.extras?.getLong(REQUEST_SIGNAGE_ID)
+
+        topLeftX = intents.getIntExtra("PointTopLeftX", 0)
+        topLeftY = intents.getIntExtra("PointTopLeftY", 0)
+        topRightX = intents.getIntExtra("PointTopRightX", 0)
+        topRightY = intents.getIntExtra("PointTopRightY", 0)
+        bottomLeftX = intents.getIntExtra("PointBottomLeftX", 0)
+        bottomLeftY = intents.getIntExtra("PointBottomLeftY", 0)
+        bottomRightX = intents.getIntExtra("PointBottomRightX", 0)
+        bottomRightY = intents.getIntExtra("PointBottomRightY", 0)
+
+        Log.d(
+            "PointsOfRectangleByUser",
+            "${topLeftX},${topLeftY},${topRightX},${topRightY},${bottomLeftX},${bottomLeftY},${bottomRightX},${bottomRightY}"
+        )
+
 
         try {
             signageDetectModule =
@@ -109,172 +243,220 @@ class ErrorDetectActivity : ComponentActivity() {
                 Module.load(assetFilePath(applicationContext, errorDetectModuleFileName))
         } catch (e: Exception) {
             Log.e("TorchScriptModule", "Failed to open module files.")
-            //
-            //
+            setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
+            finish()
         }
+        analysisViewModel.progressMessage.value = "모델 읽는 중"
+        if (intents.data == null || signageId == null || nullableType == null) {
+            setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
+            finish()
+        }
+
+//        var uri = intent.getStringExtra("uri")
+        // var temp:MutableList<Point> = getCorners(uriToMat(Uri.parse(uri),this))
+//        Log.d("Hi","hellow")
 
         lifecycleScope.launch {
-            when (type) {
-                REQUEST_DETECT_VIDEO -> detectVideo()
-                REQUEST_DETECT_PHOTO -> detectPhoto()
-                else -> {
-                    Log.e("ErrorDetectActivity", "Wrong Access to Activity!")
-                    //
-                    //
-                    //
-                    //
-                    //
-                    //
-                    //
-                    //
-                }
+            withContext(Dispatchers.IO) {
+                uri = intents.data!!
+                signage = analysisViewModel.getSignageById(signageId!!)
+                cabinet = analysisViewModel.getCabinet(signageId)
+                type = nullableType!!
+            }
+            if (!OpenCVLoader.initDebug()) {
+                Log.d("OpenCV", "onResume :: Internal OpenCV library not found.")
+                OpenCVLoader.initAsync(
+                    OpenCVLoader.OPENCV_VERSION,
+                    applicationContext,
+                    mLoaderCallback
+                )
+            } else {
+                Log.d("OpenCV", "onResume :: OpenCV library found inside package. Using it!")
+                mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS)
             }
         }
+
 
         setContent {
-            SignEzPrototypeTheme {
-                AnalysisProgress()
+            SignEzTheme {
+                AnalysisProgress(analysisViewModel = analysisViewModel)
             }
         }
-
 
     }
 
+
     private suspend fun detectVideo() = coroutineScope {
         launch {
-            val signage = analysisViewModel.getSignage().value.signage
-            val cabinet = analysisViewModel.getCabinet().value.cabinet
 
-            val width = signage.width.toInt() * 100
-            val height = signage.height.toInt() * 100
+            val width = signage.width.toInt() / 10
+            val height = signage.height.toInt() / 10
             val moduleWidth: Float =
                 width.toFloat() / (signage.widthCabinetNumber * cabinet.moduleRowCount)
             val moduleHeight: Float =
                 height.toFloat() / (signage.heightCabinetNumber * cabinet.moduleColCount)
 
-            val tempFile = withContext(Dispatchers.IO) {
-                File.createTempFile("video", ".temp")
-            }
-            val inputStream: InputStream? = applicationContext.contentResolver
-                .openInputStream(analysisViewModel.videoContentUri.value)
-            val outputStream = withContext(Dispatchers.IO) {
-                FileOutputStream(tempFile)
-            }
-
             try {
-                val resultId = analysisViewModel.saveResult()
-                inputStream?.copyTo(outputStream)
-                val videoCapture = VideoCapture()
-                videoCapture.open(tempFile.path)
+                analysisViewModel.progressMessage.value = "영상 읽는 중"
+                Log.d("VideoProcess", "1")
+                val resultId = analysisViewModel.saveResult(signage.id)
+                Log.d("VideoProcess", "2")
+                Log.d("VideoProcess", "3")
+                val mediaMetadataRetriever = MediaMetadataRetriever()
+                mediaMetadataRetriever.setDataSource(applicationContext, uri)
 
-                val frameCount = videoCapture.get(Videoio.CAP_PROP_FRAME_COUNT).toInt()
 
-                if (videoCapture.isOpened) {
-                    val frameSize = Size(
-                        videoCapture.get(Videoio.CAP_PROP_FRAME_WIDTH),
-                        videoCapture.get(Videoio.CAP_PROP_FRAME_HEIGHT)
-                    )
+                Log.d("VideoProcess", "4")
+
+
+                val frameCount: Int =
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_FRAME_COUNT)!!
+                        .toInt()
+
+                Log.d("VideoProcess", "${frameCount.toString()}")
+
+                val frameSize = Size(
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)!!
+                        .toDouble(),
+                    mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)!!
+                        .toDouble()
+                )
+                Log.d("VideoProcess", "${frameSize.toString()}")
+                var points: MutableList<Point>? = null
+                analysisViewModel.progressMessage.value = "영상 분석 중"
+
+                for (i in 0 until frameCount) {
+                    analysisViewModel.progressFloat.value = i.toFloat() / frameCount
+                    Log.d("VideoProcess", "${i.toString()}")
+                    val bitmapFrame: Bitmap? = mediaMetadataRetriever.getFrameAtIndex(i)
                     val frame = Mat(frameSize, CvType.CV_8UC3)
-                    var points: MutableList<Point>? = null
+                    Utils.bitmapToMat(bitmapFrame, frame)
 
-                    for (i in 0 until frameCount) {
-                        if (videoCapture.read(frame)) {
-                            if (i == 0) {
-                                points = getCorners(frame)
-                            }
-                            if (points != null && points.size == 4) {
-                                val warpedMat = getWarp(frame, points, width, height)
-                                val errorModuleList = getPredictions(
-                                    warpedMat,
-                                    errorDetectModule,
-                                    width,
-                                    height,
-                                    moduleWidth,
-                                    moduleHeight,
-                                    resultId
-                                )
-                                for (errorModule in errorModuleList) {
-                                    val processedMat: Mat = postProcess(
-                                        warpedMat,
-                                        errorModule,
-                                        moduleWidth,
-                                        moduleHeight
-                                    )
-                                    val processedBitmap =
-                                        Bitmap.createBitmap(
-                                            processedMat.cols(),
-                                            processedMat.rows(),
-                                            Bitmap.Config.ARGB_8888
-                                        )
-                                    Utils.matToBitmap(processedMat, processedBitmap)
-                                    analysisViewModel.saveImage(processedBitmap, errorModule.id)
-                                }
-                            }
-                            setProgresses(frameCount, i)
+                    if (bitmapFrame != null) {
+                        if (i == 0) {
+                            getPoints(frame)
                         }
+                        points = getCornersByPrevCorners(frame)
+
+                        val warpedMat = getWarp(frame, points!!, width, height)
+                        val errorModuleList = getPredictions(
+                            warpedMat,
+                            errorDetectModule,
+                            width,
+                            height,
+                            moduleWidth,
+                            moduleHeight,
+                            resultId
+                        )
+                        for (errorModule in errorModuleList) {
+                            val processedMat: Mat = postProcess(
+                                warpedMat,
+                                errorModule,
+                                moduleWidth,
+                                moduleHeight
+                            )
+                            val processedBitmap =
+                                Bitmap.createBitmap(
+                                    processedMat.cols(),
+                                    processedMat.rows(),
+                                    Bitmap.Config.ARGB_8888
+                                )
+                            Utils.matToBitmap(processedMat, processedBitmap)
+                            analysisViewModel.saveImage(processedBitmap, errorModule.id)
+                        }
+
                     }
-                } else {
-                    Log.e("VideoProcessing", "Failed to open video file.")
                 }
+
 
             } catch (e: Exception) {
                 Log.e("VideoProcessing", "Error processing video file: ${e.localizedMessage}", e)
-            } finally {
-                withContext(Dispatchers.IO) {
-                    outputStream.close()
-                    inputStream?.close()
-                }
-                tempFile.delete()
+                setResult(REQUEST_CODE_ERROR_DETECT_FAIL_ACTIVITY)
+                finish()
             }
-
 
         }
     }
 
     private suspend fun detectPhoto() = coroutineScope {
         launch {
-            val originalImage: Bitmap? = loadBitmapFromUriWithGlide(
-                applicationContext,
-                analysisViewModel.imageContentUri.value
-            )
-            val signage = analysisViewModel.getSignage().value.signage
-            val cabinet = analysisViewModel.getCabinet().value.cabinet
-
-            val width = signage.width.toInt() * 100
-            val height = signage.height.toInt() * 100
-            val moduleWidth: Float =
-                width.toFloat() / (signage.widthCabinetNumber * cabinet.moduleRowCount)
-            val moduleHeight: Float =
-                height.toFloat() / (signage.heightCabinetNumber * cabinet.moduleColCount)
-
-            val resultId = analysisViewModel.saveResult()
-
-            val originalMat: Mat = bitmapToMat(originalImage!!)
-            val points: MutableList<Point> = getCorners(originalMat)
-
-            val warpedMat = getWarp(originalMat, points, width, height)
-
-            val errorModuleList = getPredictions(
-                warpedMat,
-                errorDetectModule,
-                width,
-                height,
-                moduleWidth,
-                moduleHeight,
-                resultId
-            )
-            for (errorModule in errorModuleList) {
-                val processedMat: Mat =
-                    postProcess(warpedMat, errorModule, moduleWidth, moduleHeight)
-                val processedBitmap =
-                    Bitmap.createBitmap(
-                        processedMat.cols(),
-                        processedMat.rows(),
-                        Bitmap.Config.ARGB_8888
-                    )
-                Utils.matToBitmap(processedMat, processedBitmap)
-                analysisViewModel.saveImage(processedBitmap, errorModule.id)
+            analysisViewModel.progressMessage.value = "사진 읽는 중"
+            Log.i("ImageProcess", uri.toString())
+            val originalImage: Bitmap? = withContext(Dispatchers.IO) {
+                loadBitmapFromUriWithGlide(
+                    applicationContext,
+                    uri
+                )
             }
+            analysisViewModel.progressFloat.value = 0.1f
+
+            if (originalImage != null) {
+                Log.d(
+                    "Image Size",
+                    "${originalImage!!.toString()}"
+                )
+//            Log.d(
+//                "Image Size",
+//                "${originalImage!!.width.toString()}   ${originalImage!!.width.toString()}"
+//            )
+
+                val width = signage.width.toInt() / 10
+                val height = signage.height.toInt() / 10
+                val moduleWidth: Float =
+                    width.toFloat() / (signage.widthCabinetNumber * cabinet.moduleRowCount)
+                val moduleHeight: Float =
+                    height.toFloat() / (signage.heightCabinetNumber * cabinet.moduleColCount)
+                Log.d("Signage Size", "${width.toString()},  ${height.toString()}")
+                Log.d("Module Size", "${moduleWidth.toString()},  ${moduleHeight.toString()}")
+
+                val resultId = analysisViewModel.saveResult(signage.id)
+                Log.d("ImageProcess", "resultId = ${resultId.toString()}")
+                analysisViewModel.progressFloat.value = 0.2f
+                analysisViewModel.progressMessage.value = "사진 분석 중"
+
+                val originalMat: Mat = bitmapToMat(originalImage!!)
+                Log.d("originalMatSize", "${originalMat.size().toString()}")
+                try {
+                    getPoints(originalMat)
+                    var points: MutableList<Point> = getCornersByPrevCorners(originalMat)
+                    Log.d("ImageProcess", "points = ${points.toString()}")
+                    analysisViewModel.progressFloat.value = 0.3f
+
+                    val warpedMat = getWarp(originalMat, points, width, height)
+                    analysisViewModel.progressFloat.value = 0.5f
+
+                    val errorModuleList = getPredictions(
+                        warpedMat,
+                        errorDetectModule,
+                        width,
+                        height,
+                        moduleWidth,
+                        moduleHeight,
+                        resultId
+                    )
+                    analysisViewModel.progressFloat.value = 0.8f
+                    Log.d("ImageProcess", "errorModuleList = ${errorModuleList.toString()}")
+                    for (errorModule in errorModuleList) {
+                        val processedMat: Mat =
+                            postProcess(warpedMat, errorModule, moduleWidth, moduleHeight)
+                        val processedBitmap =
+                            Bitmap.createBitmap(
+                                processedMat.cols(),
+                                processedMat.rows(),
+                                Bitmap.Config.ARGB_8888
+                            )
+                        Utils.matToBitmap(processedMat, processedBitmap)
+                        analysisViewModel.saveImage(processedBitmap, errorModule.id)
+                    }
+                    analysisViewModel.progressFloat.value = 0.9f
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                Log.e("ImageProcess", "Image Load Fail!")
+            }
+            analysisViewModel.progressFloat.value = 1.0f
+
         }
     }
 
@@ -284,28 +466,31 @@ class ErrorDetectActivity : ComponentActivity() {
         moduleWidth: Float,
         moduleHeight: Float
     ): Mat {
-        var processedMat: Mat = warpedMat
+        var processedMat: Mat = warpedMat.clone()
         Imgproc.rectangle(
             processedMat,
-            Point(errorModule.x.toDouble() * moduleWidth, errorModule.y.toDouble() * moduleHeight),
             Point(
-                (errorModule.x + 1).toDouble() * moduleWidth,
-                (errorModule.y + 1).toDouble() * moduleHeight
+                (errorModule.x - 1).toDouble() * moduleWidth,
+                (errorModule.y - 1).toDouble() * moduleHeight
             ),
-            Scalar(0.0, 0.0, 255.0),
-            2
+            Point(
+                (errorModule.x).toDouble() * moduleWidth,
+                (errorModule.y).toDouble() * moduleHeight
+            ),
+            Scalar(255.0, 0.0, 0.0),
+            3
         )
         Imgproc.putText(
             processedMat,
-            "%0.2f".format(errorModule.score),
+            "%.2f".format(errorModule.score),
             Point(
-                errorModule.x.toDouble() * moduleWidth,
-                (errorModule.y - 1).toDouble() * moduleHeight
+                (errorModule.x - 1).toDouble() * moduleWidth,
+                (errorModule.y - 2).toDouble() * moduleHeight
             ),
             Imgproc.FONT_HERSHEY_PLAIN,
-            20.0,
-            Scalar(0.0, 0.0, 255.0),
-            2
+            3.0,
+            Scalar(255.0, 0.0, 0.0),
+            3
         )
 
         return processedMat
@@ -322,6 +507,7 @@ class ErrorDetectActivity : ComponentActivity() {
     ): List<ErrorModule> {
         val imgScaleX = width.toFloat() / RESIZE_SIZE
         val imgScaleY = height.toFloat() / RESIZE_SIZE
+        Log.d("Detection", "${imgScaleX.toString()},  ${imgScaleY.toString()}")
         // 640x640 resize
         val resizedMat = Mat()
         Imgproc.resize(warpedMat, resizedMat, Size(RESIZE_SIZE.toDouble(), RESIZE_SIZE.toDouble()))
@@ -333,6 +519,7 @@ class ErrorDetectActivity : ComponentActivity() {
             TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, NO_MEAN_RGB, NO_STD_RGB)
         // detect
         val outputTuple = detectModule.forward(IValue.from(inputTensor)).toTuple()
+        Log.d("Detection", outputTuple.toString())
         // output to error module entities
         val outputTensor: Tensor = outputTuple[0].toTensor()
         val outputFloats: FloatArray = outputTensor.dataAsFloatArray
@@ -356,6 +543,7 @@ class ErrorDetectActivity : ComponentActivity() {
         moduleHeight: Float,
         resultId: Long
     ): List<ErrorModule> {
+        val mutableMap = mutableMapOf<Int, Double>()
 
         for (i in 0 until mOutputRow) {
             if (outputs[i * mOutputColumn + 4] > scoreThreshold) {
@@ -364,6 +552,7 @@ class ErrorDetectActivity : ComponentActivity() {
                 val w = outputs[i * mOutputColumn + 2]
                 val h = outputs[i * mOutputColumn + 3]
                 val score = outputs[i * mOutputColumn + 4]
+                Log.d("ErrorDetection", "${x}, ${y}, ${w}, ${h}, ${score}")
 
                 val left = imgScaleX * (x - w / 2)
                 val top = imgScaleY * (y - h / 2)
@@ -372,38 +561,155 @@ class ErrorDetectActivity : ComponentActivity() {
 
                 val centerX = (imgScaleX * x).toInt()
                 val centerY = (imgScaleY * y).toInt()
+                Log.d(
+                    "ErrorDetection",
+                    "${left}, ${top}, ${right}, ${bottom}, ${centerX}, ${centerY}"
+                )
+                Log.d("ErrorDetectionModuleSize", "${moduleWidth.toInt()}, ${moduleHeight.toInt()}")
 
-                if (left % moduleWidth < rectThreshold && left % moduleWidth > moduleWidth - rectThreshold
-                    && right % moduleWidth < rectThreshold && right % moduleWidth > moduleWidth - rectThreshold
-                    && top % moduleHeight < rectThreshold && top % moduleHeight > moduleHeight - rectThreshold
-                    && bottom % moduleHeight < rectThreshold && bottom % moduleHeight > moduleHeight - rectThreshold
-                ) {
-                    val moduleX: Int = (centerX / moduleWidth.toInt()) + 1
-                    val moduleY: Int = (centerY / moduleHeight.toInt()) + 1
-                    analysisViewModel.saveModule(
-                        resultId = resultId,
-                        score = score.toDouble(),
-                        x = moduleX,
-                        y = moduleY
-                    )
+
+                val moduleX: Int = (centerX / moduleWidth.toInt()) + 1
+                val moduleY: Int = (centerY / moduleHeight.toInt()) + 1
+                Log.d("ErrorDetectionXandY", "${moduleWidth.toInt()}, ${moduleHeight.toInt()}")
+                if (mutableMap.get(moduleX * 10000 + moduleY) == null || mutableMap.get(moduleX * 10000 + moduleY)!! < score.toDouble()) {
+                    mutableMap.put(moduleX * 10000 + moduleY, score.toDouble())
                 }
-            }
 
+            }
         }
-        return analysisViewModel.getRelatedModule(resultId)
+        val mutableList = mutableListOf<ErrorModule>()
+        mutableMap.forEach { entry ->
+            Log.d("AddErrorModule", "${entry.key} : ${entry.value}")
+            val moduleId = analysisViewModel.saveModule(
+                resultId = resultId,
+                score = entry.value,
+                x = entry.key / 10000,
+                y = entry.key % 10000
+            )
+            mutableList.add(
+                ErrorModule(
+                    moduleId,
+                    resultId,
+                    entry.value,
+                    entry.key / 10000,
+                    entry.key % 10000
+                )
+            )
+        }
+        return mutableList
     }
 
 
     private fun getCorners(originalMat: Mat): MutableList<Point> {
-        var points = mutableListOf<Point>()
-        //
-        //
-        //
-        //
-        //
+        // hyosang
+//        var left = intent.getIntExtra("left",0)
+//        var right = intent.getIntExtra("right",0)
+//        var top = intent.getIntExtra("top",0)
+//        var bottom = intent.getIntExtra("bottom",0)
 
-        if (points.size != 4) throw SignageNotFoundException("Signage Not Found")
+//        var uri = intent.getStringExtra("uri")
+//        Log.d("uri","${Uri.parse(uri)}")
+//        val maxContourFromRec = findLargestRectangle(originalMat)
+//        Log.d("hyosang","${maxContourFromRec}")
+
+        var points = mutableListOf<Point>()
+
+        val grayMat = Mat()
+        Imgproc.cvtColor(originalMat, grayMat, Imgproc.COLOR_BGR2GRAY)
+        val gauss = Mat()
+        Imgproc.GaussianBlur(grayMat, gauss, Size(0.0, 0.0), 2.0)
+        val edged = Mat()
+        Imgproc.Canny(gauss, edged, 30.0, 80.0)
+
+        val contours: MutableList<MatOfPoint> = ArrayList()
+        val hierarchy = Mat()
+        Imgproc.findContours(
+            edged,
+            contours,
+            hierarchy,
+            Imgproc.RETR_CCOMP,
+            Imgproc.CHAIN_APPROX_SIMPLE
+        )
+
+        // contour 중 특정 크기 이상의 사각형인 contour를 찾습니다.
+        val filteredContours = contours.filter { Imgproc.contourArea(it) > 10000 }
+
+        // 근사치를 사용하여 다각형으로 변환합니다.
+        val approxContours = filteredContours.map { contour ->
+            val epsilon = 0.01 * Imgproc.arcLength(MatOfPoint2f(*contour.toArray()), true)
+            val approx = MatOfPoint2f()
+            Imgproc.approxPolyDP(MatOfPoint2f(*contour.toArray()), approx, epsilon, true)
+            MatOfPoint(*approx.toArray())
+        }
+
+        // 네 모서리를 가진 contour를 찾습니다.
+        val quadContours = approxContours.filter { it.toList().size == 4 }
+
+        // 면적이 가장 큰 contour를 찾습니다.
+        val maxContour = quadContours.maxByOrNull { Imgproc.contourArea(it) }
+
+        if (maxContour != null) {
+            points = maxContour.toList()
+        }
+
+
+        if (points.size != 4) {
+            return mutableListOf<Point>(
+                Point(0.0, 0.0),
+                Point(0.0, originalMat.size().height - 1),
+                Point(originalMat.size().width - 1, 0.0),
+                Point(originalMat.size().width - 1, originalMat.size().height - 1)
+            )
+        }
+
+        Log.i("Points", points.toString())
         return points
+    }
+
+    private fun getCornersByPrevCorners(originalMat: Mat): MutableList<Point> {
+        var points = mutableListOf<Point>()
+        val tl = Point(topLeftX.toDouble(), topLeftY.toDouble())
+        val tr = Point(topRightX.toDouble(), topRightY.toDouble())
+        val bl = Point(bottomLeftX.toDouble(), bottomLeftY.toDouble())
+        val br = Point(bottomRightX.toDouble(), bottomRightY.toDouble())
+        if (topLeftX == 0 && topLeftY == 0) {
+            points.add(tl)
+            points.add(tr)
+            points.add(bl)
+            points.add(br)
+            return points
+        }
+
+        val grayMat = Mat()
+        Imgproc.cvtColor(originalMat, grayMat, Imgproc.COLOR_BGR2GRAY)
+//        val blur = Mat()
+//        Imgproc.GaussianBlur(grayMat, blur, Size(0.0,0.0), 1.0)
+        val corners = MatOfPoint()
+        Imgproc.goodFeaturesToTrack(grayMat, corners, 300, 0.1, 3.0)
+        Log.d("corners", corners.toList().toString())
+
+        points.add(getNearestCorner(tl, corners))
+        points.add(getNearestCorner(tr, corners))
+        points.add(getNearestCorner(bl, corners))
+        points.add(getNearestCorner(br, corners))
+
+
+        return points
+    }
+
+    private fun getNearestCorner(prev: Point, corners: MatOfPoint): Point {
+        val next = corners.toList().filter { p ->
+            abs(p.x - prev.x) < 15 &&
+                    abs(p.y - prev.y) < 15
+        }.minByOrNull { corner ->
+            val dx = corner.x - prev.x
+            val dy = corner.y - prev.y
+            dx * dx + dy * dy
+        } ?: return prev
+        if ((next.x - prev.x) * (next.x - prev.x) + (next.y - prev.y) * (next.y - prev.y) > 300) {
+            return prev
+        }
+        return next
     }
 
     private fun getWarp(
@@ -413,6 +719,10 @@ class ErrorDetectActivity : ComponentActivity() {
         height: Int
     ): Mat {
         val sortedPoints = sortPoints(points)
+        Log.d(
+            "PointsOfRectangleByUser",
+            "${topLeftX},${topLeftY},${topRightX},${topRightY},${bottomLeftX},${bottomLeftY},${bottomRightX},${bottomRightY}"
+        )
         val point: Array<Point> = sortedPoints.toTypedArray()
         val src = MatOfPoint2f(*point)
         val dst = MatOfPoint2f(
@@ -427,16 +737,24 @@ class ErrorDetectActivity : ComponentActivity() {
     }
 
     private fun sortPoints(points: MutableList<Point>): MutableList<Point> {
+        var sortedPoints = ArrayList<Point>()
         val a1 = points.minBy { it.x + it.y }
-        val a2 = points.minBy { it.x - it.y }
+        val a2 = points.maxBy { it.x - it.y }
         val a3 = points.maxBy { it.x + it.y }
-        val a4 = points.maxBy { it.x - it.y }
-        points.removeAll { true }
-        points.add(a1)
-        points.add(a2)
-        points.add(a3)
-        points.add(a4)
-        return points
+        val a4 = points.minBy { it.x - it.y }
+        sortedPoints.add(a1)
+        sortedPoints.add(a2)
+        sortedPoints.add(a3)
+        sortedPoints.add(a4)
+        topLeftX = sortedPoints[0].x.toInt()
+        topLeftY = sortedPoints[0].y.toInt()
+        topRightX = sortedPoints[1].x.toInt()
+        topRightY = sortedPoints[1].y.toInt()
+        bottomLeftX = sortedPoints[2].x.toInt()
+        bottomLeftY = sortedPoints[2].y.toInt()
+        bottomRightX = sortedPoints[3].x.toInt()
+        bottomRightY = sortedPoints[3].y.toInt()
+        return sortedPoints
     }
 
 
@@ -444,8 +762,8 @@ class ErrorDetectActivity : ComponentActivity() {
 
     }
 
-    private fun loadBitmapFromUriWithGlide(context: Context, uri: Uri): Bitmap? {
-        return try {
+    private fun loadBitmapFromUriWithGlide(context: Context, uri: Uri): Bitmap? = runBlocking {
+        return@runBlocking try {
             Glide.with(context)
                 .asBitmap()
                 .load(uri)
@@ -456,14 +774,124 @@ class ErrorDetectActivity : ComponentActivity() {
         }
     }
 
+    private fun uriToMat(uri: Uri, context: Context): Mat {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        val mat = Mat()
+        Utils.bitmapToMat(bitmap, mat)
+        return mat
+    }
+
     private fun bitmapToMat(bitmap: Bitmap): Mat {
         val mat = Mat()
         Utils.bitmapToMat(bitmap, mat)
         return mat
     }
 
+    @Throws(IOException::class)
+    private fun assetFilePath(context: Context, assetName: String): String {
+        val file = File(context.filesDir, assetName)
+        if (file.exists() && file.length() > 0) {
+            return file.absolutePath
+        }
+        context.assets.open(assetName).use { inputStream ->
+            FileOutputStream(file).use { outputStream ->
+                val buffer = ByteArray(4 * 1024)
+                var read: Int
+                while (inputStream.read(buffer).also { read = it } != -1) {
+                    outputStream.write(buffer, 0, read)
+                }
+                outputStream.flush()
+            }
+            return file.absolutePath
+        }
+    }
+
+    fun getPathFromUri(context: Context, contentUri: Uri): String? {
+        val cursor: Cursor? = context.contentResolver.query(
+            contentUri,
+            arrayOf(MediaStore.Images.Media.DATA),
+            null,
+            null,
+            null
+        )
+        if (cursor == null) {
+            return contentUri.path
+        } else {
+            cursor.moveToFirst()
+            val index: Int = cursor.getColumnIndex(MediaStore.Images.Media.DATA)
+            val path = cursor.getString(index)
+            cursor.close()
+            return path
+        }
+    }
+
+
+    private fun getPoints(frame: Mat) {
+        topLeftX = if (topLeftX < 0) {
+            0
+        } else if (topLeftX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            topLeftX
+        }
+        topRightX = if (topRightX < 0) {
+            0
+        } else if (topRightX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            topRightX
+        }
+        bottomLeftX = if (bottomLeftX < 0) {
+            0
+        } else if (bottomLeftX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            bottomLeftX
+        }
+        bottomRightX = if (bottomRightX < 0) {
+            0
+        } else if (bottomRightX >= frame.width()) {
+            frame.width() - 1
+        } else {
+            bottomRightX
+        }
+
+        topLeftY = if (topLeftY < 0) {
+            0
+        } else if (topLeftY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            topLeftY
+        }
+        topRightY = if (topRightY < 0) {
+            0
+        } else if (topRightY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            topRightY
+        }
+        bottomLeftY = if (bottomLeftY < 0) {
+            0
+        } else if (bottomLeftY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            bottomLeftY
+        }
+        bottomRightY = if (bottomRightY < 0) {
+            0
+        } else if (bottomRightY >= frame.height()) {
+            frame.height() - 1
+        } else {
+            bottomRightY
+        }
+
+    }
+
+
     override fun onBackPressed() {
         setResult(Activity.RESULT_OK)
         super.onBackPressed()
     }
 }
+ 
