@@ -233,7 +233,7 @@ class AnalysisViewModel(
         return bitmap
     }
 
-    fun insertTestRecord() = viewModelScope.launch {
+    fun insertTestRecord() = runBlocking {
         // Save image as a Blob
 //        val bitmap1 = createSimpleBitmap(100, 100, Color.BLUE)
 //        val outputStream1 = ByteArrayOutputStream()

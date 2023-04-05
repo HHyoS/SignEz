@@ -19,6 +19,7 @@ import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 
 class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : ViewModel(),
@@ -52,7 +53,7 @@ class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : View
         return bitmap
     }
 
-    fun insertTestRecord(context:Context) = viewModelScope.launch {
+    fun insertTestRecord(context:Context) = runBlocking {
         // Save image as a Blob
 //        val bitmap = createSimpleBitmap(100, 100, Color.RED)
 

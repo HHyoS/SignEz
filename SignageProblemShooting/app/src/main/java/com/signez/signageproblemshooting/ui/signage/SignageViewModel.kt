@@ -71,7 +71,7 @@ class SignageViewModel(
         return bitmap
     }
 
-    fun insertTestRecord(context: Context) = viewModelScope.launch {
+    fun insertTestRecord(context: Context) = runBlocking {
         // Save image as a Blob
 
         // -------------
@@ -321,10 +321,10 @@ class SignageViewModel(
         val testAnalysisResult6 = Signage(
             id = 6L,
             name = "S 백화점 신관",
-            width = 5000.0,
-            height = 16000.0,
-            widthCabinetNumber = 5,
-            heightCabinetNumber = 16,
+            width = 12000.0,
+            height = 18000.0,
+            widthCabinetNumber = 12,
+            heightCabinetNumber = 18,
             modelId = 1,
             repImg = byteArray6
         )

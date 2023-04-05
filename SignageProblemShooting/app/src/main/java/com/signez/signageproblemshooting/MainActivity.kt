@@ -33,6 +33,8 @@ import java.io.*
 import java.util.*
 import android.Manifest
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
@@ -43,10 +45,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
+import com.signez.signageproblemshooting.data.SignEzDatabase
+import com.signez.signageproblemshooting.data.SignEzDatabaseCallback
 import com.signez.signageproblemshooting.data.datastore.StoreInitialLaunch
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private lateinit var viewModel1: PictureViewModel
@@ -136,6 +141,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
+        val intent = Intent(this, MainActivity::class.java)
+
         viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
@@ -168,7 +175,13 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         viewModel4.insertTestRecord(applicationContext)
         viewModel3.insertTestRecord(applicationContext)
         viewModel5.insertTestRecord()
-        mainViewModel.insertTestRecord()
+        mainViewModel.insertTestRecord(applicationContext)
+
+
+        // ...
+        // Check if the initial data input is finished and restart the activity
+
+
         setContent {
             navController = rememberNavController()
             val isInitialLaunch = StoreInitialLaunch(LocalContext.current).getInitialLaunch.collectAsState(initial = false).value!!
@@ -190,10 +203,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                 )
             }
         }
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            requestPermissions()
-//        }, 200)
-        AutoPermissions.Companion.loadSelectedPermissions(this, REQUEST_CODE_PERMISSIONS, permissions)
+
+        AutoPermissions.loadSelectedPermissions(this, REQUEST_CODE_PERMISSIONS, permissions)
     }
     fun go() {
         applicationContext
