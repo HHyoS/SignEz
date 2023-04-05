@@ -16,16 +16,8 @@
 
 package com.signez.signageproblemshooting.data.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
-import com.signez.signageproblemshooting.data.entities.AnalysisResult
-import com.signez.signageproblemshooting.data.entities.ErrorImage
-import com.signez.signageproblemshooting.data.entities.ErrorModule
-import com.signez.signageproblemshooting.data.entities.Item
+import androidx.room.*
+import com.signez.signageproblemshooting.data.entities.*
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -63,5 +55,9 @@ interface ErrorModuleDao {
         WHERE resultId = :resultId
     """)
     suspend fun getModuleById(resultId: Long): ErrorModule
+
+    @Transaction
+    @Query("SELECT * FROM error_modules WHERE x = :x AND y = :y AND resultId = :resultId")
+    suspend fun getModulesByXYResultId(x: Int, y: Int, resultId: Long): List<ErrorModuleWithImage>
 
 }

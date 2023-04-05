@@ -76,7 +76,8 @@ fun AddSignageScreen(
     val allFieldsNotEmpty = (
             viewModel.sName.value.isNotEmpty() &&
                     viewModel.sWidth.value.isNotEmpty() &&
-                    viewModel.sHeight.value.isNotEmpty()
+                    viewModel.sHeight.value.isNotEmpty() &&
+                    viewModel.selectedCabinetId.value > 0
             )
     val cabinetState by viewModel.getCabinet().collectAsState()
 
@@ -132,7 +133,7 @@ fun AddSignageScreen(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-                title = "새 사이니지 추가",
+                title = "새 사이트 추가",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
             )
@@ -147,6 +148,7 @@ fun AddSignageScreen(
                 rightOnClickEvent = {
                     coroutineScope.launch {
                         try {
+                            if(viewModel.selectedCabinetId.value < 1L) throw Exception("Cabinet Not Selected!")
                             viewModel.saveItem(
                                 bitmap = imageBitmap,
                                 modelId = viewModel.selectedCabinetId.value
@@ -166,6 +168,8 @@ fun AddSignageScreen(
         Spacer(modifier = modifier.padding(innerPadding))
         Box(
             modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.91f)
                 .padding(start = 16.dp, end = 16.dp)
                 .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
@@ -190,7 +194,7 @@ fun AddSignageScreen(
                         }
 
                         Text(
-                            text = "사이니지 사진을 추가해 주세요.",
+                            text = "사이트 사진을 추가해 주세요.",
                             modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
                             style = TextStyle(color = Color.Black), // Customize the text style
                         )
@@ -270,7 +274,7 @@ fun AddSignageScreen(
                             CustomTextInput(
                                 value = viewModel.sName.value,
                                 onValueChange = { it -> viewModel.sName.value = it },
-                                placeholder = "사이니지 이름"
+                                placeholder = "사이트 이름"
                             )
                         }
                         Row(

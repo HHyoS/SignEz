@@ -18,7 +18,7 @@ enum
     CV_LOAD_IMAGE_ANYDEPTH   =2,
 /* ?, any color */
     CV_LOAD_IMAGE_ANYCOLOR   =4,
-/* ?, no rotate */
+/* ?, no Frotate */
     CV_LOAD_IMAGE_IGNORE_ORIENTATION  =128
 };
 

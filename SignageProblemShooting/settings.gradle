@@ -14,5 +14,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "SignageProblemShooting"
+
+
 include ':app'
 include ':opencv'

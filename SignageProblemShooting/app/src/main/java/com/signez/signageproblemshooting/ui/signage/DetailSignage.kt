@@ -501,9 +501,23 @@ fun SDetail(
 //                                    Text(text = "${cabinet.cabinetWidth} mm")
 //                                    Text(text = "${cabinet.cabinetHeight} mm")
 //                                    Text(text = "${cabinet.moduleColCount}X${cabinet.moduleRowCount}")
-
-
                 }
+                FocusBlock(
+                    title = "캐비닛 배치",
+                    subtitle = "기본 배치를 사용하지 않고 직접 배치",
+                    buttonTitle = "배치",
+                    isbuttonVisible = true,
+                    buttonOnclickEvent = {
+                        if (signage != null) {
+                            if (cabinet != null) {
+                                navController.navigate(
+                                    BlockLayoutDestination.route+"/${signage.id}/${cabinet.id}"
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier,
+                )
             }
 //            Row {
 //                Button(onClick = {

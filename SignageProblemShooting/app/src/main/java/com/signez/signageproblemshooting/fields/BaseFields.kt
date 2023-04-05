@@ -1,6 +1,5 @@
 package com.signez.signageproblemshooting.fields
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -12,23 +11,15 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
-import com.signez.signageproblemshooting.ui.theme.SignEzPrototypeTheme
-import java.text.NumberFormat
-import java.util.*
 
 @Composable
 fun BasicTextField(
@@ -183,7 +174,7 @@ fun String.getCommaNumber(): String {
 //@Preview
 //@Composable
 //fun TextFieldsPreview() {
-//    SignEzPrototypeTheme(darkTheme = false) {
+//    SignEzTheme(darkTheme = false) {
 //        Column() {
 //
 //        }

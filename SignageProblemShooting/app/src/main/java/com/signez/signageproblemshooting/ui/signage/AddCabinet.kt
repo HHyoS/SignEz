@@ -178,6 +178,8 @@ fun AddCabinetScreen(
         Spacer(modifier = modifier.padding(innerPadding))
         Box(
             modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.91f)
                 .padding(start = 16.dp, end = 16.dp)
                 .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
