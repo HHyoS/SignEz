@@ -1,7 +1,6 @@
 # <img src="README.assets/slogo.png" align="left" width="40" height="40">SignEz - Signage ProblemShooting Solution> 
-
-<h3> Signage 문제, SignEz로 해결하세요
-<div align="center"><img src="README.assets/logo.png" width = 300px></div>
+<h3> Signage 문제, SignEz로 해결하세요<br>
+<div align="center"><img src="README.assets/logo.png"></div>
 
 <br>
 
@@ -138,7 +137,10 @@
 <br>
 
 <div align="center">
-<img src="README.assets/analyze.gif" width="100%" height="500" />
+  <img src="README.assets/analyze.gif" width="100%" height="500" />
+</div>
+<br>
+
 ### **영상 분석 / 사진 분석**
 > 영상/사진 분석기능은 입력한 사이니지 정보를 바탕으로 분석을 진행하는 기능입니다.<br>
 > 분석하는 사진/영상을 직접 촬영하거나 갤러리에서 선택하여 분석을 진행합니다.<br>
