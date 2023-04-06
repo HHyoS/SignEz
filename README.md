@@ -1,12 +1,6 @@
-# 스마트 반려화분
-
-<img src="README.assets/logo.png"  width="800">
-
-Planto - 당신 곁의 반려화분
-
-> <h3> Signage 문제, SignEz로 해결하세요
-
-![image-2.png](./image-2.png)
+# <img src="README.assets/slogo.png" align="left" width="40" height="40">SignEz - Signage ProblemShooting Solution> 
+<h3> Signage 문제, SignEz로 해결하세요<br>
+<div align="center"><img src="README.assets/logo.png"></div>
 
 <br>
 
@@ -21,14 +15,13 @@ Planto - 당신 곁의 반려화분
 > **SignEz** 프로젝트는 기존 프로세스의 단계들을 하나의 어플리케이션으로 통합하여 사용자의 편의성을 높이고, 머신러닝 기술을 적용하여 문제해결의 정밀도와 정확도를 개선하고자 합니다.
 > 이를 통해 전반적인 Signage 문제해결 과정의 효율성을 높이고, 예상 사용자인 설치업체와 QA에게 더 나은 문제해결 경험을 제공하려고 합니다.
 
-
 <br>
 
 ## 🎥 **소개 영상**
-- [UCC 바로가기](https://youtu.be/NvX9HVT-hbI)
+
+- [UCC 바로가기](https://youtu.be/uSm4YDu5cFg)
 
 <br>
-
 
 ## 🕘 **프로젝트 진행 기간**
 
@@ -38,13 +31,12 @@ Planto - 당신 곁의 반려화분
 
 <table>
  <tr>
-  
-    <td align="center"><a href="https://github.com/"><img src="README.assets/hyo.png" width="80px;" alt=""></td>
-    <td align="center"><a href="https://github.com/"><img src="README.assets/yen.png" width="80px;" alt=""></td>
-    <td align="center"><a href="https://github.com/"><img src="README.assets/one.png" width="80px;" alt=""></td>
-    <td align="center"><a href="https://github.com/"><img src="README.assets/sun.png" width="80px;" alt=""></td>
-    <td align="center"><a href="https://github.com/"><img src="README.assets/young.png" width="80px;" alt=""></td>
-    <td align="center"><a href="https://github.com/"><img src="README.assets/hyeon.png" width="80px;" alt=""></td>
+    <td align="center"><a href="https://github.com/grolarkim"><img src="README.assets/kmj.png" width=80px; alt=""></td>
+    <td align="center"><a href="https://github.com/KangDue"><img src="README.assets/kgh.png" width= 80px alt=""></td>
+    <td align="center"><a href="https://github.com/SSangRRae"><img src="README.assets/ksr.png" width="80px;" alt=""></td>
+    <td align="center"><a href="https://github.com/YoonsikOh5"><img src="README.assets/oys.png" width="80px;" alt=""></td>
+    <td align="center"><a href="https://github.com/"><img src="README.assets/jyt.png" width="80px;" alt=""></td>
+    <td align="center"><a href="https://github.com/HHyoS"><img src="README.assets/hhs.png" width="80px;" alt=""></td>
   </tr>
   <tr>
     <td align="center">팀장, ML</td>
@@ -55,12 +47,12 @@ Planto - 당신 곁의 반려화분
     <td align="center">ML</td>
   </tr>
      <tr>
-    <td align="center"><a href="https://github.com/"><sub><b>김명준</b></td>
-    <td align="center"><a href="https://github.com/"><sub><b>강기한</b></td>
-    <td align="center"><a href="https://github.com/"><sub><b>김상래</b></td>
-    <td align="center"><a href="https://github.com/"><sub><b>오윤식</b></td>
+    <td align="center"><a href="https://github.com/grolarkim"><sub><b>김명준</b></td>
+    <td align="center"><a href="https://github.com/KangDue"><sub><b>강기한</b></td>
+    <td align="center"><a href="https://github.com/SSangRRae"><sub><b>김상래</b></td>
+    <td align="center"><a href="hhttps://github.com/YoonsikOh5"><sub><b>오윤식</b></td>
     <td align="center"><a href="https://github.com/"><sub><b>진윤태</b></td>
-    <td align="center"><a href="https://github.com/"><sub><b>황효상</b></td>
+    <td align="center"><a href="https://github.com/HHyoS"><sub><b>황효상</b></td>
   </tr>
 
 </table>
@@ -70,237 +62,103 @@ Planto - 당신 곁의 반려화분
 ## 📍 PPT
 
 - **[최종 발표 PPT](https://drive.google.com/drive/folders/1arW7T25XFIs4wlZCQjDpa6VOl8Ldpun0?usp=sharing)**
-  
-<br>
-
-## 🧾 프로젝트 산출물 -> 우리 산출물 링크 달기
-
-- [컨벤션](https://www.notion.so/d705551eab504cc196b4208737384345)
-- [웹기능](https://www.notion.so/e68b9b75a0344f93a60bfaf7e3d79625)
-- [아키텍쳐 설계](https://www.notion.so/1ff26861849c4ec6ac4b9d8a2da33369)
-- [포팅메뉴얼/시연시나리오](https://www.notion.so/351a24c618464248942f7d8927ccbe20)
-- [데이터베이스 모델링](https://www.notion.so/c94826dbc7124f2a9d75884c9ed8dc3d)
-- [기능명세서](https://www.notion.so/85ff5d229c6040d8aa0fd739a491dab6)
-- [API 설계](https://www.notion.so/API-82c510571bea4209805aebf98f36cc10)
-- [웹 사진](https://www.notion.so/75c66c845f4142e5ab4b5744c0f0f214)
 
 <br>
+
+## 🧾 프로젝트 산출물
+
+- [컨벤션](https://handsome-linen-cba.notion.site/Git-Branch-Strategy-Commit-Convention-0ab0e506c0d2477abd50a0e2039cb003)
+- [기능명세서](https://handsome-linen-cba.notion.site/e72d1e82c0ca4bf7994e010c72cf91e0?v=5960ffe7f30a44fca147d2b4436ad866)
+- [Gantt Char](https://handsome-linen-cba.notion.site/Gantt-Chart-6a6df79f994649cbbcb5b5ba534de3d1)
+- [회고록](https://handsome-linen-cba.notion.site/7141d1e7db3c4a2c837fee1a40ae7cde)
+  <br>
 
 ## ✔️ 주요 기능
 
-> **반려 화분 Planto**
+> **SignEz**
 
-<img src="README.assets/pot.png"  width="800">
+<div align="center">
+  <img src="README.assets/logo.png">
+</div>
+<br>
 
-- **스마트 화분(Planto)**
+- **문제 해결 솔루션(SignEz)**
 
-  - 아두이노, 라즈베리파이로 자체 제작한 스마트 화분
-  - 환경 데이터(온도,습도,조도)와 외부 자극(진동, 압력, 소리)를 센서데이터로 입력받음.
-  - 데이터를 바탕으로 사용자와 상호작용
-  - MQTT통신을 통해 서버와 통신하여 호감도, 날씨 등의 데이터를 주고받고 화면을 통해 표시 가능.
+  - Android OS기반 Kotlin으로 개발한 어플리케이션.
+  - 삼성 One Ui를 앱 디자인에 적용
+  - ML을 사용한 Obeject & Error Detection
+  - 사용자의 입력으로 데이터의 확장 가능
+  - 이전 결과를 DB에 저장하여 재분석 가능
 
-- **데이터 통신**
+- **Add Infomation**
 
-  - Planto의 센서로부터 입력되는 데이터 수집하여 서버와 통신
-  - 날씨, 호감도. 센서데이터 세가지 토픽으로 서버와 통신하고 Serial Number로 유일성 보장
-  - 통신 과정에서 수신되는 데이터를 파일로 저장하고, 필요시 사용
-  
-- **호감도 기능**
+  - SignEz에는 현재까지 설치되어있는 삼성의 모든 Signage에 대한 정보가 들어있어, Signage ErrorDetection에 사용할 수 있습니다.
+  - Signage가 추가/변경되는 경우, '사이니지 스펙 입력'화면에서 Signage에 대한 정보를 수정/추가할 수 있습니다.
 
-  - 호감도 Topic에 대한 레코드로, 서버와 통신
-  - 서버에서 Planto에게 호감도 변화 토픽을 수신시 txt파일에 해당 내용을 저장하고, 호감도에 맞는 Planto로 변화
+- **Signage Detection**
 
+  - 영상/사진 분석화면에서 '분석하기' 버튼을 누르면 ML을 통해 Signage Detection을 실행하고, Signage의 좌표를 네 점으로 표시해줍니다.
+  - 사용자의 네 점을 이동해서 사이니지 화면에 맞게 세부조정을 할 수 있습니다.
 
-- **상호작용**
+- **Error Detection**
 
-  - 현재 환경 데이터(온도,습도,조도)와 외부 자극(압력, 딱콩 등)에 따라 상황에 맞는 화면 표시
+  - Signage Detction에서 Signage위치를 정하면 ErrorDection 기능이 실행됩니다.
+  - Error Detection은 Signage Detection에서 정한 위치를 바탕으로 Corner Detection을 진행하여 꼭지점을 찾습니다.
+  - 위의 방법을 통해 영상에서 사람의 손이 흔들리더라도 꼭지점을 갱신하여 Error Detection을 수행합니다.
+  - 동작 순서는 다음과 같습니다.
+    - 꼭지점 찾기
+    - 사이니지 화면 펴기
+    - 주어진 영상/사진을 Frame 단위로 확인하며 ML 수행
+    - ErrorDetection이 되면 해당 Frame을 저장하기
 
-- **날씨 표시 기능**
+- **Analysis of results**
 
-  - 날씨 Topic에 대한 레코드로, 서버와 통신
-  - 주기적으로 전송되는 날씨 데이터를 전송받고, 데이터를 변수와 메모장에 저장
-  - 프로그램 실행 시, 메모장에 저장된 날씨데이터를 변수에 저장 이후 서버에서 날씨데이터를 수신받으면 해당 데이터로 교체.
-  - 사용자가 화면 터치시 데이터에 따른 날씨화면, 정보 및 현재시간 표시. 
-
+  - 에러 발생모듈을 Hitmap 형식으로 표현
+  - Slider를 사용하여 ErrorDetection의 정확도인 Threshold를 변경할 수 있습니다.
+  - 정확도에 따라 Hitmap에 표시되는 에러가 달라지며, 에러 터치시 위치를 세부 정보를 확인할 수 있습니다.
+  - 에러를 터치한 상태에서 하단의 사진보기를 누르면 실제 사진에서 에러모듈을 확인할 수 있습니다.
 
 <br>
 
-
-> **웹** 
-
-
-
-- **QR 등록**
-
-  - 카메라를 이용해 화분에 표시된 QR코드를 읽어 등록
-  - QR인식 성공시 식물 등록 페이지로 이동
-
-
-- **식물/화분 상태 확인**
-
-  - 센서데이터를 기반으로 식물의 온도, 습도, 조도 환경 확인
-  - 등록한 식물 데이터를 받아와 적합한 생육 환경 확인
-  - 식물 입양 날짜 확인 및 교감 데이터를 기반으로 한 호감도 표시
-
-
-- **필터링 기반 추천**
-
-  - 총 4가지 키워드를 바탕으로 적합한 식물 정보를 제공
-  - 어두운 집 / 물 조금만 / 까다로운 / 기르기 쉬운
-  - 농사로 API의 정보를 바탕으로 사용자에게 숙련도와 생육 환경에 따른 식물 추천
-
-- **식물 사전 페이지**
-
-  - 사전 페이지를 통해서 식물 세부 관리 환경 표시
-  - 농사로 API를 이용한 선호 환경 정보 제공
-  - 기능적, 환경적, 추가 관리 정보 slide로 제공
-
-
-- **업적**
-  - 교감 데이터 및 생육 데이터를 기반으로 특정 조건에 따른 업적 리스트 생성
-  - 최근 달성한 업적 리스트 표시
-  - 업적 달성 시 planto의 표정으로 된 뱃지 획득
-  - 뱃지 클릭 시 업적의 세부 내용과 달성 기준 모달로 표시
-  - 이용자의 planto 교감 및 지속적인 생육 관심 유도
-
-​
-
-
-## &#128215; 아키텍처
-
-![image](https://user-images.githubusercontent.com/57944215/225843584-7458ce9f-5c03-4c38-8e2f-0226e60dc947.png)
-     
-<br>   <br>
-
-## &#128217; 포팅메뉴얼
-
-[PLANTO_포팅매뉴얼 (1).pdf](https://github.com/HHyoS/Planto/files/10999001/PLANTO_.1.pdf)
-
-
 ## &#128187; 서비스 화면
 
+## **Main화면**
 
-### [스마트 화분] 
+<div align="center">
+<img src="README.assets/main.gif" width="100%" height="500" />
+</div>
 
-#### 1. Onboarding 
+> Main화면에서는 1)사이니지 정보입력 2)영상 분석 3)사진 분석 세 가지 기능이 있습니다.<br>
 
-- 플랜토는 전원을 연결하면 초기 화면으로 QR코드를 표시해줍니다. 플랜토 구매 후 첫 부팅시 QR코드를 등록하여 화분과 웹을 연동시킬 수 있습니다.
+### **사이니지 정보 입력**
+>사이니지 정보입력 기능은 분석할 대상인 사이니지의 정보를 입력/수정/삭제 하는 기능으로 기본적으로 현재 설치된 모든 사이니지의 정보가 담겨있습니다.<br>
+>만약 사용자가 사이니지의 정보가 변경되거나 수정될 경우 사용자가 내용을 수정할 수 있습니다. 
 
-* 만약 이미 등록된 상태라면 디스플레이를 한번 터치하는것으로 다음 화면으로 넘어갈 수 있습니다.
+<br>
 
-![image](https://user-images.githubusercontent.com/57944215/225845920-6c4735c2-6427-4caf-9177-dff6f84e4786.png)
+<div align="center">
+  <img src="README.assets/analyze.gif" width="100%" height="500" />
+</div>
+<br>
+
+### **영상 분석 / 사진 분석**
+> 영상/사진 분석기능은 입력한 사이니지 정보를 바탕으로 분석을 진행하는 기능입니다.<br>
+> 분석하는 사진/영상을 직접 촬영하거나 갤러리에서 선택하여 분석을 진행합니다.<br>
+> [분석하기] 버튼을 누르면 ML을 통해 사이니지의 위치를 탐색하여, 사이니지가 존재하는 범위를 4개의 점으로 표시해줍니다.<br>
+> 사용자의 제공된 점을 이동시켜 사이니지의 화면에 맞게 정밀조작 할 수 있습니다.
+
+
 
 <br>
 
 #### 2. Interaction
 
-
 - 플랜토는 1) 온.습도 2) 조도 3) 토양 습도센서 4) 소리 5) 진동 6) 압력 센서의 데이터를 이용하여 감정을 표현, 사용자와 상호작용 합니다.
 
 - 상호작용을 통해 호감도의 상승, 하락이 가능하고, 호감도에 따라 플랜토의 기분이 바뀌니 조심해주세요!
-
-![image](https://user-images.githubusercontent.com/57944215/225847206-15ae82b7-643f-4d68-9e8b-7608b8e06441.png)
-
-![image](https://user-images.githubusercontent.com/57944215/225849646-e18f91a3-da62-4567-bc9d-a3125ab26b62.png)
-
-![image](https://user-images.githubusercontent.com/57944215/225849701-1c85d61f-a341-4be7-b4b9-db5e4b487780.png)
 
 ### 3. Display weather information
 
 - 플랜토는 웹과 통신을 통해 실시간 날씨 데이터를 받아와 화면에 표시해줍니다.
 
- * 날씨 정보가 필요하다면 디스플레이 터치!
- 
- ![image](https://user-images.githubusercontent.com/57944215/225849205-4278fb58-16f0-47d1-8edd-f3d60b158318.png)
-
-
-
-### [Web]
-
-#### 1. Introduce
-
- - 웹으로 접속 시 보이는 소개화면
- 
- - 화면에 존재하는 QR코드를 통해 Planto 모바일 서비스로 이동
- 
-![Untitled](https://user-images.githubusercontent.com/57944215/226173730-557eaa85-f7ff-474c-b512-0ffda5a7953e.png)
-
-
-
-#### 2. 메인
-
- - 카카오 로그인을 통해 회원가입을 할 수 있고, 카카오 로그인 이후 식물 등록 가능
- 
-![Untitled (1)](https://user-images.githubusercontent.com/57944215/226173738-d5112c7c-9278-4229-b47f-c49476cd73df.png)
-
-#### 3. 식물 사전
-
- - 농사로 API에 저장되어있는 식물 데이터를 바탕으로 사용자에게 정보를 제공하는 화면
- 
- - 식물에게 필요한 조도,습도 등 환경정보를 제공하여 사용자가 식물을 선택할 수 있도록 구현
- 
-![Untitled (2)](https://user-images.githubusercontent.com/57944215/226173757-9f45bae7-7ce0-4ea6-bc05-04e220ee7ba8.png)
-
-![Untitled (3)](https://user-images.githubusercontent.com/57944215/226173759-16966708-8e6d-44f8-a001-77de8d368293.png)
-
-#### 4. 식물 정보 등록
-
-  - Planto 부팅 시 화면에 존재하는 QR코드를 통해 Planto의 고유 Serial Number를 확인하고, 해당 값을 바탕으로 Planto를 앱에 등록하여 통신 시작
-
-![Untitled (4)](https://user-images.githubusercontent.com/57944215/226173788-afde241b-6963-499c-a0ac-052f23344901.png)
-
-#### 5. 식물 정보
-
-  - 현재 로그인되어있는 계정과 연동된 Planto의 정보를 확인할 수 있는 화면
-  
-  - 센서 데이터를 수집한 환경 데이터와 사용자와 상호작용을 통해 쌓은 호감도를 시각화하여 보여줌
-  
-![Untitled (6)](https://user-images.githubusercontent.com/57944215/226174116-f5d54534-540a-4572-a5f6-2ff2bb3568af.png)
-
-#### 6. 업적 시스템
-
- - Planto와 상호작용을 DB에 저장하고, 해당 내용을 바탕으로 업적 달성 시 사용자에게 모달창으로 표시
- 
-![Untitled (5)](https://user-images.githubusercontent.com/57944215/226173799-ec0b0dec-cf29-47b0-a1f4-e039ffc6782c.png)
-
-
-
-
-
-
-
-
-
-✔ 김명준
-
-- 팀장
-- 에러 탐지 머신러닝 학습
-- 안드로이드 앱에서 에러 탐지 기능 개발
-
-✔ 강기한
-
-- 안드로이드 앱에서 Room 개발
-- 안드로이드 뷰모델 개발
-
-✔ 김상래
-
-- 사이니지 탐지 머신러닝 학습
-- 안드로이드 앱에서 사이니지 탐지 기능 개발
-
-✔ 오윤식
-
-- 안드로이드 앱 UI 설계
-- 안드로이드 앱 UI 개발
-
-✔ 진윤태
-
-- UCC 제작
-- 에러 탐지 머신러닝 학습
-- 안드로이드 앱에서 에러 탐지 기능 개발
-
-✔ 황효상
-
-- 사이니지 탐지 머신러닝 학습
-- 안드로이드 앱에서 사이니지 탐지 기능 개발
-
-
+* 날씨 정보가 필요하다면 디스플레이 터치!
