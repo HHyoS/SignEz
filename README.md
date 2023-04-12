@@ -1,6 +1,8 @@
-# <img src="README.assets/slogo.png" align="left" width="40" height="40">SignEz - Signage ProblemShooting Solution>
+# <img src="README.assets/slogo.png" align="left" width="40" height="40">SignEz - Signage ProblemShooting Solution
 
-<h3> Signage 문제, SignEz로 해결하세요<br>
+>
+
+<h3> Signage 문제, SignEz로 해결하세요
 <div align="center"><img src="README.assets/logo.png"></div>
 
 <br>
@@ -125,40 +127,62 @@
 
 ## **Main화면**
 
+
+> Main화면에서는 1)사이니지 정보입력 2)영상 분석 3)사진 분석 세 가지 기능이 있습니다.<br>
+
+
+<BR>
+
+### **사이니지 정보 입력**
+
+
 <div align="center">
 <img src="README.assets/main.gif" width="100%" height="500" />
 </div>
 
-> Main화면에서는 1)사이니지 정보입력 2)영상 분석 3)사진 분석 세 가지 기능이 있습니다.<br>
 
-### **사이니지 정보 입력**
-
-> 사이니지 정보입력 기능은 분석할 대상인 사이니지의 정보를 입력/수정/삭제 하는 기능으로 기본적으로 현재 설치된 모든 사이니지의 정보가 담겨있습니다.<br>
-> 만약 사용자가 사이니지의 정보가 변경되거나 수정될 경우 사용자가 내용을 수정할 수 있습니다.
+>사이니지 정보입력 기능은 분석할 대상인 사이니지의 정보를 입력/수정/삭제 하는 기능으로 기본적으로 현재 설치된 모든 사이니지의 정보가 담겨있습니다.<br>
+>만약 사용자가 사이니지의 정보가 변경되거나 수정될 경우 사용자가 내용을 수정할 수 있습니다. 
 
 <br>
 
-<div align="center">
-  <img src="README.assets/analyze.gif" width="100%" height="500" />
-</div>
-<br>
 
 ### **영상 분석 / 사진 분석**
 
-> 영상/사진 분석기능은 입력한 사이니지 정보를 바탕으로 분석을 진행하는 기능입니다.<br>
-> 분석하는 사진/영상을 직접 촬영하거나 갤러리에서 선택하여 분석을 진행합니다.<br> > [분석하기] 버튼을 누르면 ML을 통해 사이니지의 위치를 탐색하여, 사이니지가 존재하는 범위를 4개의 점으로 표시해줍니다.<br>
+<div align="center">
+<img src="README.assets/analyze.gif" width="100%" height="500" />
+</div>
+
+>영상/사진 분석기능은 입력한 사이니지 정보를 바탕으로 분석을 진행하는 기능입니다.<br>
+> 분석하는 사진/영상을 직접 촬영하거나 갤러리에서 선택하여 분석을 진행합니다.<br>
+> [분석하기] 버튼을 누르면 ML을 통해 사이니지의 위치를 탐색하여, 사이니지가 존재하는 범위를 4개의 점으로 표시해줍니다.<br>
 > 사용자의 제공된 점을 이동시켜 사이니지의 화면에 맞게 정밀조작 할 수 있습니다.
 
 <br>
 
-#### 2. Interaction
 
-- 플랜토는 1) 온.습도 2) 조도 3) 토양 습도센서 4) 소리 5) 진동 6) 압력 센서의 데이터를 이용하여 감정을 표현, 사용자와 상호작용 합니다.
+### **Error Detect**
+<div align="center">
+<img src="README.assets/boonsuk.gif" width="100%" height="500" />
+</div>
 
-- 상호작용을 통해 호감도의 상승, 하락이 가능하고, 호감도에 따라 플랜토의 기분이 바뀌니 조심해주세요!
+> Error Dection기능은 선택한 영상/사진과 사이니지 위치를 기준으로 에러를 탐색하는 기능입니다.<br>
+> 에러를 탐색하는 기능은 [Corner Detection] 과 [Error Dection]두가지로 구성되어 있습니다.<br>
+> [Corner Detection]은 [분석하기]에서 선택한 점을 기준으로 가장 가까운 코너를 선택하여 사각형의 꼭지점으로 선택하는 기능으로, 사용자가 정확한 사이니지의 위치를 지정하지 않더라도 가장 가까운 꼭지점을 선택하기 때문에 영상에서 발생하는 손떨림 등에 의한 위치변동 또한 잡아낼 수 있습니다.
+> [Corner Detection] 이후에는 꼭지점을 바탕으로 사각형을 정하고, OpenCv를 사용해서 해당 사각형을 직사각형으로 펴주는 작업을 수행합니다.
+> [Error Dection]은 [Corner Detction]에서 만들어진 사각형을 이용하여 에러를 탐지하는 기능입니다. Yolov5를 사용하여 에러 모듈의 위치를 찾아내고, 해당 데이터를 바탕으로 Hitmap 형식으로 표현해줍니다.
 
-### 3. Display weather information
 
-- 플랜토는 웹과 통신을 통해 실시간 날씨 데이터를 받아와 화면에 표시해줍니다.
+<br>
 
-* 날씨 정보가 필요하다면 디스플레이 터치!
+### **에러모듈 확인**
+
+<div align="center">
+<img src="README.assets/info.gif" width="100%" height="500" />
+</div>
+
+<br>
+
+> 에러모듈 확인 기능은 Hitmap에서 발견된 에러모듈의 정보를 확인하는 기능입니다.<br>
+> Hitmap에서 에러 모듈로 보이는 빨간점을 선택할 경우 에러 모듈의 위치정보를 확인할 수 있습니다. <br>
+> 에러모듈 선택 후 하단의 [사진보기] 버튼을 클릭하면 해당 모듈이 에러라고 판단되는 프레임과, 에러모듈의 위치를 사용자에게 보여줍니다.
