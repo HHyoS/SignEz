@@ -87,7 +87,8 @@
         <div align="center">
           <img src="README.assets/erd.png">
         </div>
-    </details>
+    </details>  
+  </details>
   - [ClassDiagram](https://drive.google.com/file/d/1Xjm-bdqHNJViNJnO5jlTdmK5wJkb9KSn/view)
 </details>
 - [컨벤션](https://handsome-linen-cba.notion.site/Git-Branch-Strategy-Commit-Convention-0ab0e506c0d2477abd50a0e2039cb003)
