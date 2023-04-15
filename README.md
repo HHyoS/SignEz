@@ -70,6 +70,26 @@
 
 ## 🧾 프로젝트 산출물
 
+- [다이어그램](https://www.notion.so/Diagram-f90ec468fa464cf6b084c82eaa5bd5ff?pvs=4)
+  - [UseCaseDiagram](https://www.notion.so/Use-Case-Diagram-644f02d76c5d408b8318e360057d4733?pvs=4)
+  - [SequenceDiagram](https://www.notion.so/38d4a2b888544ad2a31ef9233ed4ff36?pvs=4)
+  - [WireFrame](https://www.figma.com/file/6eNC1A1Tm2kaPNxUKetiBw/%EC%99%80%EC%9D%B4%EC%96%B4%ED%94%84%EB%A0%88%EC%9E%84)
+  <details>
+    <summary>기타 다이어그램</summary>
+    <details>
+      <summary>Flow Char</summary>
+        <div align="center">
+          <img src="README.assets/wire.png">
+        </div>
+    </details>
+    <details>
+      <summary>ERD</summary>
+        <div align="center">
+          <img src="README.assets/erd.png">
+        </div>
+    </details>
+  - [ClassDiagram](https://drive.google.com/file/d/1Xjm-bdqHNJViNJnO5jlTdmK5wJkb9KSn/view)
+</details>
 - [컨벤션](https://handsome-linen-cba.notion.site/Git-Branch-Strategy-Commit-Convention-0ab0e506c0d2477abd50a0e2039cb003)
 - [기능명세서](https://handsome-linen-cba.notion.site/e72d1e82c0ca4bf7994e010c72cf91e0?v=5960ffe7f30a44fca147d2b4436ad866)
 - [Gantt Char](https://handsome-linen-cba.notion.site/Gantt-Chart-6a6df79f994649cbbcb5b5ba534de3d1)
