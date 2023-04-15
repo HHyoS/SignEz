@@ -90,7 +90,7 @@
         </div>
     </details>  
   </details>
-</details>
+  
 - [컨벤션](https://handsome-linen-cba.notion.site/Git-Branch-Strategy-Commit-Convention-0ab0e506c0d2477abd50a0e2039cb003)
 - [기능명세서](https://handsome-linen-cba.notion.site/e72d1e82c0ca4bf7994e010c72cf91e0?v=5960ffe7f30a44fca147d2b4436ad866)
 - [Gantt Char](https://handsome-linen-cba.notion.site/Gantt-Chart-6a6df79f994649cbbcb5b5ba534de3d1)
