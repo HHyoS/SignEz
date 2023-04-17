@@ -1,10 +1,7 @@
 package com.signez.signageproblemshooting.ui.signage
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,10 +9,7 @@ import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.data.repository.CabinetsRepository
 import com.signez.signageproblemshooting.data.repository.SignagesRepository
-import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.analysis.SignageState
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
@@ -32,19 +26,6 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
     override var type = 0;
     lateinit var cabinet: MutableState<Cabinet>
     var newCabinetId = mutableStateOf(-1L)
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
-
-    fun init() {
-        mCurrentPhotoPath.value = ""
-        imageUri.value = Uri.EMPTY
-        sWidth.value = ""
-        sHeight.value = ""
-        sName.value = ""
-        newCabinetId.value = -1L
-    }
 
     fun getCabinetById(modelId: Long) =
         runBlocking {
@@ -68,9 +49,9 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
         else {
             signage.modelId
         }
-        val this_cabinet = getCabinetById(signage.modelId)
-        signage.heightCabinetNumber = (signage.height/this_cabinet.cabinetHeight).toInt()
-        signage.widthCabinetNumber = (signage.width/this_cabinet.cabinetWidth).toInt()
+        val thisCabinet = getCabinetById(signage.modelId)
+        signage.heightCabinetNumber = (signage.height/thisCabinet.cabinetHeight).toInt()
+        signage.widthCabinetNumber = (signage.width/thisCabinet.cabinetWidth).toInt()
 
         signageRepository.updateSignage(signage)
     }
@@ -90,14 +71,10 @@ class SignageDetailViewModel(private val signageRepository: SignagesRepository, 
     }
 
     suspend fun getSignage(signageId: Long): Signage {
-        val signage: Signage =
-            signageRepository.getSignageById(signageId)
-        return signage
+        return signageRepository.getSignageById(signageId)
     }
 
     suspend fun getNewCabinet(): Cabinet {
-        val cabinet: Cabinet =
-            cabinetRepository.getNewCabinet(newCabinetId.value)
-        return cabinet
+        return cabinetRepository.getNewCabinet(newCabinetId.value)
     }
 }

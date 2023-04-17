@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -18,11 +17,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -42,8 +38,6 @@ import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.IntentButton
 import com.signez.signageproblemshooting.ui.inputs.dispatchTakePictureIntent
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
-import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
-import com.signez.signageproblemshooting.ui.theme.OneBGGrey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,17 +52,16 @@ object DetailCabinetScreenDestination : NavigationDestination {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CDetail(
+    modifier: Modifier = Modifier,
     navController: NavController,
     cabinetId: Long = -1,
     activity: Activity,
     viewModel: CabinetDetailViewModel,
-    modifier: Modifier = Modifier,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
 
     val coroutineScope = rememberCoroutineScope()
-    var bitmap: Bitmap? = null
+    val bitmap: Bitmap? = null
     var imageBitmap by remember { mutableStateOf<Bitmap?>(bitmap) }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -104,8 +97,6 @@ fun CDetail(
                             }
                         })
                     // Load the image bitmap on a background thread
-//                    imageBitmap =
-//                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
                 } catch (e: Exception) {
                     // Handle any errors that occur while loading the image
                     Log.e("Error", "Error loading image", e)
@@ -137,11 +128,10 @@ fun CDetail(
         }
     }
     if (viewModel.imageUri.value != Uri.EMPTY) {
-//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
         loadImageAsync(context, contentUri)
     }
 
-    androidx.compose.material.Scaffold(
+    Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background),
@@ -392,83 +382,6 @@ fun CDetail(
                 }
 
             }
-            //
-//            Column {
-//
-//                OutlinedButton(
-//                    onClick = { },
-//                    shape = RoundedCornerShape(20.dp),
-//                    border = BorderStroke(2.dp, Color.Blue),
-//                    colors = ButtonDefaults.outlinedButtonColors(
-//                        backgroundColor = Color.White,
-//                        contentColor = Color.Blue
-//                    ),
-//                    modifier = Modifier.padding(16.dp)
-//                ) {
-//                    Text("카메라")
-//                }
-//            }
-
-
-//            Row {
-//                Button(onClick = {
-//                    coroutineScope.launch {
-//                        try {
-//                            Log.d("gogo","${imageBitmap == null}")
-//                            if (cabinet != null) {
-//                                if (imageBitmap == null ){
-//                                    viewModel.updateRecord(
-//                                        name = cabinetName.value,
-//                                        width = cabinetWidth.value.toDouble(),
-//                                        height = cabinetHeight.value.toDouble(),
-//                                        bitmap = null,
-//                                        cabinet = cabinet,
-//                                        colNum = colModuleCount.value.toInt(),
-//                                        rowNum = rowModuleCount.value.toInt(),
-//                                    )
-//                                }
-//                                else {
-//                                    viewModel.updateRecord(
-//                                        name = cabinetName.value,
-//                                        width = cabinetWidth.value.toDouble(),
-//                                        height = cabinetHeight.value.toDouble(),
-//                                        bitmap = imageBitmap,
-//                                        cabinet = cabinet,
-//                                        colNum = colModuleCount.value.toInt(),
-//                                        rowNum = rowModuleCount.value.toInt(),
-//                                    )
-//                                }
-//                            }
-//                        } catch (e: Exception) {
-//                            withContext(Dispatchers.Main) {
-//                                Log.d("finde",e.toString())
-//                                Toast.makeText(context, "정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
-//                            }
-//                        }
-//                    }
-//                    navController.popBackStack() }) {
-//                    Text(text = "확인")
-//                }
-//
-//                Button(onClick = {
-//                    coroutineScope.launch {
-//                        try {
-//                            if (cabinet != null) {
-//                                if (!viewModel.delete(cabinet = cabinet)) {
-//                                    Toast.makeText(context, "연관된 사이니지가 있습니다.", Toast.LENGTH_SHORT).show()
-//                                }
-//                                navController.popBackStack()
-//                            }
-//                        } catch (e: Exception) {
-//                            withContext(Dispatchers.Main) {
-//                                Toast.makeText(context, "연관된 사이니지가 있습니다.", Toast.LENGTH_SHORT).show()
-//                            }
-//                        }
-//                    }
-//                }) {
-//                    Text(text = "삭제")
-//                }
-//            }
         } // 컬럼 끝
 
     }// 화면 전체 컬럼 끝

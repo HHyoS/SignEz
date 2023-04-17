@@ -1,7 +1,6 @@
 package com.signez.signageproblemshooting.ui.signage
 
 import android.graphics.Bitmap
-import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -18,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -53,19 +51,17 @@ inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier
 
 @Composable
 fun SignageInformationScreen(
-    onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: AnalysisViewModel,
     detailViewModel: SignageViewModel,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
     var selectedId: Long by remember { mutableStateOf(-1) }
     var searchQuery by remember { mutableStateOf("") }
-    androidx.compose.material.Scaffold(
+    Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background),
@@ -169,19 +165,6 @@ fun SignageList(
 ) {
     val signageListState by viewModel.signageListState.collectAsState()
     val itemList = signageListState.itemList
-//    val cabinetState = produceState(initialValue = null as Cabinet?, producer = {
-//        value = viewModel.getRelatedCabinet(1)
-//    })
-//    val cabinet = cabinetState.value
-
-//    if (selectedId > -1) { // 외래기 연결 데이터 확인용
-//        Button(onClick = { /*TODO*/ }) {
-//            if (cabinet != null) {
-//                Text(text=cabinet.cabinetHeight.toString())
-//            }
-//        }
-//    }
-
     if (itemList.isEmpty()) {
         Text(
             text = "텅 비었어요.",
@@ -190,7 +173,6 @@ fun SignageList(
     } else {
         LazyColumn(
             modifier = modifier.background(MaterialTheme.colors.surface),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = itemList, key = { it.id }) { item ->
                 if (item.name.uppercase().contains(searchQuery.uppercase())) {
@@ -345,7 +327,7 @@ fun SearchBar(
             onSearch(searchQuery)
             keyboardController?.hide()
         }),
-        colors = androidx.compose.material.TextFieldDefaults.outlinedTextFieldColors(
+        colors = TextFieldDefaults.outlinedTextFieldColors(
             textColor = MaterialTheme.colors.onSurface,
             backgroundColor = MaterialTheme.colors.secondary,
             focusedBorderColor = MaterialTheme.colors.secondary,
@@ -353,13 +335,3 @@ fun SearchBar(
         )
     )
 }
-
-//@Preview
-//@Composable
-//fun ComponentPreview() {
-//    SignEzTheme(darkTheme = false) {
-//        Column {
-//            SearchBar()
-//        }
-//   }
-//}

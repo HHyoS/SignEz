@@ -1,6 +1,5 @@
 package com.signez.signageproblemshooting.fields
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,37 +10,11 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-@Composable
-fun BasicTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(value)) }
-
-    androidx.compose.foundation.text.BasicTextField(
-        modifier = modifier
-            .background(color = MaterialTheme.colors.surface),
-        value = textFieldValue,
-        onValueChange = {
-            textFieldValue = it
-            onValueChange(it.text)
-        },
-        singleLine = true,
-        textStyle = MaterialTheme.typography.subtitle1.copy(fontSize = 20.sp),
-        cursorBrush = SolidColor(Color.Black)
-    )
-}
 
 @Composable
 fun EditNumberField(
@@ -50,7 +23,6 @@ fun EditNumberField(
     keyboardActions: KeyboardActions,
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
     unit: String
 ) {
     Row(
@@ -74,8 +46,6 @@ fun EditNumberField(
             modifier = Modifier
                 .heightIn(min = 20.dp) // set min height to 48dp
                 .weight(0.35f),
-//                .fillMaxWidth(0.4f),
-//                .padding(3.dp),
             singleLine = true,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
@@ -95,9 +65,6 @@ fun EditNumberField(
                 .align(Alignment.Bottom) // center vertically with TextField
                 .weight(0.2f)
         )
-        //디자인 참고
-        //https://developer.android.com/jetpack/compose/text?hl=ko#styling-textfield
-        //https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#textfield
     }
 }
 
@@ -164,19 +131,7 @@ class NumberCommaVisualTransformation : VisualTransformation {
     }
 }
 
-// Extension function to insert commas in a number string
 fun String.getCommaNumber(): String {
     val regex = "(\\d)(?=(\\d{3})+\$)".toRegex()
     return replace(regex, "\$1,")
 }
-//https://dealicious-inc.github.io/2022/03/14/android-compose-apply.html 참고
-
-//@Preview
-//@Composable
-//fun TextFieldsPreview() {
-//    SignEzTheme(darkTheme = false) {
-//        Column() {
-//
-//        }
-//    }
-//}

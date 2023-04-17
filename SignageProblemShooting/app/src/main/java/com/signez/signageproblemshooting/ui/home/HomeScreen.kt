@@ -1,15 +1,10 @@
 package com.signez.signageproblemshooting.ui.home
 
-import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +16,8 @@ import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
-import kotlinx.coroutines.launch
 
 
 object HomeDestination : NavigationDestination {
@@ -41,22 +34,13 @@ fun HomeScreen(
     mainViewModel: MainViewModel,
     navController: NavController
 ) {
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    val signageState by viewModel.getSignage().collectAsState()
     var signage by remember { mutableStateOf(Signage(0, "", 0, 0, 0.0, 0.0, 0L)) }
     var cabinet by remember { mutableStateOf(Cabinet(0, "", 0.0, 0.0, 0, 0)) }
     LaunchedEffect(viewModel.signageId.value) {
         signage = viewModel.getSignageById(viewModel.signageId.value)
         cabinet = viewModel.getCabinet(viewModel.signageId.value)
     }
-
-    val appSettingsResultLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            onAppSettingsClosed()
-            checkAndRequestPermissions(context, mainViewModel)
-        }
 
     androidx.compose.material.Scaffold(
         topBar = {
@@ -65,17 +49,6 @@ fun HomeScreen(
                 canNavigateBack = false
             )
         },
-        // 하단 양쪽 버튼 예시
-//        bottomBar = {
-//            BottomDoubleFlatButton(
-//                leftTitle = "취소",
-//                rightTitle = "확인",
-//                isLeftUsable = true,
-//                isRightUsable = false,
-//                leftOnClickEvent = { /*TODO*/ },
-//                rightOnClickEvent = { /*TODO*/ }
-//            )
-//        }
         bottomBar = {
             Column(
                 modifier = Modifier
@@ -85,12 +58,6 @@ fun HomeScreen(
                 PictureAnalysisBtn(navigateToPicture)
             }
         }
-        // 플로팅 버튼 예시
-//        floatingActionButton = {
-//            SignEzFloatingButton(
-//                onClickEvent = {}
-//            )
-//        }
     ) { innerPadding -> // default Scaffold 내부 다른 구조와 겹치지 않는 적절한 값.
         Box(
             modifier = Modifier
@@ -99,19 +66,6 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-//            if (!mainViewModel.permissionsGranted.value) {
-//                Column(
-//                    modifier = Modifier
-//                        .align(alignment = Alignment.TopCenter),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    PermissionInfo()
-//                    Button(onClick = { openAppSettings(context, appSettingsResultLauncher) }) {
-//                        Text(text = "권한 설정")
-//                    }
-//                }
-//
-//            } else {
             Column(
                 modifier = Modifier
                     .align(alignment = Alignment.TopCenter)
@@ -134,92 +88,19 @@ fun HomeScreen(
                 {
                     if (viewModel.signageId.value > -1) {
                         SignEzSpec(
-                            modifier = Modifier,
-                            navigateToSignageList,
-                            signage
+                            navigateToSignageList = navigateToSignageList,
+                            signage = signage
                         )
-                        CabinetSpec(modifier = Modifier, cabinet)
+                        CabinetSpec(cabinet = cabinet)
                     } else {
-                        SignEzSpec(modifier = Modifier, navigateToSignageList, null)
-                        CabinetSpec(modifier = Modifier, null)
+                        SignEzSpec(
+                            navigateToSignageList = navigateToSignageList,
+                            signage = null
+                        )
+                        CabinetSpec(cabinet = null)
                     }
                 }
-//                }
             }
         }
     }
 }
-
-
-//                    Text(
-//                        text = "분석 데이터 선택",
-//                        modifier = Modifier.padding(16.dp),
-//                        fontSize = 40.sp,
-//                        fontWeight = FontWeight.Bold
-//                    )
-//                    Text(
-//                        text = "사이니지 정보",
-//                        modifier = Modifier.padding(12.dp),
-//                        fontSize = 30.sp,
-//                        fontWeight = FontWeight.SemiBold,
-//                        color = Color(0xFF0c4da2)
-//                    )
-//                    Text(text = "사이니지 사이즈 (mm)")
-//                    EditNumberField(
-//                        // 가로 길이
-//                        head = "W : ",
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Number,
-//                            imeAction = ImeAction.Done
-//                        ),
-//                        keyboardActions = KeyboardActions(
-//                            onDone = { focusManager.clearFocus() }
-//                        ),
-//                        value = sWidth.value,
-//                        onValueChange = { sWidth.value = it },
-//                    )
-//                    EditNumberField(
-//                        // 세로 길이
-//                        head = "H : ",
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Number,
-//                            imeAction = ImeAction.Done
-//
-//                        ),
-//                        keyboardActions = KeyboardActions(
-//                            onDone = { focusManager.clearFocus() }
-//                        ),
-//                        value = sHeight.value,
-//                        onValueChange = { sHeight.value = it },
-//                    )
-//                    Spacer(modifier = Modifier.padding(10.dp))
-//
-//                    Text(text = "디스플레이 사이즈 (mm)")
-//                    EditNumberField(
-//                        // 가로 길이
-//                        head = "W : ",
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Number,
-//                            imeAction = ImeAction.Done
-//                        ),
-//                        keyboardActions = KeyboardActions(
-//                            onDone = { focusManager.clearFocus() }
-//                        ),
-//                        value = dWidth.value,
-//                        onValueChange = { dWidth.value = it },
-//                    )
-//                    EditNumberField(
-//                        // 세로 길이
-//                        head = "H : ",
-//                        keyboardOptions = KeyboardOptions(
-//                            keyboardType = KeyboardType.Number,
-//                            imeAction = ImeAction.Done
-//                        ),
-//                        keyboardActions = KeyboardActions(
-//                            onDone = { focusManager.clearFocus() }
-//                        ),
-//                        value = dHeight.value,
-//                        onValueChange = { dHeight.value = it },
-//                    )
-//                    Spacer(modifier = Modifier.padding(10.dp))
-// 일단 찍기, 불러오기 uri 따로 분리했는데 합쳐도 될듯.

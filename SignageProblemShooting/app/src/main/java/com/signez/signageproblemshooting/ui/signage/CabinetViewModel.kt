@@ -3,20 +3,16 @@ package com.signez.signageproblemshooting.ui.signage
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.Cabinet
-import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.data.repository.CabinetsRepository
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -32,32 +28,15 @@ class CabinetViewModel(private val cabinetRepository: CabinetsRepository) : View
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = CabinetListState()
             )
-    private val _selectedCabinetId = MutableStateFlow<Long?>(null)
-    val selectedCabinetId: StateFlow<Long?> get() = _selectedCabinetId
     override var mCurrentPhotoPath = mutableStateOf("")
     override var imageUri = mutableStateOf(Uri.EMPTY)
     override var type = 0;
-
-    fun setSelectedCabinetId(id: Long) {
-        _selectedCabinetId.value = id
-    }
-
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-    fun createSimpleBitmap(width: Int, height: Int, color: Int): Bitmap {
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        canvas.drawColor(color)
-        return bitmap
-    }
-
     fun insertTestRecord(context:Context) = runBlocking {
         // Save image as a Blob
-//        val bitmap = createSimpleBitmap(100, 100, Color.RED)
-
-
         val drawable = ContextCompat.getDrawable(context, R.drawable.xpr)
         // Convert drawable to Bitmap
         val bitmap = if (drawable is BitmapDrawable) {

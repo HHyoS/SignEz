@@ -5,22 +5,15 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Rect
-import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.google.common.reflect.Reflection.getPackageName
-import com.signez.signageproblemshooting.ErrorDetectActivity
 import com.signez.signageproblemshooting.ImageCropActivity
 import com.signez.signageproblemshooting.TutorialActivity
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -49,7 +42,6 @@ fun createImageFile(viewModel: MediaViewModel): File {
     // Create the image file in the app directory
     val imageFile = File(appDir, imageFileName)
     viewModel.mCurrentPhotoPath.value = imageFile.absolutePath
-//    mCurrentPhotoPath =
     return imageFile
 }
 
@@ -70,7 +62,6 @@ fun createVideoFile(viewModel: VideoViewModel): File {
     }
 
     // Create the video file in the app directory
-    //    mCurrentVideoPath.value = videoFile.absolutePath
     val videoFile = File(appDir, videoFileName)
     viewModel.mCurrentVideoPath.value = videoFile.absolutePath
 
@@ -148,8 +139,6 @@ fun galleryAddPic(context: Context, viewModel: MediaViewModel) {
         put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
         put(MediaStore.Images.Media.DATA, imagePath)
     }
-//        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-//    imageUri.value = Uri.parse(imagePath)
     viewModel.imageUri.value = Uri.parse(imagePath)
     Toast.makeText(context, "사진이 앨범에 저장되었습니다.", Toast.LENGTH_SHORT).show();
 }
@@ -167,61 +156,16 @@ fun galleryAddVideo(context: Context, viewModel: VideoViewModel) {
     viewModel.videoUri.value = Uri.parse(videoPath)
     Toast.makeText(context, "Video saved to gallery.", Toast.LENGTH_SHORT).show()
 }
-
-fun getRealPathFromURI(uri: Uri, activity: Activity): String? {
-    val projection = arrayOf(MediaStore.Images.Media.DATA)
-    val cursor = activity.contentResolver.query(uri, projection, null, null, null)
-    val columnIndex = cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-    cursor?.moveToFirst()
-    val path = columnIndex?.let { cursor.getString(it) }
-    cursor?.close()
-    return path
-}
-
-fun getImageUri(inContext: Context, inImage: Bitmap): Uri {
-    val bytes = ByteArrayOutputStream()
-    inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-    val path =
-        MediaStore.Images.Media.insertImage(inContext.contentResolver, inImage, "Title", null)
-    return Uri.parse(path)
-}
-
-fun playVideoFromUri(context: Context, uri: Uri) {
-    val mediaPlayer = MediaPlayer().apply {
-        setDataSource(context, uri)
-        prepare()
-        start()
-    }
-}
-
-
 fun openImageCropActivity(context: Context, type:Int, signageId: Long, uri: Uri) {
     val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
-    val REQUEST_TYPE: String = "REQUEST_TYPE"
-    val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
+    val REQUEST_TYPE = "REQUEST_TYPE"
+    val REQUEST_SIGNAGE_ID = "REQUEST_SIGNAGE_ID"
     val intent = Intent(context, ImageCropActivity::class.java)
     intent.putExtra(REQUEST_TYPE, type)
     intent.putExtra(REQUEST_SIGNAGE_ID, signageId)
     intent.putExtra("uri",uri.toString())
-    intent.setData(uri)
-    (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
-}
-fun openErrorDetectActivity(context: Context,rec : Rect,uri : Uri) {
-    val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
-    val REQUEST_TYPE: String = "REQUEST_TYPE"
-    val REQUEST_SIGNAGE_ID: String = "REQUEST_SIGNAGE_ID"
-
-    val intent = Intent(context, ErrorDetectActivity::class.java)
-
-    intent.putExtra("left",rec.left)
-    intent.putExtra("right",rec.right)
-    intent.putExtra("top",rec.top)
-    intent.putExtra("bottom",rec.bottom)
-    intent.putExtra("uri",uri.toString())
     intent.data = uri
-    Log.d("start","start ${uri}")
     (context as Activity).startActivityForResult(intent, REQUEST_CODE_IMAGE_CROP_ACTIVITY)
-    Log.d("end","end")
 }
 
 fun openTutorialActivity(context: Context) {
@@ -232,6 +176,6 @@ fun openTutorialActivity(context: Context) {
 
 fun openSettingIntent(context: Context){
     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-    intent.setData(Uri.parse("package:" + "com.signez.signageproblemshooting"));
+    intent.data = Uri.parse("package:" + "com.signez.signageproblemshooting");
     ContextCompat.startActivity(context, intent, null);
 }

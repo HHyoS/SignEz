@@ -1,8 +1,6 @@
 package com.signez.signageproblemshooting.data.entities
 
 import androidx.room.*
-import com.signez.signageproblemshooting.data.Converters
-import java.sql.Blob
 
 @Entity(tableName = "signages",
     foreignKeys = [
@@ -13,7 +11,6 @@ import java.sql.Blob
             onUpdate = ForeignKey.CASCADE,
         )
     ])
-@TypeConverters(Converters::class)
 data class Signage(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")

@@ -32,26 +32,16 @@ import com.signez.signageproblemshooting.ui.theme.SignEzTheme
 import java.io.*
 import java.util.*
 import android.Manifest
-import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
-import com.signez.signageproblemshooting.data.SignEzDatabase
-import com.signez.signageproblemshooting.data.SignEzDatabaseCallback
 import com.signez.signageproblemshooting.data.datastore.StoreInitialLaunch
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private lateinit var viewModel1: PictureViewModel
@@ -72,11 +62,8 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     private val REQUEST_CODE_IMAGE_CAPTURE_3 = 222
     private val REQUEST_CODE_IMAGE_CAPTURE_4 = 2222
     private val REQUEST_CODE_IMAGE_CAPTURE_5 = 22222
-    private val PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 4
-    private val REQUEST_CODE_ERROR_DETECT_ACTIVITY = 999
     private val REQUEST_CODE_IMAGE_CROP_ACTIVITY = 957
     private val REQUEST_CODE_TUTORIAL_ACTIVITY = 310
-
 
     val permissions = arrayOf(
         Manifest.permission.CAMERA,
@@ -127,7 +114,6 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
                     navController.popBackStack()
                     navController.navigate(ResultsHistoryDestination.route)
                     navController.navigate(ResultGridDestination.route+"/-1")
-                    Log.d("godetect","clear ${requestCode}")
                 }
                 REQUEST_CODE_TUTORIAL_ACTIVITY-> {
                     finishActivity(REQUEST_CODE_TUTORIAL_ACTIVITY)
@@ -141,47 +127,44 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
-        val intent = Intent(this, MainActivity::class.java)
+        Intent(this, MainActivity::class.java)
 
         viewModel1 = ViewModelProvider( // 분석 이미지
             this,
             factory = AppViewModelProvider.Factory
-        ).get(PictureViewModel::class.java)
+        )[PictureViewModel::class.java]
         viewModel2 = ViewModelProvider( // 분석 영상
             this,
             factory = AppViewModelProvider.Factory
-        ).get(VideoViewModel::class.java)
+        )[VideoViewModel::class.java]
         viewModel3 = ViewModelProvider( // 사이니지
             this,
             factory = AppViewModelProvider.Factory
-        ).get(SignageViewModel::class.java)
+        )[SignageViewModel::class.java]
         viewModel4 = ViewModelProvider( // 캐비닛
             this,
             factory = AppViewModelProvider.Factory
-        ).get(CabinetViewModel::class.java)
+        )[CabinetViewModel::class.java]
         viewModel5 = ViewModelProvider( // 분석 종합
             this,
             factory = AppViewModelProvider.Factory
-        ).get(AnalysisViewModel::class.java)
+        )[AnalysisViewModel::class.java]
         viewModel6 = ViewModelProvider( // 사이니지 수정
             this,
             factory = AppViewModelProvider.Factory
-        ).get(SignageDetailViewModel::class.java)
+        )[SignageDetailViewModel::class.java]
         viewModel7 = ViewModelProvider( // 캐비닛 수정
             this,
             factory = AppViewModelProvider.Factory
-        ).get(CabinetDetailViewModel::class.java)
+        )[CabinetDetailViewModel::class.java]
 
         viewModel4.insertTestRecord(applicationContext)
         viewModel3.insertTestRecord(applicationContext)
-        viewModel5.insertTestRecord()
         mainViewModel.insertTestRecord(applicationContext)
 
 
         // ...
         // Check if the initial data input is finished and restart the activity
-
-
         setContent {
             navController = rememberNavController()
             val isInitialLaunch = StoreInitialLaunch(LocalContext.current).getInitialLaunch.collectAsState(initial = false).value!!
@@ -206,20 +189,16 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
 
         AutoPermissions.loadSelectedPermissions(this, REQUEST_CODE_PERMISSIONS, permissions)
     }
-    fun go() {
-        applicationContext
-    }
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         AutoPermissions.Companion.parsePermissions(this, REQUEST_CODE_PERMISSIONS, permissions, this)
     }
 
     override fun onDenied(requestCode: Int, permissions: Array<String>) {
-        {}
     }
 
     override fun onGranted(requestCode: Int, permissions: Array<String>) {
-        {}
     }
     private fun checkAndRequestPermissions(): Boolean {
         val notGrantedPermissions = permissions.filter {
@@ -232,64 +211,5 @@ class MainActivity : ComponentActivity(), AutoPermissionsListener {
         }
         return true
     }
-
-    private fun openAppSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        val uri = Uri.fromParts("package", packageName, null)
-        intent.data = uri
-        startActivityForResult(intent, REQUEST_CODE_APP_SETTINGS)
-    }
-
-
-//    private fun requestPermissions() {
-//        val permissionsToRequest = mutableListOf<String>()
-//        for (permission in permissions) {
-//            if (ContextCompat.checkSelfPermission(
-//                    this,
-//                    permission
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                permissionsToRequest.add(permission)
-//                shouldShowRequestPermissionRationale(permission)
-//            }
-//        }
-//
-//        if (permissionsToRequest.isNotEmpty()) { // 권한 요청할게 있으면 요청 날림.
-//            ActivityCompat.requestPermissions(
-//                this,
-//                permissionsToRequest.toTypedArray(),
-//                REQUEST_CODE_PERMISSIONS
-//            )
-//        } else {
-//            Log.d("permissionis","granted")
-//        }
-//    }
-
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        var allPermissionsGranted = mutableStateOf(false)
-//        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-//            for (i in grantResults.indices) {
-//                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-//                    allPermissionsGranted.value = false
-//                    break
-//                }
-//            }
-//            if (allPermissionsGranted.value) {
-//                // Permissions granted
-//                Log.d("permissions are","granted")
-//            } else {
-//                // Permissions denied
-//                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
-////                finishAffinity() // Close the app if permissions are denied
-//            }
-//        }
-//    }
 }
 
-//@Preview(showBackground = true)
-// 일단 찍기, 불러오기 uri 따로 분리했는데 합쳐도 될듯.
