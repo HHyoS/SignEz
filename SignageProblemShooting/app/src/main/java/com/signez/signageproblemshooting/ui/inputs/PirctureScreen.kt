@@ -1,13 +1,9 @@
 package com.signez.signageproblemshooting.ui.inputs
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Rect
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -19,13 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
@@ -40,7 +33,6 @@ import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.pytorch.Module
 import java.io.File
 
 object PictureScreenDestination : NavigationDestination {
@@ -53,12 +45,10 @@ object PictureScreenDestination : NavigationDestination {
 fun PictureAnalysis(
     activity: Activity,
     dispatchTakePictureIntent: (Activity, PictureViewModel, Int) -> Unit,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     viewModel: PictureViewModel,
     analysisViewModel: AnalysisViewModel,
     modifier: Modifier = Modifier,
-    navController: NavController
 ) {
     val context = LocalContext.current
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -70,22 +60,6 @@ fun PictureAnalysis(
     var contentUri: Uri = Uri.EMPTY
     val REQUEST_DETECT_PHOTO: Int = 101
 
-    //test start
-    var mModule: Module? = null
-    var mWidth: Int = 2
-    var mHeight: Int = 2
-    var mmWidth: Int = 3
-    var mmHeight: Int = 5
-    var mImgScaleX = 0f
-    var mImgScaleY = 0f
-    var mIvScaleX = 0f
-    var mIvScaleY = 0f
-    var mStartX = 0f
-    var mStartY = 0f
-    var imageUri by remember { mutableStateOf(contentUri) }
-    var rec : Rect? = null
-
-    //test end
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
         if (!viewModel.imageUri.value.toString().contains("content")) {
@@ -98,7 +72,6 @@ fun PictureAnalysis(
         analysisViewModel.imageContentUri.value = contentUri
     }
 
-//    var tempUri by remember { mutableStateOf(Uri.EMPTY) }
     // image의 제목, 크기 등 메타데이터 가져옴
     val loadImageMetadata = {
         if (viewModel.imageUri.value != Uri.EMPTY) {
@@ -122,7 +95,6 @@ fun PictureAnalysis(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-//                title = PictureScreenDestination.titleRes,
                 title = "사진 분석",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
@@ -136,8 +108,6 @@ fun PictureAnalysis(
                 isRightUsable = true,
                 leftOnClickEvent = onNavigateUp,
                 rightOnClickEvent = {
-
-                    // test
 
                     if(contentUri == Uri.EMPTY){
                         Toast.makeText(context,"사진을 등록 후 진행해주세요.", Toast.LENGTH_SHORT).show()
@@ -174,7 +144,6 @@ fun PictureAnalysis(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-//                                    .fillMaxHeight(0.4f)
                                     .clip(RoundedCornerShape(15.dp))
                                     .background(color = OneBGDarkGrey)
                             )
@@ -209,7 +178,6 @@ fun PictureAnalysis(
                     buttonTitle = "입력",
                     isbuttonVisible = false,
                     buttonOnclickEvent = {},
-                    modifier = Modifier,
                 )
 
                 Row(

@@ -1,5 +1,6 @@
 package com.signez.signageproblemshooting.service
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
@@ -17,6 +18,7 @@ class ResultView : View {
         mPaintText = Paint()
     }
 
+    @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (mResults == null) return
@@ -49,10 +51,6 @@ class ResultView : View {
                 mPaintText!!
             )
         }
-    }
-
-    fun setResults(results: ArrayList<Result>?) {
-        mResults = results
     }
 
     companion object {

@@ -1,35 +1,27 @@
 package com.signez.signageproblemshooting.ui.signage
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalFocusManager import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.SignEzTopAppBar
-import com.signez.signageproblemshooting.data.entities.Cabinet
-import com.signez.signageproblemshooting.data.entities.Signage
+import com.signez.signageproblemshooting.data.entities.Cabinet import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
-import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
-import com.signez.signageproblemshooting.ui.theme.OneBGBlue
+import com.signez.signageproblemshooting.ui.navigation.NavigationDestination import com.signez.signageproblemshooting.ui.theme.OneBGBlue
 import com.signez.signageproblemshooting.ui.theme.OneBGGrey
 import java.text.NumberFormat
 import java.util.*
@@ -44,20 +36,18 @@ object CabinetListScreenDestination : NavigationDestination {
 
 @Composable
 fun CabinetInformationScreen(
-    onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     signageViewModel: SignageViewModel,
     detailViewModel: SignageDetailViewModel,
     mode: String,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
     var selectedId: Long by remember { mutableStateOf(-1) }
     var searchQuery by remember { mutableStateOf("") }
-    androidx.compose.material.Scaffold(
+    Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
             .background(OneBGGrey),
@@ -135,24 +125,6 @@ fun CabinetInformationScreen(
                             searchQuery=searchQuery
                         )
                     }
-                    // 이거 지우나요?
-//                    if (selectedId != -1L) {
-//                        if (mode == "edit") {
-//                            Button(onClick = {
-//                                detailViewModel.newCabinetId.value = selectedId
-//                                navController.popBackStack()
-//                            }) {
-//                                Text(text = "선택")
-//                            }
-//                        } else {
-//                            Button(onClick = {
-//                                signageViewModel.selectedCabinetId.value = selectedId
-//                                navController.popBackStack()
-//                            }) {
-//                                Text(text = "선택")
-//                            }
-//                        }
-//                    }
                 }
             }
         }
@@ -178,7 +150,6 @@ fun CabinetList(
     } else {
         LazyColumn(
             modifier = modifier.background(MaterialTheme.colors.surface),
-//            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(items = itemList, key = { it.id }) { item ->
                 if (item.name.uppercase().contains(searchQuery.uppercase())) {
@@ -211,7 +182,6 @@ private fun InventoryItem(
 ) {
     Row(
         modifier = modifier
-//        .clickable {  }
             .fillMaxWidth()
             .conditional(selectedId == cabinet.id) {
                 background(
@@ -221,8 +191,6 @@ private fun InventoryItem(
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        var bitmap: Bitmap
         Row(
             modifier = Modifier
                 .wrapContentWidth()
@@ -240,7 +208,6 @@ private fun InventoryItem(
             ) // 라디오 버튼
         }
         Divider(
-//            color = MaterialTheme.colors.onSurface,
             modifier = Modifier
                 .height(20.dp)
                 .width(1.dp)

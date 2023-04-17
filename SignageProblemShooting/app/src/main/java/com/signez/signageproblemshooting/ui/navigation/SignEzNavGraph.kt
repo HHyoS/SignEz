@@ -1,24 +1,17 @@
 package com.signez.signageproblemshooting.ui.navigation
 
 import android.app.Activity
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.signez.signageproblemshooting.SignEzApplication
-import com.signez.signageproblemshooting.data.entities.Signage
-import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.analysis.*
 import com.signez.signageproblemshooting.ui.home.HomeDestination
 import com.signez.signageproblemshooting.ui.home.HomeScreen
 import com.signez.signageproblemshooting.ui.inputs.*
 import com.signez.signageproblemshooting.ui.signage.*
-import kotlin.math.sign
 
 @Composable
 fun SignEzNavHost(
@@ -66,11 +59,9 @@ fun SignEzNavHost(
             PictureAnalysis(
                 activity = activity,
                 dispatchTakePictureIntent = ::dispatchTakePictureIntent,
-                navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel1,//viewModel(factory = AppViewModelProvider.Factory)
                 analysisViewModel = viewModel5,
-                navController = navController
             )
         }
 
@@ -78,22 +69,18 @@ fun SignEzNavHost(
             VideoAnalysis(
                 activity = activity,
                 dispatchTakeVideoIntent = ::dispatchTakeVideoIntent,
-                navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel2,
                 analysisViewModel = viewModel5,
-                navController = navController
             )
         }
 
         composable(route = SignageListScreenDestination.route) {
             SignageInformationScreen(
-                onItemClick = {},
                 modifier = Modifier,
                 navController = navController,
                 viewModel =  viewModel5,
                 detailViewModel = viewModel3,
-                navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
             )
         }
@@ -103,7 +90,6 @@ fun SignEzNavHost(
                 activity=activity,
                 viewModel = viewModel3,
                 navController = navController,
-                navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },)
         }
 
@@ -111,13 +97,11 @@ fun SignEzNavHost(
             backStackEntry ->
             backStackEntry.arguments?.getString("mode")?.let {
                 CabinetInformationScreen(
-                    onItemClick = {},
                     modifier = Modifier,
                     navController = navController,
                     signageViewModel =  viewModel3,
                     detailViewModel = viewModel6,
                     mode=it,
-                    navigateBack = { navController.popBackStack() },
                     onNavigateUp = { navController.navigateUp() },
                 )
             }
@@ -136,30 +120,29 @@ fun SignEzNavHost(
         composable(route = DetailSignageScreenDestination.route+"/{signageId}") {
             backStackEntry ->
             backStackEntry.arguments?.getString("signageId")?.let {
-                SDetail(navController,
+                SDetail(
+                    navController = navController,
                     signageId=it.toLong(),
                     activity=activity,
                     viewModel=viewModel6,
-                    navigateBack = { navController.popBackStack() },
-                    onNavigateUp = { navController.navigateUp() },) }
+                    onNavigateUp = { navController.navigateUp() }) }
         }
         composable(route = DetailCabinetScreenDestination.route+"/{cabinetId}") {
                 backStackEntry ->
             backStackEntry.arguments?.getString("cabinetId")?.let {
-                CDetail(navController,
+                CDetail(
+                    navController = navController,
                     cabinetId=it.toLong(),
                     activity=activity,
                     viewModel=viewModel7,
-                    navigateBack = { navController.popBackStack() },
-                    onNavigateUp = { navController.navigateUp() },) }
+                    onNavigateUp = { navController.navigateUp() })
+            }
         }
 
         composable(route = ResultsHistoryDestination.route) {
             ResultsHistoryView(
-                onItemClick = {},
                 modifier = Modifier,
                 navController = navController,
-                navigateBack = { navController.popBackStack() },
                 onNavigateUp = { navController.navigateUp() },
                 viewModel = viewModel5
             )
@@ -170,10 +153,8 @@ fun SignEzNavHost(
             backStackEntry ->
             backStackEntry.arguments?.getString("resultId")?.let {
                 ResultGridView(
-                    onItemClick = {},
                     modifier = Modifier,
                     navController = navController,
-                    navigateBack = { navController.popBackStack() },
                     onNavigateUp = { navController.navigateUp() },
                     viewModel = viewModel5,
                     resultId = it.toLong()
@@ -185,10 +166,7 @@ fun SignEzNavHost(
             backStackEntry ->
             backStackEntry.arguments?.let {
                 ErrorImageView(
-                    onItemClick = {},
                     modifier = Modifier,
-                    navController = navController,
-                    navigateBack = { navController.popBackStack() },
                     onNavigateUp = { navController.navigateUp() },
                     viewModel = viewModel5,
                     x = it.getString("x")!!.toInt(),
@@ -205,7 +183,6 @@ fun SignEzNavHost(
                     signageId = it.getString("signageId")!!,
                     cabinetId = it.getString("cabinetId")!!,
                     navController = navController,
-                    navigateBack = { navController.popBackStack() },
                     onNavigateUp = { navController.navigateUp() },
                 )
             }

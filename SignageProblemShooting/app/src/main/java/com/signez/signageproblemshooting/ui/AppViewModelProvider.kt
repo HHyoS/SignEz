@@ -18,15 +18,11 @@ package com.signez.signageproblemshooting.ui
 
 import android.app.Application
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.signez.signageproblemshooting.SignEzApplication
-import com.signez.signageproblemshooting.data.repository.ErrorImagesRepository
-import com.signez.signageproblemshooting.data.repository.ErrorModulesRepository
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.inputs.MainViewModel
 import com.signez.signageproblemshooting.ui.inputs.PictureViewModel
 import com.signez.signageproblemshooting.ui.inputs.VideoViewModel
 import com.signez.signageproblemshooting.ui.signage.CabinetDetailViewModel
@@ -71,7 +67,7 @@ object AppViewModelProvider {
             SignageDetailViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
         }
         initializer {
-            CabinetDetailViewModel(SignEzApplication().container.signagesRepository,SignEzApplication().container.cabinetsRepository)
+            CabinetDetailViewModel(SignEzApplication().container.cabinetsRepository)
         }
     }
 }

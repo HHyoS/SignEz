@@ -66,15 +66,14 @@ fun LoadingSpinner(
 @Composable
 fun SpinnerPreview() {
     SignEzTheme(darkTheme = false) {
-        var inprogressFrame = remember { mutableStateOf(0) }
-        var totalFrame = remember { mutableStateOf(1) }
-        totalFrame.value = 300
-        var progressPercent = inprogressFrame.value / (totalFrame).value.toFloat()
+        val inProgressFrame = remember { mutableStateOf(0) }
+        val totalFrame = remember { mutableStateOf(300) }
+        val progressPercent = inProgressFrame.value / (totalFrame).value.toFloat()
 
         Column(modifier = Modifier.fillMaxSize()) {
             LoadingSpinner("분석 중", progressPercent)
-            Button(onClick = { inprogressFrame.value = inprogressFrame.value + 1 }) {
-                Text(text = inprogressFrame.value.toString())
+            Button(onClick = { inProgressFrame.value = inProgressFrame.value + 1 }) {
+                Text(text = inProgressFrame.value.toString())
             }
         }
     }

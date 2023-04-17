@@ -13,19 +13,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.analysis.moduleClickEvent
@@ -65,13 +57,6 @@ fun ErrorModuleHeatMap(
             IntArray(cabinetColCount + 1)
         }
 
-
-//    Array<ErrorModule>
-//    for (errormoudle in errorModuleList) {
-//        val crow = (errormoudle.x / moduleRowCount) + 1
-//        val ccol = (errormoudle.y / moduleColCount) + 1
-//    }
-
     cabinetMatrix[1][1] = 1
 
     Box(
@@ -80,7 +65,6 @@ fun ErrorModuleHeatMap(
             .graphicsLayer(
                 scaleX = scale,
                 scaleY = scale,
-//                rotationZ = rotation,
                 translationX = offset.x,
                 translationY = offset.y
             )
@@ -129,7 +113,6 @@ fun ErrorModuleHeatMap(
                                     for (moduleR in 1..moduleRowCount) {
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
-//                                        modifier = Modifier.padding(vertical = 1.dp)
                                         ) {
                                             for (moduleC in 1..moduleColCount) {
                                                 Box(
@@ -229,11 +212,6 @@ fun ErrorModuleHeatMap(
         } // Col
 
     }
-
-//    signageMatrix[0][0][0][0] = 3
-//    val ints = signageMatrix[0][0][0][0]
-//    Text(text = ints.toString())
-
 }
 
 @Preview
@@ -278,21 +256,9 @@ fun HeatMapPreview() {
                     ErrorModule(resultId = 12, score = 70.0, x = 9, y = 9),
                     ErrorModule(resultId = 13, score = 75.0, x = 9, y = 9),
                     ErrorModule(resultId = 14, score = 80.0, x = 9, y = 9),
-//                ErrorModule(resultId = 15, score = 73.0, x = 30, y = 31),
                 ).filter {
                     it.score >= threshold
                 }
-
-//                ErrorModuleHeatMap(
-//                    widthCabinetNumber = 11,
-//                    heightCabinetNumber = 19,
-//                    moduleRowCount = 4,
-//                    moduleColCount = 4,
-//                    errorModuleList = errorModuleFilteredList,
-//                    moduleSize = 20.dp,
-//                    cabinetHeigth = 10.dp,
-//                    cabinetWidth = 10.dp,
-//                )
             }
 
             Text(text = threshold.toString())

@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -20,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -43,7 +41,6 @@ import com.signez.signageproblemshooting.ui.components.IntentButton
 import com.signez.signageproblemshooting.ui.inputs.dispatchTakePictureIntent
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
-import com.signez.signageproblemshooting.ui.theme.OneBGGrey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -65,7 +62,7 @@ fun AddCabinetScreen(
     onNavigateUp: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
+    val bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
     var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -97,8 +94,6 @@ fun AddCabinetScreen(
             withContext(Dispatchers.IO) {
                 try {
                     // Load the image bitmap on a background thread
-//                    imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
-//                    imageBitmap =
                     Glide.with(context)
                         .asBitmap()
                         .load(contentUri)
@@ -121,20 +116,18 @@ fun AddCabinetScreen(
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
-        if (!viewModel.imageUri.value.toString().contains("content")) {
-            contentUri =
-                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        contentUri = if (!viewModel.imageUri.value.toString().contains("content")) {
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         } else {
-            contentUri = viewModel.imageUri.value
+            viewModel.imageUri.value
         }
     }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
-//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
         loadImageAsync(context, contentUri)
     }
 
-    androidx.compose.material.Scaffold(
+    Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background),
@@ -190,17 +183,15 @@ fun AddCabinetScreen(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap.let {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = "rep Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = OneBGDarkGrey)
-                            )
-                        }
+                        Image(
+                            bitmap = imageBitmap.asImageBitmap(),
+                            contentDescription = "rep Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = OneBGDarkGrey)
+                        )
 
                         Text(
                             text = "캐비닛 사진을 추가해 주세요.",
@@ -212,17 +203,15 @@ fun AddCabinetScreen(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap.let {
-                            GlideImage(
-                                model = contentUri,
-                                contentDescription = "글라이드",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = MaterialTheme.colors.onSurface)
-                            )
-                        }
+                        GlideImage(
+                            model = contentUri,
+                            contentDescription = "글라이드",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = MaterialTheme.colors.onSurface)
+                        )
                     }
                 }
 
@@ -249,23 +238,6 @@ fun AddCabinetScreen(
                             )
                         }
                     }
-
-
-//                    OutlinedButton(
-//                        onClick = {
-//                            imageBitmap = bitmap
-//                            viewModel.imageUri.value = Uri.EMPTY
-//                        },
-//                        shape = RoundedCornerShape(20.dp),
-//                        border = BorderStroke(2.dp, Color.Blue),
-//                        colors = ButtonDefaults.outlinedButtonColors(
-//                            backgroundColor = Color.White,
-//                            contentColor = Color.Blue
-//                        ),
-//                        modifier = Modifier.padding(16.dp)
-//                    ) {
-//                        Text("Clear")
-//                    }
                 }
 
                 // 텍스트필드 박스
@@ -280,12 +252,10 @@ fun AddCabinetScreen(
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-//                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row {
                             CustomTextInput(
                                 value = cabinetName.value,
-                                onValueChange = { it -> cabinetName.value = it },
+                                onValueChange = { cabinetName.value = it },
                                 placeholder = "캐비닛 모델 명"
                             )
                         }
@@ -368,33 +338,6 @@ fun AddCabinetScreen(
                     }
                 }
             }
-
-
-//                Row {
-//                    Button(onClick = { navController.popBackStack() }) {
-//                        Text(text = "취소")
-//                    }
-//                    Button(onClick = {
-//                        coroutineScope.launch {
-//                            try {
-//                                viewModel.saveItem(
-//                                    name=cabinetName.value,
-//                                    width=cabinetWidth.value.toDouble(),
-//                                    height=cabinetHeight.value.toDouble(),
-//                                    colCount=colModuleCount.value.toInt(),
-//                                    rowCount=rowModuleCount.value.toInt(),
-//                                    bitmap=imageBitmap)
-//                                navController.popBackStack()
-//                            } catch (e: Exception) {
-//                                withContext(Dispatchers.Main) {
-//                                    Toast.makeText(context, "입력 정보를 다시 확인해주세요.", Toast.LENGTH_SHORT).show()
-//                                }
-//                            }
-//                    } },
-//                        enabled= allFieldsNotEmpty) {
-//                        Text(text = "저장")
-//                    }
-//                }
         }// 화면 전체 컬럼 끝
     }// 화면 전체 박스 끝
 }
