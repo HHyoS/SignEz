@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
@@ -20,10 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,7 +60,6 @@ object AddSignageDestination : NavigationDestination {
 fun AddSignageScreen(
     modifier: Modifier = Modifier, activity: Activity, viewModel: SignageViewModel,
     navController: NavHostController,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -90,8 +86,6 @@ fun AddSignageScreen(
             withContext(Dispatchers.IO) {
                 try {
                     // Load the image bitmap on a background thread
-//                    imageBitmap =
-//                        MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
                     Glide.with(context)
                         .asBitmap()
                         .load(contentUri)
@@ -114,20 +108,18 @@ fun AddSignageScreen(
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
         // content uri가 아니면 content uri로 바꿔줌.
-        if (!viewModel.imageUri.value.toString().contains("content")) {
-            contentUri =
-                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        contentUri = if (!viewModel.imageUri.value.toString().contains("content")) {
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         } else {
-            contentUri = viewModel.imageUri.value
+            viewModel.imageUri.value
         }
     }
 
     if (viewModel.imageUri.value != Uri.EMPTY) {
-//        imageBitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, contentUri)
         loadImageAsync(context, contentUri)
     }
 
-    androidx.compose.material.Scaffold(
+    Scaffold(
         modifier = Modifier
             .noRippleClickable { focusManager.clearFocus() }
             .background(MaterialTheme.colors.background),
@@ -187,7 +179,6 @@ fun AddSignageScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-//                                    .fillMaxHeight(0.4f)
                                     .clip(RoundedCornerShape(15.dp))
                                     .background(color = OneBGDarkGrey)
                             )
@@ -238,22 +229,6 @@ fun AddSignageScreen(
                             )
                         }
                     }
-
-//                    OutlinedButton(
-//                        onClick = {
-//                            imageBitmap = bitmap
-//                            viewModel.imageUri.value = Uri.EMPTY
-//                        },
-//                        shape = RoundedCornerShape(20.dp),
-//                        border = BorderStroke(2.dp, Color.Blue),
-//                        colors = ButtonDefaults.outlinedButtonColors(
-//                            backgroundColor = Color.White,
-//                            contentColor = Color.Blue
-//                        ),
-//                        modifier = Modifier.padding(16.dp)
-//                    ) {
-//                        Text("Clear")
-//                    }
                 }
 
                 androidx.compose.material3.Card(
@@ -267,13 +242,10 @@ fun AddSignageScreen(
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-//                            verticalAlignment = Alignment.CenterVertically
-
-                        ) {
+                        Row {
                             CustomTextInput(
                                 value = viewModel.sName.value,
-                                onValueChange = { it -> viewModel.sName.value = it },
+                                onValueChange = { viewModel.sName.value = it },
                                 placeholder = "사이트 이름"
                             )
                         }
@@ -322,20 +294,6 @@ fun AddSignageScreen(
                     WhiteButton(title = "캐비닛 스펙 추가하기", isUsable = true) {
                         navController.navigate(CabinetListScreenDestination.route + "/add")
                     }
-//                    OutlinedButton(
-//                        onClick = {
-//                            navController.navigate(CabinetListScreenDestination.route + "/edit")
-//                        },
-//                        shape = RoundedCornerShape(20.dp),
-//                        border = BorderStroke(2.dp, Color.Blue),
-//                        colors = ButtonDefaults.outlinedButtonColors(
-//                            backgroundColor = Color.White,
-//                            contentColor = Color.Blue
-//                        ),
-//                        modifier = Modifier.padding(16.dp)
-//                    ) {
-//                        Text("캐비닛 스펙 추가")
-//                    }
                 } // 캐비닛 정보 선택 구간
                 else {
                     FocusBlock(
@@ -349,32 +307,7 @@ fun AddSignageScreen(
                         buttonTitle = "변경",
                         isbuttonVisible = true,
                         buttonOnclickEvent = { navController.navigate(CabinetListScreenDestination.route + "/add") },
-                        modifier = Modifier,
                     )
-
-                    //
-//                    Box {
-//                        Column {
-//                            OutlinedButton(
-//                                onClick = {
-//                                    navController.navigate(CabinetListScreenDestination.route+"/add")
-//                                },
-//                                shape = RoundedCornerShape(20.dp),
-//                                border = BorderStroke(2.dp, Color.Blue),
-//                                colors = ButtonDefaults.outlinedButtonColors(
-//                                    backgroundColor = Color.White,
-//                                    contentColor = Color.Blue
-//                                ),
-//                                modifier = Modifier.padding(16.dp)
-//                            ) {
-//                                Text("변경")
-//                            }
-//                            Text(text = "캐비닛 스펙")
-//                            Text(text = cabinetState.cabinet.name)
-//                            Text(text = "${cabinetState.cabinet.cabinetWidth} mm")
-//                            Text(text = "${cabinetState.cabinet.cabinetHeight} mm")
-//                            Text(text = "${cabinetState.cabinet.moduleColCount}X${cabinetState.cabinet.moduleRowCount}")
-//                        }
                 }
             } // 캐비닛 변경 버튼 else문
         }// 화면 전체 컬럼 끝

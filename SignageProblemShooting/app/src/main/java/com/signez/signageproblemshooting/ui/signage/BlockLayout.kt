@@ -1,9 +1,7 @@
 package com.signez.signageproblemshooting.ui.signage
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -15,25 +13,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.consumeAllChanges
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 object BlockLayoutDestination : NavigationDestination {
     override val route = "BlockLayout"
     override val titleRes = "BlockLayout"
@@ -45,7 +36,6 @@ fun LayoutScreen(
     cabinetId:String,
     sViewModel:SignageDetailViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavController,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -122,9 +112,7 @@ fun LayoutScreen(
 @Composable
 fun DraggableBlock(
     block: Block,
-    viewModel:BlockViewModel,
     viewRatio:Int = 15,
-    onDragEnd: (Block) -> Unit,
 ) {
     val density = LocalDensity.current
     val offsetX = remember { mutableStateOf(with(density) { block.x.toDp() / viewRatio }) }
@@ -143,19 +131,6 @@ fun DraggableBlock(
             .size(width, height)
             .background(Color.Blue)
             .border(width = 1.dp, color = Color.Black)
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { },
-                    onDrag = { change, dragAmount ->
-                        change.consumeAllChanges()
-//                        offsetX.value += dragAmount.x.toDp()
-//                        offsetY.value += dragAmount.y.toDp()
-                    },
-                    onDragEnd = {
-//                        onDragEnd(block.copy(x = block.x + offsetX.value.roundToInt(), y = block.y + offsetY.value.roundToInt()))
-                    }
-                )
-            }
     )
 }
 
@@ -168,9 +143,7 @@ fun BlocksArea(viewModel: BlockViewModel) {
         .fillMaxWidth()
         .height(600.dp)) {
         blocks.forEach { block ->
-            DraggableBlock(block=block,viewModel=viewModel) { updatedBlock ->
-                viewModel.updateBlock(updatedBlock)
-            }
+            DraggableBlock(block=block)
         }
     }
 }

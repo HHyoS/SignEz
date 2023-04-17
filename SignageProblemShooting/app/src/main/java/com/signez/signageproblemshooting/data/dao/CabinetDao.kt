@@ -18,7 +18,6 @@ package com.signez.signageproblemshooting.data.dao
 
 import androidx.room.*
 import com.signez.signageproblemshooting.data.entities.Cabinet
-import com.signez.signageproblemshooting.data.entities.Item
 import kotlinx.coroutines.flow.Flow
 
 /**

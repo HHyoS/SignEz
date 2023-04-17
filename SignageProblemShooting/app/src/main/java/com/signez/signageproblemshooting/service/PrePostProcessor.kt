@@ -2,7 +2,6 @@ package com.signez.signageproblemshooting.service
 
 
 import android.graphics.Rect
-import android.util.Log
 import java.io.Serializable
 import java.util.*
 
@@ -87,25 +86,25 @@ object PrePostProcessor {
     /**
      * Computes intersection-over-union overlap between two bounding boxes.
      */
-    fun IOU(a: Rect, b: Rect): Float {
+    private fun IOU(a: Rect, b: Rect): Float {
         val areaA = ((a.right - a.left) * (a.bottom - a.top)).toFloat()
         if (areaA <= 0.0) return 0.0f
         val areaB = ((b.right - b.left) * (b.bottom - b.top)).toFloat()
         if (areaB <= 0.0) return 0.0f
-        val intersectionMinX = Math.max(a.left, b.left).toFloat()
-        val intersectionMinY = Math.max(a.top, b.top).toFloat()
-        val intersectionMaxX = Math.min(a.right, b.right).toFloat()
-        val intersectionMaxY = Math.min(a.bottom, b.bottom).toFloat()
-        val intersectionArea = Math.max(intersectionMaxY - intersectionMinY, 0f) *
-                Math.max(intersectionMaxX - intersectionMinX, 0f)
+        val intersectionMinX = a.left.coerceAtLeast(b.left).toFloat()
+        val intersectionMinY = a.top.coerceAtLeast(b.top).toFloat()
+        val intersectionMaxX = a.right.coerceAtMost(b.right).toFloat()
+        val intersectionMaxY = a.bottom.coerceAtMost(b.bottom).toFloat()
+        val intersectionArea = (intersectionMaxY - intersectionMinY).coerceAtLeast(0f) *
+                (intersectionMaxX - intersectionMinX).coerceAtLeast(0f)
         return intersectionArea / (areaA + areaB - intersectionArea)
     }
 
     fun getValue(a: Int): Int {
-        if (a < 0)
-            return 0
+        return if (a < 0)
+            0
         else
-            return a
+            a
     }
 
     @JvmStatic

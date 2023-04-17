@@ -16,7 +16,6 @@
 
 package com.signez.signageproblemshooting.data.repository
 
-import androidx.room.Query
 import com.signez.signageproblemshooting.data.entities.*
 import kotlinx.coroutines.flow.Flow
 

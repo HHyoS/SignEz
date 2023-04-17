@@ -4,14 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
-import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.signez.signageproblemshooting.R
@@ -19,14 +13,11 @@ import com.signez.signageproblemshooting.data.AppContainer
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.ErrorImage
 import com.signez.signageproblemshooting.data.entities.ErrorModule
-import com.signez.signageproblemshooting.data.imageToByteArray
-import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.analysis.resultListState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.io.ByteArrayOutputStream
 
@@ -36,16 +27,8 @@ class MainViewModel(appContainer: AppContainer) : ViewModel() {
     private val errorModuleRepository = appContainer.errorModulesRepository
     private val errorImageRepository = appContainer.errorImagesRepository
     val permissionsGranted = mutableStateOf(true)
-    val navigateToAppSettings = mutableStateOf(false)
-    fun openAppSettings() {
-        navigateToAppSettings.value = true
-    }
 
-    fun onAppSettingsResult() {
-        navigateToAppSettings.value = false
-    }
-
-    fun imageToByteArray(context: Context, rId: Int): ByteArray {
+    private fun imageToByteArray(context: Context, rId: Int): ByteArray {
         val drawable = ContextCompat.getDrawable(context, rId)
         // Convert drawable to Bitmap
         val bitmap = if (drawable is BitmapDrawable) {
