@@ -1,37 +1,22 @@
 package com.signez.signageproblemshooting.ui.signage
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.signez.signageproblemshooting.data.entities.Cabinet
-import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.data.repository.CabinetsRepository
-import com.signez.signageproblemshooting.data.repository.SignagesRepository
-import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.analysis.SignageState
 import com.signez.signageproblemshooting.ui.inputs.MediaViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
-class CabinetDetailViewModel(private val signageRepository: SignagesRepository, private val cabinetRepository: CabinetsRepository) : ViewModel(),
+class CabinetDetailViewModel(private val cabinetRepository: CabinetsRepository) : ViewModel(),
     MediaViewModel {
 
     override var mCurrentPhotoPath = mutableStateOf("")
     override var imageUri = mutableStateOf(Uri.EMPTY)
     override var type = 0;
-    var defaultBitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
-
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
-
     fun updateRecord(name:String,width:Double,height:Double,bitmap:Bitmap?,colNum:Int,rowNum:Int,cabinet:Cabinet) = viewModelScope.launch {
         if (bitmap != null) {
             val outputStream = ByteArrayOutputStream()
@@ -50,19 +35,17 @@ class CabinetDetailViewModel(private val signageRepository: SignagesRepository, 
     suspend fun delete(cabinet:Cabinet) :Boolean {
         var success = false
         viewModelScope.launch {
-            try {
+            success = try {
                 cabinetRepository.deleteCabinet(cabinet)
-                success = true
+                true
             } catch (e: Exception) {
-                success = false
+                false
             }
         }.join()
         return success
     }
 
-    suspend fun getCabinet(cabinetId:Long): Cabinet {
-        val cabinet: Cabinet =
-                cabinetRepository.getNewCabinet(cabinetId)
-        return cabinet
+    suspend fun getCabinet(cabinetId: Long): Cabinet {
+        return cabinetRepository.getNewCabinet(cabinetId)
     }
 }

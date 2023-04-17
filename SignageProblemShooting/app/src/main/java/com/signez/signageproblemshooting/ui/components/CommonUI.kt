@@ -37,21 +37,16 @@ fun FocusBlock(
     buttonTitle: String?,
     isbuttonVisible: Boolean,
     buttonOnclickEvent: () -> Unit,
-    modifier: Modifier
 ) {
     Card(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 8.dp)
             .fillMaxWidth(),
-//            .clickable(onClick = buttonOnclickEvent),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colors.surface
         )
     ) {
-        Column(
-            Modifier
-//                .fillMaxWidth()
-        ) {
+        Column {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -76,7 +71,7 @@ fun FocusBlock(
                             onClickEvent = buttonOnclickEvent
                         )
                     }
-                } else if (buttonTitle == null) {
+                } else {
                     Spacer(
                         modifier = Modifier.weight(0.3f)
                     )
@@ -112,16 +107,7 @@ fun FocusBlock(
                     )
                 }
             }
-
-//                Text(
-//                    text = subtitle,
-//                    style = MaterialTheme.typography.body1,
-//                    color = MaterialTheme.colors.onBackground,
-//                    modifier = Modifier.padding(start = 18.dp, bottom = 16.dp)
-//                )
-
         }
-
         Spacer(modifier = Modifier.height(15.dp))
     }
 }
@@ -201,13 +187,12 @@ fun InFocusBlockButton(
         ) {
             Text(
                 text = title,
-//                style = MaterialTheme.typography.button,
                 style = MaterialTheme.typography.body1,
                 color = MaterialTheme.colors.onSurface,
                 modifier = Modifier.padding(bottom = 2.dp)
             )
         }
-    } else if (!isVisible) {
+    } else {
         androidx.compose.material3.Button(
             onClick = {},
             shape = RoundedCornerShape(20.dp),
@@ -224,7 +209,6 @@ fun InFocusBlockButton(
         ) {
             Text(
                 text = title,
-//                style = MaterialTheme.typography.button,
                 style = MaterialTheme.typography.body1,
                 color = MaterialTheme.colors.surface,
                 modifier = Modifier.padding(bottom = 2.dp)
@@ -265,12 +249,12 @@ fun SignEzFloatingButton(
     FloatingActionButton(
         onClick = onClickEvent,
         shape = CircleShape,
-        containerColor = androidx.compose.material.MaterialTheme.colors.primary,
+        containerColor = MaterialTheme.colors.primary,
     ) {
         androidx.compose.material.Icon(
             imageVector = Icons.Rounded.Add,
             contentDescription = "추가",
-            tint = androidx.compose.material.MaterialTheme.colors.onPrimary
+            tint = MaterialTheme.colors.onPrimary
         )
     }
 }
@@ -317,9 +301,7 @@ fun BottomSingleFlatButton(
         ),
         enabled = isUsable,
         modifier = Modifier
-//            .padding(top = 10.dp, end = 15.dp)
             .fillMaxWidth()
-//            .wrapContentHeight()
             .height(65.dp),
     ) {
         Text(
@@ -402,40 +384,12 @@ fun BottomDoubleFlatButton(
 
 }
 
-//@Composable
-//fun InputFocusBlock(
-//    ,
-//    modifier: Modifier = Modifier
-//) {
-//    Card(
-//        modifier = Modifier
-//            .padding(top = 8.dp, bottom = 8.dp)
-//            .fillMaxWidth(),
-//        colors = CardDefaults.cardColors(
-//            containerColor = MaterialTheme.colors.surface
-//        )
-//    ) {
-//        Column(
-//            Modifier
-//        ) {
-//            for (textField in textFields) {
-//                Row {
-//                    textField
-//                }
-//            }
-//        }
-//    }
-//}
-
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ResultHistoryBlock(
     site: String = "",
     date: String = "",
     thumbnail: ByteArray? = null,
-//    blockOnclickEvent: () -> Unit,
-//    blockOnLongclickEvent: () -> Unit,
-    modifier: Modifier
 ) {
     Card(
         modifier = Modifier
@@ -617,28 +571,6 @@ fun BottomTutorialFlatButton(
 fun ComponentPreview() {
     SignEzTheme(darkTheme = false) {
         Column() {
-//            FocusBlock(
-//                title = "사이니지 스펙",
-//                subtitle = "정보 입력이 필요합니다",
-//                buttonTitle = "입력",
-//                isbuttonVisible = true,
-//                buttonOnclickEvent = {},
-//                modifier = Modifier
-//            )
-//            AnalyzeButton("영상 분석", false, onClickEvent = {})
-//            AnalyzeButton("사진 분석", true, onClickEvent = {})
-//            InFocusBlockButton(title = "입력", isVisible = true, onClickEvent = {})
-//            IntentButton(title = "갤러리", onClickEvent = {})
-//            SignEzFloatingButton(onClickEvent = {})
-//            TutorialStartButton(title = "시작하기", onClickEvent = {})
-//            BottomSingleFlatButton(title = "확인", true, onClickEvent = {})
-//            BottomDoubleFlatButton(leftTitle = "취소",
-//                rightTitle = "확인",
-//                isLeftUsable = true,
-//                isRightUsable = false,
-//                leftOnClickEvent = {},
-//                rightOnClickEvent = {})
-//            InputFocusBlock(textFields =    )
         }
     }
 }

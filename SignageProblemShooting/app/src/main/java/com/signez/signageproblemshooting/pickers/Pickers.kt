@@ -51,63 +51,17 @@ fun ImagePicker(onImageSelected: (videoUri: String) -> Unit) {
             }
         }
 
-//    Column {
-//        Row {
-            IntentButton(title = "갤러리") {
-                val intent =
-                    Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                launcher.launch(intent)
-            }
-//            OutlinedButton(
-//                onClick = {
-//                    val intent =
-//                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-//                    launcher.launch(intent)
-//                },
-//                shape = RoundedCornerShape(20.dp),
-//                border = BorderStroke(2.dp, Color.Blue),
-//                colors = ButtonDefaults.outlinedButtonColors(
-//                    backgroundColor = Color.White,
-//                    contentColor = Color.Blue
-//                ),
-//                modifier = Modifier.padding(8.dp)
-//            ) {
-//                Text("사진 가져오기")
-//            }
-
-//            OutlinedButton(
-//                onClick = {
-//                    imageBitmap = null
-//                },
-//                shape = RoundedCornerShape(20.dp),
-//                border = BorderStroke(2.dp, Color.Blue),
-//                colors = ButtonDefaults.outlinedButtonColors(
-//                    backgroundColor = Color.White,
-//                    contentColor = Color.Blue
-//                ),
-//                modifier = Modifier.padding(8.dp)
-//            ) {
-//                Text("Clear")
-//            }
-//        }
-//
-//    }
+        IntentButton(title = "갤러리") {
+            val intent =
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            launcher.launch(intent)
+        }
 }
 
 @Composable
 fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit) {
-    val defaultBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     var videoUri by remember { mutableStateOf("") }
-
-//    val launcher =
-//        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-//        videoUri = uri.toString()
-//        onVideoSelected(videoUri)
-//    }
-//
-//            IntentButton(title = "갤러리") {
-//                launcher.launch("video/mp4")
-//            }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
@@ -117,44 +71,10 @@ fun VideoPicker(onVideoSelected: (videoUri: String) -> Unit) {
         }
     }
 
-// Column {
-//     Row {
     IntentButton(title = "갤러리") {
         val pickVideoIntent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
         launcher.launch(pickVideoIntent)
     }
-//            OutlinedButton(
-//                onClick = {
-//                    launcher.launch("video/mp4")
-//                },
-//                shape = RoundedCornerShape(20.dp),
-//                border = BorderStroke(2.dp, Color.Blue),
-//                colors = ButtonDefaults.outlinedButtonColors(
-//                    backgroundColor = Color.White,
-//                    contentColor = Color.Blue
-//                ),
-//                modifier = Modifier.padding(8.dp)
-//            ) {
-//                Text("동영상 가져오기")
-//            }
-//
-//            OutlinedButton(
-//                onClick = {
-//                    videoUri = ""
-//                    videoFrame = defaultBitmap
-//                },
-//                shape = RoundedCornerShape(20.dp),
-//                border = BorderStroke(2.dp, Color.Blue),
-//                colors = ButtonDefaults.outlinedButtonColors(
-//                    backgroundColor = Color.White,
-//                    contentColor = Color.Blue
-//                ),
-//                modifier = Modifier.padding(8.dp)
-//            ) {
-//                Text("Clear")
-//            }
-//        }
-//    }
 }
 
 @SuppressLint("Range")
@@ -194,7 +114,7 @@ fun getFileSizeFromUri(uri: Uri, context: Context): Long {
     return size ?: 0
 }
 
-suspend fun getVideoTitle(uri: Uri, context: Context): String {
+fun getVideoTitle(uri: Uri, context: Context): String {
     val cursor = context.contentResolver.query(uri, null, null, null, null)
     val title = if (cursor != null && cursor.moveToFirst()) {
         val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)

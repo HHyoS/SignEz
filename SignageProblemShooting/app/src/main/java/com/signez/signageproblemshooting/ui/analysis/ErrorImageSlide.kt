@@ -17,19 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.data.entities.ErrorModuleWithImage
-import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
-import com.signez.signageproblemshooting.ui.theme.OneBGDarkGrey
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -41,11 +35,8 @@ object ErrorImageDestination : NavigationDestination {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ErrorImageView(
-    onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavHostController,
     viewModel: AnalysisViewModel,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     x: Int,
     y: Int,
@@ -68,12 +59,12 @@ fun ErrorImageView(
             deletionCompleted.value = false
         }
         Log.d(
-            "x, y, resultid",
+            "x, y, resultId",
             "${viewModel.selectedModuleX.value}, ${viewModel.selectedModuleY.value}, ${viewModel.selectedResultId.value}"
         )
         Log.d(
-            "x, y, resultid",
-            "${x}, ${y}, ${resultId}"
+            "x, y, resultId",
+            "${x}, ${y}, $resultId"
         )
         maisState.value = viewModel.getModulesByXYResultId(
             x = x,
@@ -90,7 +81,6 @@ fun ErrorImageView(
     LaunchedEffect(maisState.value) {
         mais = maisState.value
     }
-    Log.d("mais", mais.toString())
 
     androidx.compose.material.Scaffold(
         modifier = Modifier
@@ -138,50 +128,21 @@ fun ErrorImageView(
                                 .background(color = Color.Black)
                         )
                         Spacer(modifier = Modifier.padding(5.dp))
-                        mais!![selectedIdx.value].errorModule.let {
-//                            Row(horizontalArrangement = Arrangement.SpaceBetween) {
-//                                Column {
-//                                    Text(
-//                                        text = "정확도: ${(mais[selectedIdx.value].errorModule.score * 100).roundToInt()}%",
-//                                        fontSize = 20.sp,
-//                                        fontWeight = FontWeight.Bold,
-//                                        modifier = Modifier.align(alignment = Alignment.Start)
-//                                    )
-//                                    Text(
-//                                        text = "x: ${mais[selectedIdx.value].errorModule.x}" +
-//                                                " y: ${mais[selectedIdx.value].errorModule.y}",
-//                                        fontSize = 20.sp,
-//                                        fontWeight = FontWeight.Bold,
-//                                        modifier = Modifier.align(alignment = Alignment.Start)
-//                                    )
-//                                }
-//                                Button(onClick = {
-//                                    coroutineScope.launch {
-//                                        viewModel.deleteErrorModule(mais[selectedIdx.value].errorModule)
-//                                        deletionCompleted.value = true
-//                                    }
-//                                }) {
-//                                    Text(text = "삭제")
-//                                }
-//                            }
-
-//                            Spacer(modifier = Modifier.padding(10.dp))
-                            ErrorImageSlideBox(
-                                selectedIdx = selectedIdx,
-                                mais = mais!!,
-                                cabinetX = cabinetX,
-                                cabinetY = cabinetY,
-                                moduleX = moduleX,
-                                moduleY = moduleY,
-                                deleteEvent =
-                                {
-                                    coroutineScope.launch {
-                                        viewModel.deleteErrorModule(mais!![selectedIdx.value].errorModule)
-                                        deletionCompleted.value = true
-                                    }
+                        ErrorImageSlideBox(
+                            selectedIdx = selectedIdx,
+                            mais = mais!!,
+                            cabinetX = cabinetX,
+                            cabinetY = cabinetY,
+                            moduleX = moduleX,
+                            moduleY = moduleY,
+                            deleteEvent =
+                            {
+                                coroutineScope.launch {
+                                    viewModel.deleteErrorModule(mais!![selectedIdx.value].errorModule)
+                                    deletionCompleted.value = true
                                 }
-                            )
-                        }
+                            }
+                        )
                     }
 
                 }
@@ -194,7 +155,6 @@ fun ErrorImageView(
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ErrorImageSlideBox(
-    modifier: Modifier = Modifier,
     selectedIdx: MutableState<Int>,
     mais: List<ErrorModuleWithImage>,
     cabinetX: Int = 0,
@@ -203,7 +163,6 @@ fun ErrorImageSlideBox(
     moduleY: Int = 0,
     deleteEvent: () -> Unit,
 ) {
-    //
     Surface(
         modifier = Modifier
             .clip(RoundedCornerShape(15.dp))
@@ -302,14 +261,14 @@ fun ErrorImageSlideBox(
                                     )
                                 }
                                 if (showDeleteButton) {
-                                    androidx.compose.material.IconButton(
+                                    IconButton(
                                         modifier = Modifier.size(20.dp),
                                         onClick = { deleteEvent() }
                                     ) {
-                                        androidx.compose.material.Icon(
+                                        Icon(
                                             imageVector = Icons.Rounded.Close,
                                             contentDescription = "삭제",
-                                            tint = androidx.compose.material.MaterialTheme.colors.surface,
+                                            tint = MaterialTheme.colors.surface,
                                             modifier = Modifier
                                                 .size(15.dp)
                                         )

@@ -40,10 +40,4 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val signagesRepository: SignagesRepository by lazy {
         OfflineSignagesRepository(SignEzDatabase.getDatabase(context).signageDao())
     }
-    // Initialize the repositories -eager
-//    override val analysisResultsRepository: AnalysisResultsRepository = OfflineAnalysisResultsRepository(SignEzDatabase.getDatabase(context).resultDao())
-//    override val cabinetsRepository: CabinetsRepository = OfflineCabinetsRepository(SignEzDatabase.getDatabase(context).cabinetDao())
-//    override val errorImagesRepository: ErrorImagesRepository = OfflineErrorImagesRepository(SignEzDatabase.getDatabase(context).imageDao())
-//    override val errorModulesRepository: ErrorModulesRepository = OfflineErrorModulesRepository(SignEzDatabase.getDatabase(context).errorModuleDao())
-//    override val signagesRepository: SignagesRepository = OfflineSignagesRepository(SignEzDatabase.getDatabase(context).signageDao())
 }

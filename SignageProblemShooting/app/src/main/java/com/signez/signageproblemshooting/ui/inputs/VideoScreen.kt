@@ -2,8 +2,6 @@ package com.signez.signageproblemshooting.ui.inputs
 
 import android.app.Activity
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Rect
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.widget.Toast
@@ -19,19 +17,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.navigation.NavController
 import com.signez.signageproblemshooting.SignEzTopAppBar
 import com.signez.signageproblemshooting.pickers.VideoPicker
 import com.signez.signageproblemshooting.pickers.getVideoTitle
 import com.signez.signageproblemshooting.pickers.loadVideoMetadata
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
-import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
-import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
 import com.signez.signageproblemshooting.ui.components.BottomDoubleFlatButton
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.IntentButton
@@ -51,15 +45,13 @@ object VideoScreenDestination : NavigationDestination {
 fun VideoAnalysis(
     activity: Activity,
     dispatchTakeVideoIntent: (Activity, VideoViewModel) -> Unit,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     viewModel: VideoViewModel,
     analysisViewModel: AnalysisViewModel,
     modifier: Modifier = Modifier,
-    navController: NavController
 ) {
     val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-    var imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
+    val imageBitmap by remember { mutableStateOf<Bitmap>(bitmap) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     var videoTitle by remember { mutableStateOf("-") }
@@ -68,12 +60,10 @@ fun VideoAnalysis(
     var videoFrame by remember { mutableStateOf(bitmap) }
     val REQUEST_DETECT_VIDEO: Int = 100
 
-    var rec : Rect? = null
-
     val getVideoThumbnail: (Uri) -> Bitmap? = { uri ->
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, uri)
-        retriever.getFrameAtTime()
+        retriever.frameAtTime
     }
     var contentUri: Uri = Uri.EMPTY
 
@@ -91,12 +81,11 @@ fun VideoAnalysis(
 
     val loadVideoMetadata = {
         if (viewModel.videoUri.value != Uri.EMPTY) {
-            if (!viewModel.videoUri.value.toString().contains("content")) {
+            contentUri = if (!viewModel.videoUri.value.toString().contains("content")) {
                 val file = File(viewModel.videoUri.value.toString())
-                contentUri =
-                    FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+                FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
             } else {
-                contentUri = viewModel.videoUri.value
+                viewModel.videoUri.value
             }
 
             coroutineScope.launch {
@@ -106,7 +95,7 @@ fun VideoAnalysis(
                 videoTitle = getVideoTitle(contentUri, context)
                 videoLength = metadata.second.toLong() // ms
                 videoSize =
-                    metadata.third.toLong() //  byte, val megabytes = bytes.toDouble() / (1024 * 1024)
+                    metadata.third //  byte, val megabytes = bytes.toDouble() / (1024 * 1024)
             }
             analysisViewModel.imageContentUri.value = Uri.EMPTY
             analysisViewModel.videoContentUri.value = contentUri
@@ -123,7 +112,6 @@ fun VideoAnalysis(
             .background(MaterialTheme.colors.background),
         topBar = {
             SignEzTopAppBar(
-//                title = VideoScreenDestination.titleRes,
                 title = "영상 분석",
                 canNavigateBack = true,
                 navigateUp = onNavigateUp
@@ -144,21 +132,10 @@ fun VideoAnalysis(
                     } else if (analysisViewModel.signageId.value < 1) {
                         Toast.makeText(context,"사이니지를 선택 후 진행해주세요.", Toast.LENGTH_SHORT).show()
                     } else {
-                        val configuration = context.resources.configuration
                         val retriever = MediaMetadataRetriever()
                         retriever.setDataSource(context, contentUri)
-
-                        val mWidth = configuration.screenWidthDp
-                        val mHeight = configuration.screenHeightDp
-                        val mmWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toInt() ?: 0
-                        val mmHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toInt() ?: 0
                         openImageCropActivity(context, REQUEST_DETECT_VIDEO, analysisViewModel.signageId.value, contentUri)
                     }
-                    // .currentDestination?.let { navController.popBackStack(it.id , true) }
-//                    navController.popBackStack()
-//                    navController.navigate(ResultsHistoryDestination.route)
-//                    navController.navigate(ResultGridDestination.route)
-                   // openErrorDetectActivity(context,rec!!,contentUri)
                 }
             )
         }
@@ -176,18 +153,15 @@ fun VideoAnalysis(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap.let {
-                            Image(
-                                bitmap = it.asImageBitmap(),
-                                contentDescription = "rep Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-//                                    .fillMaxHeight(0.4f)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = OneBGDarkGrey)
-                            )
-                        }
+                        Image(
+                            bitmap = imageBitmap.asImageBitmap(),
+                            contentDescription = "rep Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = OneBGDarkGrey)
+                        )
                         Text(
                             text = "분석할 영상을 추가해 주세요.",
                             modifier = Modifier.align(Alignment.Center), // Adjust the alignment as needed
@@ -198,17 +172,15 @@ fun VideoAnalysis(
                     Box(
                         modifier = Modifier.padding(bottom = 10.dp)
                     ) {
-                        imageBitmap.let {
-                            Image(
-                                bitmap = videoFrame.asImageBitmap(),
-                                contentDescription = "rep Image",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(15.dp))
-                                    .background(color = MaterialTheme.colors.onSurface)
-                            )
-                        }
+                        Image(
+                            bitmap = videoFrame.asImageBitmap(),
+                            contentDescription = "rep Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(15.dp))
+                                .background(color = MaterialTheme.colors.onSurface)
+                        )
                     }
                 }
 
@@ -219,7 +191,6 @@ fun VideoAnalysis(
                     buttonTitle = "입력",
                     isbuttonVisible = false,
                     buttonOnclickEvent = {},
-                    modifier = Modifier,
                 )
 
                 Row(
@@ -242,38 +213,7 @@ fun VideoAnalysis(
                         }
                     }
                 }
-            }//Column
-
-
-//            if (!videoFrame.sameAs(bitmap)) {
-//                    Box(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .border(BorderStroke(width = 4.dp, color = Color.Black))
-//                            .height(400.dp)
-//                    ) {
-//                        Image(
-//                            bitmap = videoFrame.asImageBitmap(),
-//                            contentDescription = "Video frame",
-//                            contentScale = ContentScale.FillBounds,
-//                            modifier = Modifier
-//                                .fillMaxHeight()
-//                                .align(Alignment.Center)
-//                                .clickable(onClick = {
-//                                    val intent = Intent(Intent.ACTION_VIEW)
-//                                    intent.setDataAndType(
-//                                        viewModel.videoUri.value,
-//                                        "video/*"
-//                                    )
-//                                        intent.putExtra("loop", true) // 비디오 반복재생 설정
-//                                        intent.putExtra("position", 5000) ms 단위로 비디오 시작점 지정
-//                                        intent.putExtra("control", false) // 재생여부등 기본긴으 컨트롤러 키기
-//                                        intent.putExtra("quality", "1080p") 화질 조정정                                        startActivity(context,intent,null)
-//                                })
-//                        )
-//                    }
-//                }
-
+            }
         }
     }
 }//최외곽 컬럼 끝

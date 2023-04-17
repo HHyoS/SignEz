@@ -2,14 +2,8 @@ package com.signez.signageproblemshooting.ui.home
 
 import android.Manifest
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -26,35 +20,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.Signage
-import com.signez.signageproblemshooting.ui.AppViewModelProvider
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
 import com.signez.signageproblemshooting.ui.analysis.ResultGridDestination
 import com.signez.signageproblemshooting.ui.analysis.ResultsHistoryDestination
-import com.signez.signageproblemshooting.ui.analysis.ShowContextMenu
 import com.signez.signageproblemshooting.ui.components.FocusBlock
 import com.signez.signageproblemshooting.ui.components.WhiteButton
 import com.signez.signageproblemshooting.ui.inputs.MainViewModel
-import com.signez.signageproblemshooting.ui.signage.conditional
-import com.signez.signageproblemshooting.ui.theme.SignEzTheme
-import kotlinx.coroutines.launch
 
 @Composable //지난 분석 결과 틀
 fun PastResult(
@@ -151,20 +134,9 @@ private fun HomeHistoryElement(
         }
     } // if 끝
 }
-//@Preview
-//@Composable
-//fun ComponentPreview() {
-//    SignEzTheme(darkTheme = false) {
-//        Column {
-//            PastResult()
-//        }
-//    }
-//}
-
 
 @Composable // 사이니지 스펙 틀
 fun SignEzSpec(
-    modifier: Modifier = Modifier,
     navigateToSignageList: () -> Unit,
     signage: Signage?
 ) {
@@ -176,32 +148,20 @@ fun SignEzSpec(
             buttonTitle = "입력",
             isbuttonVisible = true,
             buttonOnclickEvent = navigateToSignageList,
-            modifier = Modifier,
         )
-    } else if (signage == null) {
+    } else {
         FocusBlock(
             title = stringResource(id = R.string.signage_spec_title),
             infols = listOf(stringResource(id = R.string.need_signage_info)),
             buttonTitle = "입력",
             isbuttonVisible = true,
             buttonOnclickEvent = navigateToSignageList,
-            modifier = Modifier,
         )
     }
-
-//    if (signage != null) {
-//        Text(text = "설치 장소 = ${signage.name}")
-//        Text(text = "높이 : ${signage.width}")
-//        Text(text = "너비 : ${signage.height}")
-//    }
-
-
-//}
 }
 
 @Composable // 캐비닛 스펙 틀
 fun CabinetSpec(
-    modifier: Modifier = Modifier,
     cabinet: Cabinet?
 ) {
     if (cabinet != null) {
@@ -216,20 +176,17 @@ fun CabinetSpec(
             buttonTitle = null,
             isbuttonVisible = false,
             buttonOnclickEvent = {},
-            modifier = Modifier
         )
 
-    } else if (cabinet == null) {
+    } else {
         FocusBlock(
             title = stringResource(id = R.string.cabinet_spec_title),
             infols = listOf(stringResource(id = R.string.need_cabinet_info)),
             buttonTitle = null,
             isbuttonVisible = false,
             buttonOnclickEvent = {},
-            modifier = Modifier
         )
     }
-
 }
 
 @Composable
@@ -253,7 +210,6 @@ fun VideoAnalysisBtn(navigateToVideo: () -> Unit) {
 }
 
 private object RippleCustomTheme : RippleTheme {
-
     //Your custom implementation...
     @Composable
     override fun defaultColor() =
@@ -268,29 +224,6 @@ private object RippleCustomTheme : RippleTheme {
             Color.Black,
             lightTheme = true
         )
-}
-
-@Composable
-fun AppSettingsScreen(mainViewModel: MainViewModel) {
-    val context = LocalContext.current
-
-    val openAppSettingsLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
-        mainViewModel.onAppSettingsResult()
-    }
-
-    val navigateToAppSettings = mainViewModel.navigateToAppSettings
-
-    if (navigateToAppSettings.value) {
-        openAppSettings(context, openAppSettingsLauncher)
-    }
-    // Your other composables
-}
-
-fun openAppSettings(context: Context, appSettingsResultLauncher: ActivityResultLauncher<Intent>) {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-    val uri = Uri.fromParts("package", context.packageName, null)
-    intent.data = uri
-    appSettingsResultLauncher.launch(intent)
 }
 
 fun onAppSettingsClosed() {
@@ -310,18 +243,4 @@ fun checkAndRequestPermissions(context: Context,mainViewModel:MainViewModel) {
     }.toTypedArray()
 
     mainViewModel.permissionsGranted.value = notGrantedPermissions.isEmpty()
-}
-
-@Composable
-fun PermissionInfo() {
-    MaterialTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "정상적인 앱 사용을 위해서")
-            Text(text = "아래와 같은 권한이 필요합니다.")
-            Text(text = "- 카메라 권한")
-            Text(text = " : 사이트 촬영\n")
-            Text(text = "- 파일 및 미디어 접근 권한")
-            Text(text = " : 디바이스의 사이트 사진/영상 자료 불러오기")
-        }
-    }
 }

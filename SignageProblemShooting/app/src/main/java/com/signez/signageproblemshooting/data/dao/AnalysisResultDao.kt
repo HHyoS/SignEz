@@ -23,8 +23,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.signez.signageproblemshooting.data.entities.AnalysisResult
-import com.signez.signageproblemshooting.data.entities.Cabinet
-import com.signez.signageproblemshooting.data.entities.Signage
 import kotlinx.coroutines.flow.Flow
 
 /**

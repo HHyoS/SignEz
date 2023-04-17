@@ -16,9 +16,7 @@
 
 package com.signez.signageproblemshooting.data.repository
 
-import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorImage
-import com.signez.signageproblemshooting.data.entities.ErrorModule
 import kotlinx.coroutines.flow.Flow
 
 /**

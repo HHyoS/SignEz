@@ -2,9 +2,6 @@ package com.signez.signageproblemshooting
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.provider.Settings
-import android.provider.Settings.*
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -16,8 +13,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.signez.signageproblemshooting.ui.analysis.AnalysisViewModel
@@ -145,30 +140,7 @@ fun SignEzTopAppBar(
             }
         )
     }
-//        TopAppBar(
-//            modifier = modifier,
-//            backgroundColor = MaterialTheme.colors.background,
-//            elevation = 0.dp
-//        ) {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//            ) {
-//                IconButton(onClick = navigateUp) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.arrow_back_ios_new_fill1_wght300_grad0_opsz48),
-//                        contentDescription = "뒤로 가기 버튼",
-//                        tint = MaterialTheme.colors.onSurface
-//                    )
-//                }
-//                Text(
-//                    text = title,
-//                    style = MaterialTheme.typography.h2,
-//                    color = MaterialTheme.colors.onSurface,
-//                    modifier = Modifier.padding(bottom = 3.dp)
-//                )
-//            }
-//        }
-//}
+
     else {
         TopAppBar(
             title = {
@@ -230,34 +202,8 @@ fun SignEzTopAppBar(
 
                 }
             }
-//            actions = {
-//
-//                IconButton(onClick = { /* doSomething() */ }) {
-////                    Icon(Icons.Filled.MoreVert, contentDescription = "More Vert", tint = MaterialTheme.colors.onSurface),
-//                    resour
-//                }
-//            }
         )
     }
-
-//        TopAppBar(
-//            modifier = modifier,
-//            backgroundColor = MaterialTheme.colors.background,
-//            elevation = 0.dp
-//        ) {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(
-//                    text = title,
-//                    style = MaterialTheme.typography.h2,
-//                    color = MaterialTheme.colors.onSurface,
-//                    modifier = Modifier.padding(start = 16.dp, bottom = 3.dp)
-//                )
-//
-//            }
-//        }
-//    }
 }
 
 @Preview

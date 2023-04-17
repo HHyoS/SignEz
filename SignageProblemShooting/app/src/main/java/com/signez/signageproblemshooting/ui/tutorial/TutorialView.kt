@@ -1,7 +1,6 @@
 package com.signez.signageproblemshooting.ui.tutorial
 
 import android.app.Activity
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,7 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.*
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -22,14 +20,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.signez.signageproblemshooting.R
 import com.signez.signageproblemshooting.data.datastore.StoreInitialLaunch
 import com.signez.signageproblemshooting.ui.components.*
-import com.signez.signageproblemshooting.ui.signage.*
 import kotlinx.coroutines.launch
-import java.util.*
-
-//object TutorialDestination : NavigationDestination {
-//    override val route = "ResultsHistoryScreen"
-//    override val titleRes = "ResultsHistory"
-//}
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -41,9 +32,9 @@ fun TutorialView(
     val dataStore = StoreInitialLaunch(context)
     val state = rememberPagerState()
 
-    val tutorialimage = listOf<Int>(R.drawable.tutorial_1,R.drawable.tutorial_2,R.drawable.tutorial_3,R.drawable.tutorial_4,R.drawable.tutorial_5,R.drawable.tutorial_6)
+    val tutorialimage = listOf(R.drawable.tutorial_1,R.drawable.tutorial_2,R.drawable.tutorial_3,R.drawable.tutorial_4,R.drawable.tutorial_5,R.drawable.tutorial_6)
 
-    val tutorialtext = listOf<String>(
+    val tutorialtext = listOf(
         "사이니지 스펙 입력 버튼을 눌러 분석할 사이니지를 선택 해 주세요.",
         "기존 설치된 사이니지를 선택하거나 사이니지를 새로 추가 할 수 있습니다.\n사이니지 상세 페이지에서는 캐비닛 정보를 설정 할 수 있습니다.",
         "오류 모듈을 분석할 사이니지 영상 또는 사진을 입력 해 주세요.",
@@ -129,7 +120,7 @@ fun TutorialView(
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             GlideImage(
-                                model = tutorialimage.get(page),
+                                model = tutorialimage[page],
                                 contentDescription = "글라이드",
                                 modifier = Modifier
                                     .fillMaxWidth(0.9f)
@@ -170,28 +161,4 @@ fun TutorialView(
         }
     }
 }
-
-//    Column(){
-//
-//    Button(onClick = {
-//        scope.launch {
-//            dataStore.saveInitialLaunch(false)
-//        }
-//    }) {
-//        Text("최초실행 버튼")
-//    }
-//
-//    Button(onClick = {
-//        scope.launch {
-//            dataStore.saveInitialLaunch(true)
-//        }
-//    }) {
-//        Text("최초실행취소 버튼")
-//    }
-//
-//    Text("튜토리얼 페이지 입니다 ")
-//    }
-//}
-
-
 
