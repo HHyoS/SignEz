@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 class BlockViewModel : ViewModel() {
     val blocks = mutableStateListOf<Block>()
 
-    var idx = mutableStateOf(0)
-    var firstRowLength = mutableStateOf(0)
-    var fixed = mutableStateOf(false)
+    private var idx = mutableStateOf(0)
+    private var firstRowLength = mutableStateOf(0)
+    private var fixed = mutableStateOf(false)
     var finish = mutableStateOf(false)
 
     fun addBlock(
@@ -70,13 +70,6 @@ class BlockViewModel : ViewModel() {
                 }
                 return false
             }
-        }
-    }
-
-    fun updateBlock(block: Block) {
-        val index = blocks.indexOfFirst { it.id == block.id }
-        if (index != -1) {
-            blocks[index] = block
         }
     }
 

@@ -16,9 +16,7 @@
 
 package com.signez.signageproblemshooting.data.repository
 
-import com.signez.signageproblemshooting.data.dao.AnalysisResultDao
 import com.signez.signageproblemshooting.data.dao.CabinetDao
-import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import kotlinx.coroutines.flow.Flow
 

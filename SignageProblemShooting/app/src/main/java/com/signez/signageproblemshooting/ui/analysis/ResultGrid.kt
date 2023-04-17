@@ -2,7 +2,6 @@ package com.signez.signageproblemshooting.ui.analysis
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -19,17 +18,14 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.signez.signageproblemshooting.SignEzTopAppBar
-import com.signez.signageproblemshooting.data.entities.AnalysisResult
 import com.signez.signageproblemshooting.data.entities.Cabinet
 import com.signez.signageproblemshooting.data.entities.ErrorModule
 import com.signez.signageproblemshooting.data.entities.Signage
 import com.signez.signageproblemshooting.ui.components.BottomSingleFlatButton
 import com.signez.signageproblemshooting.ui.components.ErrorModuleHeatMap
 import com.signez.signageproblemshooting.ui.components.InFocusBlockButton
-import com.signez.signageproblemshooting.ui.components.TutorialStartButton
 import com.signez.signageproblemshooting.ui.navigation.NavigationDestination
 import com.signez.signageproblemshooting.ui.signage.noRippleClickable
 import kotlin.math.roundToInt
@@ -41,11 +37,9 @@ object ResultGridDestination : NavigationDestination {
 
 @Composable
 fun ResultGridView(
-    onItemClick: (Signage) -> Unit,
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: AnalysisViewModel,
-    navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     resultId: Long,
 ) {
@@ -82,10 +76,10 @@ fun ResultGridView(
     Log.d("사이니지 넘어오냐", "ResultGridView: ${signage}")
     Log.d("모듈 넘어오냐", "ResultGridView: ${modules}")
 
-    var widthCabinetNumber = signage?.widthCabinetNumber ?: 2
-    var heightCabinetNumber = signage?.heightCabinetNumber ?: 2
-    var widthModuleNumber = cabinet?.moduleColCount ?: 2
-    var heightModuleNumber = cabinet?.moduleRowCount ?: 2
+    val widthCabinetNumber = signage?.widthCabinetNumber ?: 2
+    val heightCabinetNumber = signage?.heightCabinetNumber ?: 2
+    val widthModuleNumber = cabinet?.moduleColCount ?: 2
+    val heightModuleNumber = cabinet?.moduleRowCount ?: 2
 
     errorModuleFilteredList = modules?.filter {
         (it.score * 100).roundToInt() >= threshold
